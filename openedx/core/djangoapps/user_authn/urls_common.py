@@ -15,7 +15,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib.auth.views import PasswordResetCompleteView
 
-from .views import auto_auth, login, logout, password_reset, register
+from .views import auto_auth, login, logout, password_reset, register, mobile_register
 from .views.password_reset import PasswordResetConfirmWrapper
 
 urlpatterns = [
@@ -25,6 +25,8 @@ urlpatterns = [
     # Moved from user_api/legacy_urls.py
     # `user_api` prefix is preserved for backwards compatibility.
     url(r'^user_api/v1/account/registration/$', register.RegistrationView.as_view(),
+        name="user_api_registration"),
+    url(r'^user_api/v2/account/registration/$', mobile_register.RegistrationView.as_view(),
         name="user_api_registration"),
 
     # Moved from user_api/urls.py

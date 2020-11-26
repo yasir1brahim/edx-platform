@@ -27,13 +27,18 @@ urlpatterns = [
     url(r'^user_api/v1/account/registration/$', register.RegistrationView.as_view(),
         name="user_api_registration"),
     url(r'^user_api/v2/account/registration/$', mobile_register.RegistrationView.as_view(),
-        name="user_api_registration"),
+        name="user_api_registration_v2"),
 
     # Moved from user_api/urls.py
     # `api/user` prefix is preserved for backwards compatibility.
     url(
         r'^api/user/v1/validation/registration$',
         register.RegistrationValidationView.as_view(),
+        name='registration_validation'
+    ),
+    url(
+        r'^api/user/v2/validation/registration$',
+        mobile_register.RegistrationValidationView.as_view(),
         name='registration_validation'
     ),
 

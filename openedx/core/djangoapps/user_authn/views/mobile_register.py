@@ -682,10 +682,6 @@ class RegistrationValidationView(APIView):
     authentication_classes = []
     throttle_classes = (RegistrationValidationThrottle,)
 
-    def name_handler(self, request):
-        name = request.data.get('name')
-        return get_name_validation_error(name)
-
     def username_handler(self, request):
         """ Validates whether the username is valid. """
         username = request.data.get('username')
@@ -704,28 +700,10 @@ class RegistrationValidationView(APIView):
         # Some invalid emails (like a blank one for superusers) may exist.
         return invalid_email_error or email_exists_error
 
-    def confirm_email_handler(self, request):
-        email = request.data.get('email')
-        confirm_email = request.data.get('confirm_email')
-        return get_confirm_email_validation_error(confirm_email, email)
-
-    def password_handler(self, request):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
-        return get_password_validation_error(password, username, email)
-
-    def country_handler(self, request):
-        country = request.data.get('country')
-        return get_country_validation_error(country)
 
     validation_handlers = {
-        "name": name_handler,
         "username": username_handler,
         "email": email_handler,
-        "confirm_email": confirm_email_handler,
-        "password": password_handler,
-        "country": country_handler
     }
 
     def post(self, request):

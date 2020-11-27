@@ -15,7 +15,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib.auth.views import PasswordResetCompleteView
 
-from .views import auto_auth, login, logout, password_reset, register, mobile_register
+from .views import auto_auth, login, logout, password_reset, mobile_password_reset, register, mobile_register
 from .views.password_reset import PasswordResetConfirmWrapper
 
 urlpatterns = [
@@ -39,7 +39,7 @@ urlpatterns = [
     url(
         r'^api/user/v2/validation/registration$',
         mobile_register.RegistrationValidationView.as_view(),
-        name='registration_validation'
+        name='registration_validation_v2'
     ),
 
     url(r'^login_ajax$', login.login_user, name="login_api"),
@@ -66,7 +66,7 @@ urlpatterns = [
         name='password_reset_confirm',
     ),
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
-
+    url(r'^user_api/v2/account/password$', mobile_password_reset.password_change_request_handler, name='password_change_request_from_mobile'),
 ]
 
 # password reset django views (see above for password reset views)

@@ -335,6 +335,16 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               </select>
               <span class="tip tip-stacked">${_("Identify the course language here. This is used to assist users find courses that are taught in a specific language. It is also used to localize the 'From:' field in bulk emails.")}</span>
             </li>
+            <li class="field" id="field-course-difficulty-level">
+              <label for="course-difficulty-level">${_("Difficulty Level")}</label>
+              <select id="course-difficulty-level">
+                <option value="" selected> - </option>
+                % for dl_obj in difficulty_level_options:
+                  <option value="${dl_obj.level}">${dl_obj.label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please enter difficulty level</span>
+            </li>
           </ol>
         </div>
         % endif

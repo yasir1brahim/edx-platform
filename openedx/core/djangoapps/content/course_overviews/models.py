@@ -44,6 +44,13 @@ class CourseOverviewCaseMismatchException(Exception):
     pass
 
 
+class DifficultyLevel(models.Model):
+    label = models.CharField(max_length=50)
+    level = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Difficulty Level'
+
 @python_2_unicode_compatible
 class CourseOverview(TimeStampedModel):
     """
@@ -125,6 +132,7 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     language = TextField(null=True)
+    difficulty_level = TextField(null=True)
 
     history = HistoricalRecords()
 

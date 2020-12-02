@@ -14,6 +14,10 @@ from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+import logging
+log = logging.getLogger(__name__)
+
+
 # This list represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
 # handled separately; its value maps to an alternate key name.
@@ -44,6 +48,7 @@ class CourseDetails(object):
         self.course_id = course_id
         self.run = run
         self.language = None
+        self.difficulty_level = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -104,6 +109,8 @@ class CourseDetails(object):
         """
         Returns a fully populated CourseDetails model given the course descriptor
         """
+        log.info("====descriptor====")
+        log.info(type(course_descriptor))
         course_key = course_descriptor.id
         course_details = cls(course_key.org, course_key.course, course_key.run)
         course_details.start_date = course_descriptor.start
@@ -119,6 +126,7 @@ class CourseDetails(object):
         course_details.video_thumbnail_image_name = course_descriptor.video_thumbnail_image
         course_details.video_thumbnail_image_asset_path = course_image_url(course_descriptor, 'video_thumbnail_image')
         course_details.language = course_descriptor.language
+        course_details.difficulty_level = course_descriptor.difficulty_level
         course_details.self_paced = course_descriptor.self_paced
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info
@@ -276,6 +284,10 @@ class CourseDetails(object):
 
         if 'language' in jsondict and jsondict['language'] != descriptor.language:
             descriptor.language = jsondict['language']
+            dirty = True
+
+        if 'difficulty_level' in jsondict and jsondict['difficulty_level'] != descriptor.language:
+            descriptor.difficulty_level = jsondict['difficulty_level']
             dirty = True
 
         if (descriptor.can_toggle_course_pacing

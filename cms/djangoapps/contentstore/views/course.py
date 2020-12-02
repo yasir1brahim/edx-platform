@@ -97,6 +97,8 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundErr
 from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
+from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel
+
 from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED, get_library_creator_status
@@ -1082,6 +1084,10 @@ def settings_handler(request, course_key_string):
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
                                 verified_mode.expiration_datetime.isoformat())
 
+            # Difficulty Level Options
+            # difficulty_level_options = [('beginner', 'Beginner'), ('intermediate','Intermediate'), ('advanced','Advanced')]
+            difficulty_level_options = DifficultyLevel.objects.all()
+
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
@@ -1097,6 +1103,7 @@ def settings_handler(request, course_key_string):
                 'upload_asset_url': upload_asset_url,
                 'course_handler_url': reverse_course_url('course_handler', course_key),
                 'language_options': settings.ALL_LANGUAGES,
+                'difficulty_level_options': difficulty_level_options,
                 'credit_eligibility_enabled': credit_eligibility_enabled,
                 'is_credit_course': False,
                 'show_min_grade_warning': False,

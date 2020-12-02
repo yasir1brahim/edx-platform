@@ -824,6 +824,13 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    difficulty_level = String(
+        display_name=_("Difficulty Level"),
+        help=_("Specify the difficulty level of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
     teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".

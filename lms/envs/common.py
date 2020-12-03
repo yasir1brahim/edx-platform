@@ -2402,6 +2402,9 @@ INSTALLED_APPS = [
     # Different Course Modes
     'course_modes.apps.CourseModesConfig',
 
+    # for managing course reviews.
+    'feedback.apps.FeedbackConfig',
+
     # Enrollment API
     'openedx.core.djangoapps.enrollments',
 

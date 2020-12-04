@@ -830,6 +830,20 @@ class CourseFields(object):
         default=None,
         scope=Scope.settings
     )
+    category = String(
+        display_name=_("Category"),
+        help=_("Specify the Category of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    subcategory = String(
+        display_name=_("Sub Category"),
+        help=_("Specify the Sub Category of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
 
     teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),

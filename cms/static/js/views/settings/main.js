@@ -14,6 +14,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    'change input': 'updateModel',
                    'change textarea': 'updateModel',
                    'change select': 'updateModel',
+                   'change #course-category': 'updateSubCategory',
                    'click .remove-course-introduction-video': 'removeVideo',
                    'focus #course-overview': 'codeMirrorize',
                    'focus #course-about-sidebar-html': 'codeMirrorize',
@@ -31,6 +32,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
         // fill in fields
                    this.$el.find('#course-language').val(this.model.get('language'));
                    this.$el.find('#course-difficulty-level').val(this.model.get('difficulty_level'));
+                   this.$el.find('#course-category').val(this.model.get('category'));
+                   this.$el.find('#course-subcategory').val(this.model.get('subcategory'));
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));
                    this.$el.find('#course-name').val(this.model.get('run'));
@@ -73,6 +76,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        el: $('.course-instructor-details-fields'),
                        model: this.model
                    });
+                   this.updateSubCategory();
                },
 
                render: function() {
@@ -161,6 +165,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                fieldToSelectorMap: {
                    language: 'course-language',
                    difficulty_level: 'course-difficulty-level',
+                   category: 'course-category',
+                   subcategory: 'course-subcategory',
                    start_date: 'course-start',
                    end_date: 'course-end',
                    enrollment_start: 'enrollment-start',
@@ -226,6 +232,30 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
 
                    $(e.currentTarget).attr('title', currentTimeText);
                },
+              updateSubCategory: function() {
+                //var $categorySelect =  $("#course-category");
+                //var $subCategorySelect =  $("#course-subcategory");
+
+                var $categorySelect = this.$el.find('#' + this.fieldToSelectorMap.category)
+                var $subCategorySelect = this.$el.find('#' + this.fieldToSelectorMap.subcategory)
+
+                // clean subcategory select from older options
+                $subCategorySelect.empty();
+
+                // find selected category
+                var selectedCategoryValue = $categorySelect.val();
+
+                // if category found - populate subcategory select
+                if (selectedCategoryValue) {
+                    subcategories[selectedCategoryValue].forEach(function(subcategory) {
+
+                        // you can extract this line into separate function
+                        var $option = $('<option/>').attr('value', subcategory).html(subcategory);
+
+                        $subCategorySelect.append($option);
+                    });
+                }
+            },
                updateModel: function(event) {
                    var value;
                    var index = event.currentTarget.getAttribute('data-index');
@@ -306,6 +336,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        break;
                    case 'course-language':
                    case 'course-difficulty-level':
+                   case 'course-category':
+                   case 'course-subcategory':
                    case 'course-effort':
                    case 'course-title':
                    case 'course-subtitle':

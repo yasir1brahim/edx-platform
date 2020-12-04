@@ -8,7 +8,8 @@ name, and start dates, but don't actually need to crawl into course content.
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from .models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet, SimulateCoursePublishConfig, DifficultyLevel
+from .models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet, SimulateCoursePublishConfig, DifficultyLevel,\
+    Category, SubCategory
 
 
 class CourseOverviewAdmin(admin.ModelAdmin):
@@ -82,3 +83,5 @@ admin.site.register(CourseOverviewImageConfig, CourseOverviewImageConfigAdmin)
 admin.site.register(CourseOverviewImageSet, CourseOverviewImageSetAdmin)
 admin.site.register(SimulateCoursePublishConfig, SimulateCoursePublishConfigAdmin)
 admin.site.register(DifficultyLevel)
+admin.site.register(Category)
+admin.site.register(SubCategory)

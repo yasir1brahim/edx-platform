@@ -51,6 +51,26 @@ class DifficultyLevel(models.Model):
     class Meta:
         verbose_name = 'Difficulty Level'
 
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Category'
+
+    def __str__(self):
+        return self.name
+
+class SubCategory(models.Model):
+    name = models.CharField(max_length=50)
+    category = models.ForeignKey(Category, related_name='subcategories',
+            on_delete=models.PROTECT, null=True)
+
+    class Meta:
+        verbose_name = 'SubCategory'
+
+    def __str__(self):
+        return self.name
+
 @python_2_unicode_compatible
 class CourseOverview(TimeStampedModel):
     """
@@ -133,6 +153,8 @@ class CourseOverview(TimeStampedModel):
 
     language = TextField(null=True)
     difficulty_level = TextField(null=True)
+    category = TextField(null=True)
+    subcategory = TextField(null=True)
 
     history = HistoricalRecords()
 

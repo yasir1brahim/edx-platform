@@ -97,7 +97,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundErr
 from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
-from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel
+from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel, Category, SubCategory
 
 from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
@@ -1087,6 +1087,15 @@ def settings_handler(request, course_key_string):
             # Difficulty Level Options
             # difficulty_level_options = [('beginner', 'Beginner'), ('intermediate','Intermediate'), ('advanced','Advanced')]
             difficulty_level_options = DifficultyLevel.objects.all()
+            categories = Category.objects.all()
+            subcategories = SubCategory.objects.all()
+
+            subcat_dict = {}
+            for obj in subcategories:
+                if obj.category.name in subcat_dict.keys():
+                    subcat_dict[obj.category.name].append(obj.name)
+                else:
+                    subcat_dict[obj.category.name]=[obj.name]
 
             settings_context = {
                 'context_course': course_module,
@@ -1104,6 +1113,9 @@ def settings_handler(request, course_key_string):
                 'course_handler_url': reverse_course_url('course_handler', course_key),
                 'language_options': settings.ALL_LANGUAGES,
                 'difficulty_level_options': difficulty_level_options,
+                'categories': categories,
+                'subcategories': subcategories,
+                'subcat_dict': subcat_dict,
                 'credit_eligibility_enabled': credit_eligibility_enabled,
                 'is_credit_course': False,
                 'show_min_grade_warning': False,

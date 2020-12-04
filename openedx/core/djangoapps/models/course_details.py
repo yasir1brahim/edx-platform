@@ -49,6 +49,8 @@ class CourseDetails(object):
         self.run = run
         self.language = None
         self.difficulty_level = None
+        self.category = None
+        self.subcategory = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -127,6 +129,8 @@ class CourseDetails(object):
         course_details.video_thumbnail_image_asset_path = course_image_url(course_descriptor, 'video_thumbnail_image')
         course_details.language = course_descriptor.language
         course_details.difficulty_level = course_descriptor.difficulty_level
+        course_details.category = course_descriptor.category
+        course_details.subcategory = course_descriptor.subcategory
         course_details.self_paced = course_descriptor.self_paced
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info
@@ -288,6 +292,14 @@ class CourseDetails(object):
 
         if 'difficulty_level' in jsondict and jsondict['difficulty_level'] != descriptor.language:
             descriptor.difficulty_level = jsondict['difficulty_level']
+            dirty = True
+
+        if 'category' in jsondict and jsondict['category'] != descriptor.category:
+            descriptor.category = jsondict['category']
+            dirty = True
+
+        if 'subcategory' in jsondict and jsondict['subcategory'] != descriptor.subcategory:
+            descriptor.subcategory = jsondict['subcategory']
             dirty = True
 
         if (descriptor.can_toggle_course_pacing

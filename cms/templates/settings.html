@@ -31,6 +31,7 @@
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
+var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
   </script>
 </%block>
 
@@ -345,6 +346,27 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               </select>
               <span class="tip tip-stacked">Please enter difficulty level</span>
             </li>
+            <li class="field" id="field-course-category">
+              <label for="course-category">${_("Category")}</label>
+              <select id="course-category">
+                <option value="" selected> - </option>
+                % for category in categories:
+                  <option value="${category.name}">${category.name}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please enter Category</span>
+            </li>
+            <li class="field" id="field-course-subcategory">
+              <label for="course-subcategory">${_("Sub Category")}</label>
+              <select id="course-subcategory">
+                <option value="" selected> - </option>
+                % for subcategory in subcategories:
+                  <option value="${subcategory.name}">${subcategory.name}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please enter Sub Category</span>
+            </li>
+
           </ol>
         </div>
         % endif

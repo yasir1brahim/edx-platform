@@ -2405,6 +2405,12 @@ INSTALLED_APPS = [
     # for managing course reviews.
     'feedback.apps.FeedbackConfig',
 
+    # for managing terms and conditions.
+    'terms_conditions.apps.TermsConditionsConfig',
+
+    # for HTML editor.
+    'ckeditor', 
+
     # Enrollment API
     'openedx.core.djangoapps.enrollments',
 
@@ -3919,3 +3925,17 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
+
+CKEDITOR_CONFIGS = {
+    'default': {
+	'width': 900,
+        'toolbar': 'Custom',
+	'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+	    ['Styles', 'Format', 'Font', 'FontSize'],
+	    ['TextColor', 'BGColor'],
+        ]
+    },
+}

@@ -5,20 +5,19 @@
 //   overflow-y: scroll;
 // }
 
-html,
-body {
+html {
+  background: theme-color("inverse");
   font-family: $font-family-sans-serif;
-  font-size: $font-size-base;
   font-style: normal;
   line-height: 1em;
 }
 
-html {
-  background: theme-color("inverse");
-}
-
 body {
   background: $body-bg;
+  font-family: $font-family-sans-serif;
+  font-size: $font-size-base;
+  font-style: normal;
+  line-height: 1em;
 }
 
 // removing the outline on any element that we make programmatically focusable

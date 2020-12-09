@@ -235,7 +235,7 @@ class AccountUserExtraInfoSerializer(serializers.HyperlinkedModelSerializer, Rea
     """
     Class that serializes the portion of User model needed for account information.
     """
-    industry = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
+    industry = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=False)
 
     class Meta(object):
         model = UserExtraInfo

@@ -7,7 +7,7 @@ class UserExtraInfoForm(ModelForm):
     """
     The fields on this form are derived from the ExtraInfo model in models.py.
     """
-    industry = forms.ModelChoiceField(queryset=Category.objects.all())
+    industry = forms.ModelChoiceField(queryset=Category.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(UserExtraInfoForm, self).__init__(*args, **kwargs)

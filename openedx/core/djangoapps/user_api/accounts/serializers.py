@@ -21,6 +21,10 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from student.models import LanguageProficiency, SocialLink, UserProfile
+import importlib
+custom_reg_form = importlib.import_module('lms.djangoapps.custom-form-app', 'custom_reg_form')
+from custom_reg_form.models import UserExtraInfo
+from openedx.core.djangoapps.content.course_overviews.models import Category
 
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY,
@@ -226,6 +230,18 @@ class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFiel
         read_only_fields = ("username", "email", "date_joined", "is_active")
         explicit_read_only_fields = ()
 
+
+class AccountUserExtraInfoSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):
+    """
+    Class that serializes the portion of User model needed for account information.
+    """
+    industry = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
+
+    class Meta(object):
+        model = UserExtraInfo
+        fields = ("nric","industry")
+        # read_only_fields = ("nric","industry")
+        explicit_read_only_fields = ()
 
 class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):
     """

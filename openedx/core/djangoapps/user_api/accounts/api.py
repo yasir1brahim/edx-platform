@@ -36,8 +36,11 @@ from openedx.core.djangoapps.user_api.preferences.api import update_user_prefere
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
-from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
+from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, AccountUserExtraInfoSerializer, UserReadOnlySerializer, _visible_fields
 
+import logging
+
+log = logging.getLogger(__name__)
 # Public access point for this function.
 visible_fields = _visible_fields
 
@@ -131,14 +134,14 @@ def update_account_settings(requesting_user, update, username=None):
     if requesting_user.username != username:
         raise errors.UserNotAuthorized()
     user, user_profile = _get_user_and_profile(username)
-
     # Validate fields to update
     field_errors = {}
     _validate_read_only_fields(user, update, field_errors)
 
     user_serializer = AccountUserSerializer(user, data=update)
+    user_extra_info_serializer = AccountUserExtraInfoSerializer(user.user_extra_info, data=update)
     legacy_profile_serializer = AccountLegacyProfileSerializer(user_profile, data=update)
-    for serializer in user_serializer, legacy_profile_serializer:
+    for serializer in user_serializer, legacy_profile_serializer, user_extra_info_serializer:
         add_serializer_errors(serializer, update, field_errors)
 
     _validate_email_change(user, update, field_errors)
@@ -151,7 +154,7 @@ def update_account_settings(requesting_user, update, username=None):
 
     # Save requested changes
     try:
-        for serializer in user_serializer, legacy_profile_serializer:
+        for serializer in user_serializer, legacy_profile_serializer, user_extra_info_serializer:
             serializer.save()
 
         _update_preferences_if_needed(update, requesting_user, user)

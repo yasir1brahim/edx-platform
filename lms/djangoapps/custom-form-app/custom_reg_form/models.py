@@ -22,3 +22,6 @@ class UserExtraInfo(models.Model):
     )
     industry = models.ForeignKey(Category, related_name='users_industry', 
         on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        app_label = 'custom_reg_form'

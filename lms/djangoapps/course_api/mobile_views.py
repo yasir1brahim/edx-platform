@@ -15,13 +15,17 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .mobile_api import list_courses
 from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
-from .mobile_serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
+from .mobile_serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer, CategorySerializer
 #from openedx/core/djangoapps/content import Category, SubCategory
-from openedx.core.djangoapps.content.course_overviews.models import Category, SubCategory
+from openedx.core.djangoapps.content.course_overviews.models import Category, SubCategory, CourseOverview
+from openedx.core.lib.api.view_utils import LazySequence
 import importlib
 custom_reg_form = importlib.import_module('lms.djangoapps.custom-form-app', 'custom_reg_form')
 from custom_reg_form.models import UserExtraInfo
-
+from django.db.models import Count, F
+#from itertools import chain
+#from django.forms.models import model_to_dict
+#from django.db.models import F
 
 import logging
 log = logging.getLogger(__name__) 
@@ -169,6 +173,46 @@ class CourseListUserThrottle(UserRateThrottle):
         return super(CourseListUserThrottle, self).allow_request(request, view)
 
 
+
+class CategoryListUserThrottle(UserRateThrottle):
+    """Limit the number of requests users can make to the course list API."""
+    # The course list endpoint is likely being inefficient with how it's querying
+    # various parts of the code and can take courseware down, it needs to be rate
+    # limited until optimized. LEARNER-5527
+
+    THROTTLE_RATES = {
+        'user': '20/minute',
+        'staff': '40/minute',
+    }
+
+    def check_for_switches(self):
+        if USE_RATE_LIMIT_2_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '2/minute',
+                'staff': '10/minute',
+            }
+        elif USE_RATE_LIMIT_10_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '10/minute',
+                'staff': '20/minute',
+            }
+
+    def allow_request(self, request, view):
+        self.check_for_switches()
+        # Use a special scope for staff to allow for a separate throttle rate
+        user = request.user
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            self.scope = 'staff'
+            self.rate = self.get_rate()
+            self.num_requests, self.duration = self.parse_rate(self.rate)
+
+        return super(CategoryListUserThrottle, self).allow_request(request, view)
+
+
+
+
+
+
 class LazyPageNumberPagination(NamespacedPageNumberPagination):
     """
     NamespacedPageNumberPagination that works with a LazySequence queryset.
@@ -298,6 +342,36 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             search_term=form.cleaned_data['search_term']
         )
         return result
+
+
+
+
+@view_auth_classes(is_authenticated=False)
+class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
+
+    class CategoryListPageNumberPagination(LazyPageNumberPagination):
+        max_page_size = 100
+
+    pagination_class = CategoryListPageNumberPagination
+    serializer_class = CategorySerializer
+    throttle_classes = (CourseListUserThrottle,)
+
+    def get_queryset(self):
+        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        categories_count = CourseOverview.objects.filter(category__isnull=False).values('category').order_by().annotate(Count('category')).values('category__count','category').annotate(course_count=F('category__count')).values('category','course_count')
+        for cat in categories_count:
+            cat_id = Category.objects.filter(name=cat['category']).values()[0]
+            cat['id'] =  cat_id['id']
+        return LazySequence(
+        (c for c in categories_count),
+        est_len=categories_count.count()
+        )
+
+
+
+
 
 class CourseIdListUserThrottle(UserRateThrottle):
     """Limit the number of requests users can make to the course list id API."""

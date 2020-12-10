@@ -116,6 +116,7 @@ class UserReadOnlySerializer(serializers.Serializer):
         """
         try:
             user_profile = user.profile
+            user_extra_info = user.user_extra_info
         except ObjectDoesNotExist:
             user_profile = None
             LOGGER.warning(u"user profile for the user [%s] does not exist", user.username)
@@ -185,6 +186,14 @@ class UserReadOnlySerializer(serializers.Serializer):
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
                     "phone_number": user_profile.phone_number,
+                }
+            )
+
+        if user_extra_info:
+            data.update(
+                {
+                    "nric": user_extra_info.nric,
+                    "industry": user_extra_info.industry.name
                 }
             )
 

@@ -89,7 +89,7 @@ urlpatterns = [
     ),
     url(
         r'^v2/accounts/{}$'.format(settings.USERNAME_PATTERN),
-        AccountMobileViewSet.as_view({'patch': 'partial_update'}),
+        AccountMobileViewSet.as_view({'patch': 'partial_update', 'get': 'retrieve'}),
         name='accounts_mob_api'
     ),
     url(

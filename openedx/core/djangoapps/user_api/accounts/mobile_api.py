@@ -18,6 +18,18 @@ class AccountViewSet(ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
+    def retrieve(self, request, username):
+        """
+        GET /api/user/v1/accounts/{username}/
+        """
+        try:
+            account_settings = get_account_settings(
+                request, [username], view=request.query_params.get('view'))
+        except UserNotFound:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(account_settings[0])
+
     def partial_update(self, request, username):
         """
         PATCH /api/user/v1/accounts/{username}/

@@ -13,7 +13,6 @@ class CourseReview(models.Model):
     User can create a feedback only after purchasing that course.
     User can only give feedback once, cannot give feedback again after first feedback.
     """
-
     user_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     course_id = models.ForeignKey(CourseOverview, db_index=True, on_delete=models.CASCADE)
@@ -25,6 +24,7 @@ class CourseReview(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        #app_label = 'common.djangoapps.feedback'
         verbose_name = 'Course Review'
         verbose_name_plural = 'Course Reviews'
         constraints = [

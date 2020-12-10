@@ -671,6 +671,15 @@ urlpatterns += [
         include('openedx.features.course_experience.urls'),
     ),
 
+    # Course experience api
+    #url(
+        #r'^api/v1/courses/{}/'.format(
+            #settings.COURSE_ID_PATTERN,
+        #),
+        #include('common.djangoapps.feedback.urls'),
+    #),
+    url(r'^api/course_reviews/', include('feedback.urls')),
+
     # Course bookmarks UI in LMS
     url(
         r'^courses/{}/bookmarks/'.format(

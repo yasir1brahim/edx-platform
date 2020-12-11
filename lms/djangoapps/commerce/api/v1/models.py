@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +41,45 @@ class Course(object):
         try:
             return CourseOverview.get_from_id(course_id).display_name
         except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def difficulty_level(self):
+        """ Return course Difficulty Level. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).difficulty_level
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def comments_count(self):
+        """ Return course Difficulty Level. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).course_reviews.all().count()
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def enrollments_count(self):
+        """ Return course Difficulty Level. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseEnrollment.objects.enrollment_counts(course_id)['total']
+        except CourseEnrollment.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.
             log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)

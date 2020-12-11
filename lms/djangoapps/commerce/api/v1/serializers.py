@@ -76,6 +76,9 @@ class CourseSerializer(serializers.Serializer):
     """ Course serializer. """
     id = serializers.CharField(validators=[validate_course_id])  # pylint: disable=invalid-name
     name = serializers.CharField(read_only=True)
+    difficulty_level = serializers.CharField(read_only=True)
+    comments_count = serializers.IntegerField(read_only=True)
+    enrollments_count = serializers.IntegerField(read_only=True)
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
 

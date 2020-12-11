@@ -364,12 +364,11 @@ class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
         for cat in categories_count:
             cat_id = Category.objects.filter(name=cat['category']).values()[0]
             cat['id'] =  cat_id['id']
+            cat['category_image'] = cat_id['category_image']
         return LazySequence(
         (c for c in categories_count),
         est_len=categories_count.count()
         )
-
-
 
 
 

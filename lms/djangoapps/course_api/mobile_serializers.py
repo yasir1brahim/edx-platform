@@ -51,7 +51,6 @@ class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: di
     #course_video = _MediaSerializer(source='*', uri_attribute='course_video_url')
     image = ImageSerializer(source='image_urls')
 
-
 class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for Course objects providing minimal data about the course.
@@ -116,6 +115,7 @@ class CategorySerializer(serializers.Serializer):  # pylint: disable=abstract-me
     #number = serializers.CharField(source='display_number_with_default')
     #org = serializers.CharField(source='display_org_with_default')
     course_count = serializers.CharField()
+    category_image = serializers.CharField()
     #start = serializers.DateTimeField()
     #start_display = serializers.CharField()
     #start_type = serializers.CharField()

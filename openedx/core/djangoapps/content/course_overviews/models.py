@@ -53,6 +53,7 @@ class DifficultyLevel(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    category_image = models.ImageField(upload_to=u'category', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Category'
@@ -62,6 +63,7 @@ class Category(models.Model):
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=50)
+    sub_category_image = models.ImageField(upload_to=u'sub_category', null=True, blank=True)
     category = models.ForeignKey(Category, related_name='subcategories',
             on_delete=models.PROTECT, null=True)
 

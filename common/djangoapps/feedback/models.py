@@ -13,9 +13,9 @@ class CourseReview(models.Model):
     User can create a feedback only after purchasing that course.
     User can only give feedback once, cannot give feedback again after first feedback.
     """
-    user_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    user_id = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='user_reviews')
 
-    course_id = models.ForeignKey(CourseOverview, db_index=True, on_delete=models.CASCADE)
+    course_id = models.ForeignKey(CourseOverview, db_index=True, on_delete=models.CASCADE, related_name='course_reviews')
 
     rating = models.DecimalField(default=1.0, max_digits=2, decimal_places=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
 

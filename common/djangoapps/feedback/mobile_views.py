@@ -16,6 +16,7 @@ from lms.djangoapps.course_api import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_
 from lms.djangoapps.course_api.mobile_api import list_courses
 from lms.djangoapps.course_api.forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
 from .mobile_serializers import ReviewSerializer
+#from .serializers import CourseReviewSerializer
 #from openedx/core/djangoapps/content import Category, SubCategory
 #from openedx.core.djangoapps.content.course_overviews.models import Category, SubCategory
 from .models import CourseReview 
@@ -28,45 +29,9 @@ from custom_reg_form.models import UserExtraInfo
 import logging
 log = logging.getLogger(__name__) 
 
-class CourseListUserThrottle(UserRateThrottle):
-    """Limit the number of requests users can make to the course list API."""
-    # The course list endpoint is likely being inefficient with how it's querying
-    # various parts of the code and can take courseware down, it needs to be rate
-    # limited until optimized. LEARNER-5527
-
-    THROTTLE_RATES = {
-        'user': '20/minute',
-        'staff': '40/minute',
-    }
-
-    def check_for_switches(self):
-        if USE_RATE_LIMIT_2_FOR_COURSE_LIST_API.is_enabled():
-            self.THROTTLE_RATES = {
-                'user': '2/minute',
-                'staff': '10/minute',
-            }
-        elif USE_RATE_LIMIT_10_FOR_COURSE_LIST_API.is_enabled():
-            self.THROTTLE_RATES = {
-                'user': '10/minute',
-                'staff': '20/minute',
-            }
-
-    def allow_request(self, request, view):
-        self.check_for_switches()
-        # Use a special scope for staff to allow for a separate throttle rate
-        user = request.user
-        if user.is_authenticated and (user.is_staff or user.is_superuser):
-            self.scope = 'staff'
-            self.rate = self.get_rate()
-            self.num_requests, self.duration = self.parse_rate(self.rate)
-
-        return super(CourseListUserThrottle, self).allow_request(request, view)
-
-
-
 class ReviewListUserThrottle(UserRateThrottle):
-    """Limit the number of requests users can make to the course list API."""
-    # The course list endpoint is likely being inefficient with how it's querying
+    """Limit the number of requests users can make to the course review list API."""
+    # The course review list endpoint is likely being inefficient with how it's querying
     # various parts of the code and can take courseware down, it needs to be rate
     # limited until optimized. LEARNER-5527
 
@@ -97,10 +62,6 @@ class ReviewListUserThrottle(UserRateThrottle):
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
         return super(ReviewListUserThrottle, self).allow_request(request, view)
-
-
-
-
 
 
 class LazyPageNumberPagination(NamespacedPageNumberPagination):
@@ -145,11 +106,11 @@ class ReviewListView(DeveloperErrorViewMixin, ListAPIView):
 
     **Example Requests**
 
-        GET /api/courses/v1/courses/
+        GET /api/course_reviews/v2/courses/<COURSE_ID>
 
     **Response Values**
 
-        Body comprises a list of objects as returned by `CourseDetailView`.
+        Body comprises a list of objects as returned by `ReviewListView`.
 
     **Parameters**
 
@@ -178,30 +139,6 @@ class ReviewListView(DeveloperErrorViewMixin, ListAPIView):
         * 404 if the specified user does not exist, or the requesting user does
           not have permission to view their courses.
 
-        Example response:
-
-            [
-              {
-                "blocks_url": "/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall",
-                "media": {
-                  "course_image": {
-                    "uri": "/c4x/edX/example/asset/just_a_test.jpg",
-                    "name": "Course Image"
-                  }
-                },
-                "description": "An example course.",
-                "end": "2015-09-19T18:00:00Z",
-                "enrollment_end": "2015-07-15T00:00:00Z",
-                "enrollment_start": "2015-06-15T00:00:00Z",
-                "course_id": "edX/example/2012_Fall",
-                "name": "Example Course",
-                "number": "example",
-                "org": "edX",
-                "start": "2015-07-17T12:00:00Z",
-                "start_display": "July 17, 2015",
-                "start_type": "timestamp"
-              }
-            ]
     """
     class ReviewListPageNumberPagination(LazyPageNumberPagination):
         max_page_size = 100
@@ -214,9 +151,9 @@ class ReviewListView(DeveloperErrorViewMixin, ListAPIView):
         """
         Yield courses visible to the user.
         """
-        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
-        if not form.is_valid():
-            raise ValidationError(form.errors)
+        #form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        #if not form.is_valid():
+        #    raise ValidationError(form.errors)
         categories = CourseReview.objects.all()
         return LazySequence(
         (c for c in categories ),
@@ -231,26 +168,3 @@ class ReviewListView(DeveloperErrorViewMixin, ListAPIView):
             #search_term=form.cleaned_data['search_term']
         #)
         #return result
-
-
-
-
-class CourseIdListUserThrottle(UserRateThrottle):
-    """Limit the number of requests users can make to the course list id API."""
-
-    THROTTLE_RATES = {
-        'user': '20/minute',
-        'staff': '40/minute',
-    }
-
-    def allow_request(self, request, view):
-        # Use a special scope for staff to allow for a separate throttle rate
-        user = request.user
-        if user.is_authenticated and (user.is_staff or user.is_superuser):
-            self.scope = 'staff'
-            self.rate = self.get_rate()
-            self.num_requests, self.duration = self.parse_rate(self.rate)
-
-        return super(CourseIdListUserThrottle, self).allow_request(request, view)
-
-

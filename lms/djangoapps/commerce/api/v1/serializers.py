@@ -79,6 +79,8 @@ class CourseSerializer(serializers.Serializer):
     difficulty_level = serializers.CharField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
     enrollments_count = serializers.IntegerField(read_only=True)
+    created = serializers.DateTimeField(read_only=True)
+    ratings = serializers.FloatField()
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
 

@@ -13,6 +13,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
+from django.db.models import Avg
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +54,32 @@ class Course(object):
 
         try:
             return CourseOverview.get_from_id(course_id).difficulty_level
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def created(self):
+        """ Return course Date Created. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).created
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def ratings(self):
+        """ Return course rating. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).course_reviews.aggregate(Avg('rating'))['rating__avg']
         except CourseOverview.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.

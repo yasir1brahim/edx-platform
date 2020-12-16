@@ -155,7 +155,7 @@ class CourseOverview(TimeStampedModel):
 
     language = TextField(null=True)
     difficulty_level = TextField(null=True)
-    category = TextField(null=True)
+    new_category = TextField(null=True)
     subcategory = TextField(null=True)
 
     history = HistoricalRecords()

@@ -32,7 +32,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
         // fill in fields
                    this.$el.find('#course-language').val(this.model.get('language'));
                    this.$el.find('#course-difficulty-level').val(this.model.get('difficulty_level'));
-                   this.$el.find('#course-category').val(this.model.get('category'));
+                   this.$el.find('#course-category').val(this.model.get('new_category'));
                    this.$el.find('#course-subcategory').val(this.model.get('subcategory'));
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));
@@ -165,7 +165,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                fieldToSelectorMap: {
                    language: 'course-language',
                    difficulty_level: 'course-difficulty-level',
-                   category: 'course-category',
+                   new_category: 'course-category',
                    subcategory: 'course-subcategory',
                    start_date: 'course-start',
                    end_date: 'course-end',
@@ -236,7 +236,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 //var $categorySelect =  $("#course-category");
                 //var $subCategorySelect =  $("#course-subcategory");
 
-                var $categorySelect = this.$el.find('#' + this.fieldToSelectorMap.category)
+                var $categorySelect = this.$el.find('#' + this.fieldToSelectorMap.new_category)
                 var $subCategorySelect = this.$el.find('#' + this.fieldToSelectorMap.subcategory)
 
                 // clean subcategory select from older options

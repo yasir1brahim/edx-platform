@@ -830,7 +830,7 @@ class CourseFields(object):
         default=None,
         scope=Scope.settings
     )
-    category = String(
+    new_category = String(
         display_name=_("Category"),
         help=_("Specify the Category of course."),
         default=None,

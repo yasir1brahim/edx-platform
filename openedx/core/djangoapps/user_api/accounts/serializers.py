@@ -193,7 +193,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             data.update(
                 {
                     "nric": user_extra_info.nric,
-                    "industry": user_extra_info.industry.name
+                    "industry": getattr(user_extra_info.industry, 'name', None)
                 }
             )
 

@@ -26,6 +26,9 @@ from openedx.features.discounts.models import DiscountPercentageConfig, Discount
 from student.models import CourseEnrollment
 from track import segment
 
+import datetime
+import pytz
+utc=pytz.UTC
 # .. feature_toggle_name: discounts.enable_discounting
 # .. feature_toggle_type: flag
 # .. feature_toggle_default: False
@@ -63,11 +66,14 @@ def get_discount_expiration_date(user, course):
         mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES
     )
     if len(course_enrollment) != 1:
-        return None
+        pass
+        #return None
     time_limit_start = None
     try:
-        saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course))
-        time_limit_start = parse_datetime(saw_banner.value)
+        #saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key='discount_'+str(course))
+        #log.info(saw_banner)
+        
+        time_limit_start = parse_datetime(str(datetime.datetime.now().replace(tzinfo=utc)))
     except ExperimentData.DoesNotExist:
         return None
     discount_expiration_date = time_limit_start + timedelta(weeks=1)
@@ -75,11 +81,12 @@ def get_discount_expiration_date(user, course):
     # If the course has an upgrade deadline and discount time limit would put the discount expiration date
     # after the deadline, then change the expiration date to be the upgrade deadline
     verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
-    if not verified_mode:
-        return None
-    upgrade_deadline = verified_mode.expiration_datetime
-    if upgrade_deadline and discount_expiration_date > upgrade_deadline:
-        discount_expiration_date = upgrade_deadline
+    #if not verified_mode:
+        #return None
+    if verified_mode:
+        upgrade_deadline = verified_mode.expiration_datetime
+        if upgrade_deadline and discount_expiration_date > upgrade_deadline:
+            discount_expiration_date = upgrade_deadline
 
     return discount_expiration_date
 
@@ -97,7 +104,6 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     # Check if discount has expired
     if not discount_expiration_date:
         discount_expiration_date = get_discount_expiration_date(user, course)
-
     if discount_expiration_date is None:
         return False
     if discount_expiration_date < timezone.now():
@@ -108,15 +114,15 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     # Course needs to have a non-expired verified mode
     modes_dict = CourseMode.modes_for_course_dict(course=course, include_expired=False)
     verified_mode = modes_dict.get('verified', None)
-    if not verified_mode:
-        return False
+    #if not verified_mode:
+        #return False
     # Site, Partner, Course or Course Run not excluded from lms-controlled discounts
     if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
         return False
     # Don't allow users who have enrolled in any courses in non-upsellable
     # modes
-    if CourseEnrollment.objects.filter(user=user).exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists():
-        return False
+    #if CourseEnrollment.objects.filter(user=user).exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists():
+        #return False
 
     # Don't allow any users who have entitlements (past or present)
     if CourseEntitlement.objects.filter(user=user).exists():
@@ -125,8 +131,8 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     # We can't import this at Django load time within the openedx tests settings context
     from openedx.features.enterprise_support.utils import is_enterprise_learner
     # Don't give discount to enterprise users
-    if is_enterprise_learner(user):
-        return False
+    #if is_enterprise_learner(user):
+        #return False
 
     return True
 
@@ -170,4 +176,4 @@ def discount_percentage(course):
     configured_percentage = DiscountPercentageConfig.current(course_key=course.id).percentage
     if configured_percentage:
         return configured_percentage
-    return 15
+    return 0

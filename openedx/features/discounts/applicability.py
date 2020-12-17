@@ -100,24 +100,19 @@ def can_receive_discount(user, course, discount_expiration_date=None):
 
     if discount_expiration_date is None:
         return False
-    log.info('====== discunt expiration date is not none =======')
     if discount_expiration_date < timezone.now():
         return False
-    log.info('====== expiration date is less than current time ======')
     # Course end date needs to be in the future
     if course.has_ended():
         return False
-    log.info('===== checked course end date =======')
     # Course needs to have a non-expired verified mode
     modes_dict = CourseMode.modes_for_course_dict(course=course, include_expired=False)
     verified_mode = modes_dict.get('verified', None)
     if not verified_mode:
         return False
-    log.info('======= checked verified mode ======')
     # Site, Partner, Course or Course Run not excluded from lms-controlled discounts
     if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
         return False
-    log.info('=====  checked discount restriction ========')
     # Don't allow users who have enrolled in any courses in non-upsellable
     # modes
     if CourseEnrollment.objects.filter(user=user).exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists():

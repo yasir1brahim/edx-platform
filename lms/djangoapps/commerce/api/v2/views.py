@@ -9,8 +9,8 @@ from ..v1.serializers import CourseSerializer
 
 class CourseListView(ListAPIView):
     """ List courses and modes. """
-    authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    #authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
+    #permission_classes = (IsAuthenticated,)
     serializer_class = CourseSerializer
     pagination_class = None
 

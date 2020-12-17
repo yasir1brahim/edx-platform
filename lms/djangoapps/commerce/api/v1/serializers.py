@@ -80,7 +80,7 @@ class CourseSerializer(serializers.Serializer):
     comments_count = serializers.IntegerField(read_only=True)
     enrollments_count = serializers.IntegerField(read_only=True)
     created = serializers.DateTimeField(read_only=True)
-    ratings = serializers.FloatField()
+    ratings = serializers.FloatField(required=False)
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
 

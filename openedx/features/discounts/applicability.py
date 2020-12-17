@@ -45,7 +45,8 @@ DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
 
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
 REV1008_EXPERIMENT_ID = 16
-
+import logging
+log = logging.getLogger(__name__)
 
 def get_discount_expiration_date(user, course):
     """
@@ -63,14 +64,12 @@ def get_discount_expiration_date(user, course):
     )
     if len(course_enrollment) != 1:
         return None
-
     time_limit_start = None
     try:
         saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course))
         time_limit_start = parse_datetime(saw_banner.value)
     except ExperimentData.DoesNotExist:
         return None
-
     discount_expiration_date = time_limit_start + timedelta(weeks=1)
 
     # If the course has an upgrade deadline and discount time limit would put the discount expiration date
@@ -94,33 +93,31 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     with impersonate(user):
         if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
             return False
-
     # TODO: Add additional conditions to return False here
-
     # Check if discount has expired
     if not discount_expiration_date:
         discount_expiration_date = get_discount_expiration_date(user, course)
 
     if discount_expiration_date is None:
         return False
-
+    log.info('====== discunt expiration date is not none =======')
     if discount_expiration_date < timezone.now():
         return False
-
+    log.info('====== expiration date is less than current time ======')
     # Course end date needs to be in the future
     if course.has_ended():
         return False
-
+    log.info('===== checked course end date =======')
     # Course needs to have a non-expired verified mode
     modes_dict = CourseMode.modes_for_course_dict(course=course, include_expired=False)
     verified_mode = modes_dict.get('verified', None)
     if not verified_mode:
         return False
-
+    log.info('======= checked verified mode ======')
     # Site, Partner, Course or Course Run not excluded from lms-controlled discounts
     if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
         return False
-
+    log.info('=====  checked discount restriction ========')
     # Don't allow users who have enrolled in any courses in non-upsellable
     # modes
     if CourseEnrollment.objects.filter(user=user).exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists():

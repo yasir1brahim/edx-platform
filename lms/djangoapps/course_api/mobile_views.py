@@ -26,6 +26,7 @@ from django.db.models import Count, F
 #from itertools import chain
 #from django.forms.models import model_to_dict
 #from django.db.models import F
+from student.models import CourseEnrollment
 
 import logging
 log = logging.getLogger(__name__) 
@@ -171,6 +172,43 @@ class CourseListUserThrottle(UserRateThrottle):
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
         return super(CourseListUserThrottle, self).allow_request(request, view)
+
+
+
+class PopularCourseListUserThrottle(UserRateThrottle):
+    """Limit the number of requests users can make to the course list API."""
+    # The course list endpoint is likely being inefficient with how it's querying
+    # various parts of the code and can take courseware down, it needs to be rate
+    # limited until optimized. LEARNER-5527
+
+    THROTTLE_RATES = {
+        'user': '20/minute',
+        'staff': '40/minute',
+    }
+
+    def check_for_switches(self):
+        if USE_RATE_LIMIT_2_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '2/minute',
+                'staff': '10/minute',
+            }
+        elif USE_RATE_LIMIT_10_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '10/minute',
+                'staff': '20/minute',
+            }
+
+    def allow_request(self, request, view):
+        self.check_for_switches()
+        # Use a special scope for staff to allow for a separate throttle rate
+        user = request.user
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            self.scope = 'staff'
+            self.rate = self.get_rate()
+            self.num_requests, self.duration = self.parse_rate(self.rate)
+
+        return super(PopularCourseListUserThrottle, self).allow_request(request, view)
+
 
 
 
@@ -331,6 +369,45 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         if hasattr(user_extra_info, 'industry_id'):
             user_category = Category.objects.filter(id=user_extra_info.industry_id).first()
             if form.cleaned_data['filter_'] is not None:
+                form.cleaned_data['filter_'].update({'new_category':user_category.name})
+            else:
+                form.cleaned_data['filter_'] = {'new_category':user_category.name}
+        result= list_courses(
+            self.request,
+            form.cleaned_data['username'],
+            org=form.cleaned_data['org'],
+            filter_=form.cleaned_data['filter_'],
+            search_term=form.cleaned_data['search_term']
+        )
+        return result
+
+
+
+@view_auth_classes(is_authenticated=False)
+class PopularCourseListView(DeveloperErrorViewMixin, ListAPIView):
+    class PopularCourseListPageNumberPagination(LazyPageNumberPagination):
+        max_page_size = 100
+
+    pagination_class = PopularCourseListPageNumberPagination
+    serializer_class = CourseSerializer
+    throttle_classes = (PopularCourseListUserThrottle,)
+
+    def get_queryset(self):
+        """
+        Yield courses visible to the user.
+        """
+        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+        courses = CourseOverview.objects.all().values('course_id')
+        log.info('====== enrollments =========')
+        #queryset=CourseEnrollment.objects.filter(is_active=True).values('course_id').order_by().annotate(Count('course_id')).values('course_id__count','course_id').annotate(enrollment_count=F('course_id__count')).values('course_id','enrollment_count')
+        queryset=CourseEnrollment.objects.filter(Q(is_active=True) & Q(course_id__in=courses)).values('course_id').order_by().annotate(Count('course_id')).filter(course_id__count__gte=3).values('course_id__count','course_id').annotate(enrollment_count=F('course_id__count')).values('course_id','enrollment_count')
+        log.info(queryset)
+        user_extra_info = UserExtraInfo.objects.filter(user_id=self.request.user.id).first()
+        if hasattr(user_extra_info, 'industry_id'):
+            user_category = Category.objects.filter(id=user_extra_info.industry_id).first()
+            if form.cleaned_data['filter_'] is not None:
                 form.cleaned_data['filter_'].update({'category':user_category.name})
             else:
                 form.cleaned_data['filter_'] = {'category':user_category.name}
@@ -360,7 +437,7 @@ class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
-        categories_count = CourseOverview.objects.filter(category__isnull=False).values('category').order_by().annotate(Count('category')).values('category__count','category').annotate(course_count=F('category__count')).values('category','course_count')
+        categories_count = CourseOverview.objects.filter(new_category__isnull=False).values('new_category').order_by().annotate(Count('new_category')).values('new_category__count','new_category').annotate(course_count=F('new_category__count'),category=F('new_category')).values('category','course_count')
         for cat in categories_count:
             cat_id = Category.objects.filter(name=cat['category']).values()[0]
             cat['id'] =  cat_id['id']

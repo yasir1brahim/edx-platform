@@ -173,7 +173,18 @@ def discount_percentage(course):
     """
     Get the configured discount amount.
     """
-    configured_percentage = DiscountPercentageConfig.current(course_key=course.id).percentage
-    if configured_percentage:
-        return configured_percentage
+    #configured_percentage = DiscountPercentageConfig.current(course_key=course.id).percentage
+    configured_percentage = DiscountPercentageConfig.objects.filter(course=course.id).order_by('-id')
+    if len(configured_percentage) > 0 and configured_percentage[0].percentage > 0:
+        return configured_percentage[0].percentage
     return 0
+
+
+def discount_percentage_configured(course):
+    """
+    Get the configured discount amount.
+    """
+    configured_percentage = DiscountPercentageConfig.objects.filter(course=course.id).order_by('-id')
+    if len(configured_percentage) and configured_percentage[0].percentage > 0:
+        return True
+    return False

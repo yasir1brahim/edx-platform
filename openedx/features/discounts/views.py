@@ -24,7 +24,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
-from .applicability import can_receive_discount, discount_percentage, REV1008_EXPERIMENT_ID
+from .applicability import can_receive_discount, discount_percentage, discount_percentage_configured, REV1008_EXPERIMENT_ID
 
 log = logging.getLogger(__name__)
 
@@ -78,8 +78,7 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_key_string)
         course = CourseOverview.get_from_id(course_key)
         utc=pytz.UTC
-
-        discount_applicable = can_receive_discount(user=request.user, course=course)
+        discount_applicable = can_receive_discount(user=request.user, course=course) and discount_percentage_configured(course)
         discount_percent = discount_percentage(course)
         if discount_percent == 0:
             discount_applicable = False        

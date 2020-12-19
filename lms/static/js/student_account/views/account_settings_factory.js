@@ -28,6 +28,7 @@
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
             extendedProfileFields,
+	    courseOverviewCategory,
             displayAccountDeletion,
             isSecondaryEmailFeatureEnabled,
             betaLanguage
@@ -241,7 +242,26 @@
                                 options: fieldsData.preferred_language.options,
                                 persistChanges: true
                             })
+                        },
+                        {
+                            view: new AccountSettingsFieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('NRIC'),
+                                valueAttribute: 'nric',
+                                persistChanges: true
+                            })
+                        },
+                        {
+                            view: new AccountSettingsFieldViews.DropdownFieldView({
+                                model: userAccountModel,
+                                title: gettext('Industry'),
+                                valueAttribute: 'industry',
+                                options: courseOverviewCategory,
+                                persistChanges: true
+                            })
                         }
+
+
                     ]
                 }
             ];

@@ -1,4 +1,4 @@
-from .api import get_account_settings, update_account_settings
+from .api import update_account_settings, get_account_extra_settings
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -23,7 +23,7 @@ class AccountViewSet(ViewSet):
         GET /api/user/v1/accounts/{username}/
         """
         try:
-            account_settings = get_account_settings(
+            account_settings = get_account_extra_settings(
                 request, [username], view=request.query_params.get('view'))
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -41,7 +41,7 @@ class AccountViewSet(ViewSet):
         try:
             with transaction.atomic():
                 update_account_settings(request.user, request.data, username=username)
-                account_settings = get_account_settings(request, [username])[0]
+                account_settings = get_account_extra_settings(request, [username])[0]
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:

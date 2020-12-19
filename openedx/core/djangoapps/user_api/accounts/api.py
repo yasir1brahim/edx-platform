@@ -36,7 +36,7 @@ from openedx.core.djangoapps.user_api.preferences.api import update_user_prefere
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
-from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, AccountUserExtraInfoSerializer, UserReadOnlySerializer, _visible_fields
+from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, AccountUserExtraInfoSerializer, UserReadOnlySerializer, UserExtraFieldReadOnlySerializer, _visible_fields
 
 import logging
 
@@ -90,6 +90,59 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
         else:
             admin_fields = None
         serialized_users.append(UserReadOnlySerializer(
+            user,
+            configuration=configuration,
+            custom_fields=admin_fields,
+            context={'request': request}
+        ).data)
+
+    return serialized_users
+
+@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
+def get_account_extra_settings(request, usernames=None, configuration=None, view=None):
+    """Returns account information for a user serialized as JSON.
+
+    Note:
+        If `request.user.username` != `username`, this method will return differing amounts of information
+        based on who `request.user` is and the privacy settings of the user associated with `username`.
+
+    Args:
+        request (Request): The request object with account information about the requesting user.
+            Only the user with username `username` or users with "is_staff" privileges can get full
+            account information. Other users will get the account fields that the user has elected to share.
+        usernames (list): Optional list of usernames for the desired account information. If not
+            specified, `request.user.username` is assumed.
+        configuration (dict): an optional configuration specifying which fields in the account
+            can be shared, and the default visibility settings. If not present, the setting value with
+            key ACCOUNT_VISIBILITY_CONFIGURATION is used.
+        view (str): An optional string allowing "is_staff" users and users requesting their own
+            account information to get just the fields that are shared with everyone. If view is
+            "shared", only shared account information will be returned, regardless of `request.user`.
+
+    Returns:
+         A list of users account details.
+
+    Raises:
+         errors.UserNotFound: no user with username `username` exists (or `request.user.username` if
+            `username` is not specified)
+         errors.UserAPIInternalError: the operation failed due to an unexpected error.
+
+    """
+    requesting_user = request.user
+    usernames = usernames or [requesting_user.username]
+
+    requested_users = User.objects.select_related('profile').filter(username__in=usernames)
+    if not requested_users:
+        raise errors.UserNotFound()
+
+    serialized_users = []
+    for user in requested_users:
+        has_full_access = requesting_user.is_staff or requesting_user.username == user.username
+        if has_full_access and view != 'shared':
+            admin_fields = settings.ACCOUNT_VISIBILITY_CONFIGURATION.get('admin_fields')
+        else:
+            admin_fields = None
+        serialized_users.append(UserExtraFieldReadOnlySerializer(
             user,
             configuration=configuration,
             custom_fields=admin_fields,

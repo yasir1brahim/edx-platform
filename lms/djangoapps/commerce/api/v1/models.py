@@ -11,21 +11,23 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SubCategory
 from student.models import CourseEnrollment
 from django.db.models import Avg
 
 log = logging.getLogger(__name__)
 
 UNDEFINED = object()
-
+import requests
+import json
+import jwt
 
 class Course(object):
     """ Pseudo-course model used to group CourseMode objects. """
     id = None  # pylint: disable=invalid-name
     modes = None
     _deleted_modes = None
-
+    jwt_token = None
     def __init__(self, id, modes, **kwargs):  # pylint: disable=redefined-builtin
         self.id = CourseKey.from_string(six.text_type(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
@@ -33,6 +35,8 @@ class Course(object):
         if 'verification_deadline' in kwargs:
             self.verification_deadline = kwargs['verification_deadline']
         self._deleted_modes = []
+        if 'jwt_token' in kwargs:
+            self.jwt_token = kwargs['jwt_token']
 
     @property
     def name(self):
@@ -84,7 +88,31 @@ class Course(object):
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.
             log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
-            return None
+            return 0.0
+
+
+
+    @property
+    def subcategory_id(self):
+        """ Return course rating. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            subcategory = CourseOverview.get_from_id(course_id).subcategory
+            subcategory = SubCategory.objects.filter(name=subcategory)
+            if subcategory:
+                subcategory_id =  subcategory.first().id
+                return str(subcategory_id)
+            else:
+                return str(0)
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return 0.0
+
+
+
 
     @property
     def comments_count(self):
@@ -111,6 +139,58 @@ class Course(object):
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.
             log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
             return None
+    
+    @property
+    def discount_info(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            url = 'http://134.209.96.11/api/discounts/course/' + str(course_id)
+            headers={'Authorization': self.jwt_token}
+            response = json.loads(requests.get(url=url,headers=headers).text)
+            return response
+            #return CourseEnrollment.objects.enrollment_counts(course_id)['total']
+        except CourseEnrollment.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None 
+
+    @property
+    def discount_applicable(self):
+        return str(self.discount_info['discount_applicable'])
+
+    @property
+    def discounted_price(self):
+        #return 2.5
+        course_mode_price = self.get_paid_mode_price()
+        if self.discount_info['discount_applicable']:
+            jwt_token = self.discount_info['jwt']
+            decoded_jwt = jwt.decode(jwt_token, verify=False)
+            discount_percentage = decoded_jwt['discount_percent']
+            #course_mode_price = self.get_paid_mode_price()
+            if course_mode_price:
+                return (discount_percentage/100) * course_mode_price
+            else:
+                return 0.0
+
+        return course_mode_price
+
+    @property
+    def sale_type(self):
+        if self.discounted_price == 0.0:
+            return "free"
+        else:
+            return "paid"
+ 
+    def get_paid_mode_price(self):
+        for mode in self.modes:
+            if mode.mode_slug != 'honor':
+                return mode.min_price
+            else:
+                continue
+        return None
+
 
     def get_mode_display_name(self, mode):
         """ Returns display name for the given mode. """
@@ -208,9 +288,13 @@ class Course(object):
         return None
 
     @classmethod
-    def iterator(cls):
+    def iterator(cls,jwt_token=None,filters=None):
         """ Generator that yields all courses. """
-        course_modes = CourseMode.objects.order_by('course_id')
-
+        if filters==None:
+            course_modes = CourseMode.objects.order_by('course_id')
+        else:
+            pass
+            #course_modes = CourseMode.objects.order_by('ratings')
+        JWT_TOKEN = jwt_token
         for course_id, modes in groupby(course_modes, lambda o: o.course_id):
-            yield cls(course_id, list(modes))
+            yield cls(course_id, list(modes),jwt_token=jwt_token)

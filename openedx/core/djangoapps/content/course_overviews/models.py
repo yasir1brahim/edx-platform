@@ -257,8 +257,10 @@ class CourseOverview(TimeStampedModel):
         course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
+        if hasattr(course, 'difficulty_level'):
+            course_overview.difficulty_level = course.difficulty_level
         if hasattr(course, 'new_category'):
-            log.info( course.new_category)
+            # log.info( course.new_category)
             course_overview.new_category = course.new_category
             course_overview.subcategory = course.subcategory
         if not CatalogIntegration.is_enabled():

@@ -284,7 +284,7 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
         return super(LazyPageNumberPagination, self).get_paginated_response(data)
 
 
-@view_auth_classes(is_authenticated=False)
+@view_auth_classes(is_authenticated=True)
 class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
     **Use Cases**

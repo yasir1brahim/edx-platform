@@ -87,7 +87,6 @@ document.getElementById('register-email').placeholder = "Enter Your Email.";
 document.getElementById('register-username').placeholder = "Enter Your Username";
 document.getElementById('register-password').placeholder = "Enter Your Password";
 document.getElementById('register-name').placeholder = "Enter Your Name";
-document.getElementById('register-sector').placeholder = "Enter Your Sector";
 document.getElementById('register-country').placeholder = "Enter Your Country";
 
 

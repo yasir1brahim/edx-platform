@@ -39,7 +39,7 @@ class CreateCourseReviewUser(APIView):
             review_object = CourseReviewModel.objects.create(user_id=request.user, course_id=course_data[0], rating=request.data['rating'], review=request.data['review'])
             response = "success"
         except Exception as e:
-            response = "Duplicate Error"
+            response = "Authentication credentials were not provided."
             return Response(response, status=status.HTTP_201_CREATED)
         return Response(response, status=status.HTTP_201_CREATED)
 

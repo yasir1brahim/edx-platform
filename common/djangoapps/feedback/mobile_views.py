@@ -9,7 +9,7 @@ from edx_rest_framework_extensions.paginators import NamespacedPageNumberPaginat
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.exceptions import NotFound
-
+from rest_framework.permissions import IsAuthenticated  
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from lms.djangoapps.course_api import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
@@ -97,8 +97,9 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
         return super(LazyPageNumberPagination, self).get_paginated_response(data)
 
 
-@view_auth_classes(is_authenticated=False)
+@view_auth_classes(is_authenticated=True)
 class ReviewListView(DeveloperErrorViewMixin, ListAPIView):
+
     """
     **Use Cases**
 

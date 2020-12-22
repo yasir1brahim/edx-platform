@@ -157,6 +157,13 @@ class CourseOverview(TimeStampedModel):
     difficulty_level = TextField(null=True)
     new_category = TextField(null=True)
     subcategory = TextField(null=True)
+    platform_visibility = TextField(null=True)
+    course_sale_type = TextField(null=True)
+    premium = BooleanField(default=False)
+
+
+
+
 
     history = HistoricalRecords()
 
@@ -260,9 +267,12 @@ class CourseOverview(TimeStampedModel):
         if hasattr(course, 'difficulty_level'):
             course_overview.difficulty_level = course.difficulty_level
         if hasattr(course, 'new_category'):
-            # log.info( course.new_category)
             course_overview.new_category = course.new_category
             course_overview.subcategory = course.subcategory
+        course_overview.course_sale_type = course.course_sale_type
+        course_overview.platform_visibility = course.platform_visibility
+        course_overview.premium = course.premium
+
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
 

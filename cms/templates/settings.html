@@ -346,6 +346,33 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
               </select>
               <span class="tip tip-stacked">Please enter difficulty level</span>
             </li>
+            <li class="field" id="field-course-platform-visibility">
+              <label for="course-platform-visibility">${_("Platform Visibility")}</label>
+              <select id="course-platform-visibility">
+                <option value="" selected> - </option>
+                % for val, label in platform_visibility_options:
+                  <option value="${val}">${label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please select platform visibility</span>
+            </li>
+            <li class="field">
+                <input type="checkbox" class="field-radio" name="Premium" id="course-premium" value="true" aria-labelledby="course-pace-premium-label"/>
+                <label id="course-premium-label" class="course-label" for="course-premium">${_("Premium")}</label>
+                <span class="tip">${_("Check if course is premium")}</span>
+            </li>
+            <li class="field" id="field-course-course-sale-type">
+              <label for="course-course-sale-type">${_("Course Sale Type")}</label>
+              <select id="course-course-sale-type">
+                <option value="" selected> - </option>
+                % for val, label in course_sale_type_options:
+                  <option value="${val}">${label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please select sale type</span>
+            </li>
+
+
             <li class="field" id="field-course-category">
               <label for="course-category">${_("Category")}</label>
               <select id="course-category">
@@ -706,3 +733,4 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
   </div>
 </div>
 </%block>
+

@@ -51,6 +51,9 @@ class CourseDetails(object):
         self.difficulty_level = None
         self.new_category = None
         self.subcategory = None
+        self.platform_visibility = None
+        self.premium = None
+        self.course_sale_type = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -131,6 +134,9 @@ class CourseDetails(object):
         course_details.difficulty_level = course_descriptor.difficulty_level
         course_details.new_category = course_descriptor.new_category
         course_details.subcategory = course_descriptor.subcategory
+        course_details.platform_visibility = course_descriptor.platform_visibility
+        course_details.premium = course_descriptor.premium
+        course_details.course_sale_type = course_descriptor.course_sale_type
         course_details.self_paced = course_descriptor.self_paced
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info
@@ -290,7 +296,7 @@ class CourseDetails(object):
             descriptor.language = jsondict['language']
             dirty = True
 
-        if 'difficulty_level' in jsondict and jsondict['difficulty_level'] != descriptor.language:
+        if 'difficulty_level' in jsondict and jsondict['difficulty_level'] != descriptor.difficulty_level:
             descriptor.difficulty_level = jsondict['difficulty_level']
             dirty = True
 
@@ -301,6 +307,19 @@ class CourseDetails(object):
         if 'subcategory' in jsondict and jsondict['subcategory'] != descriptor.subcategory:
             descriptor.subcategory = jsondict['subcategory']
             dirty = True
+
+        if 'platform_visibility' in jsondict and jsondict['platform_visibility'] != descriptor.platform_visibility:
+            descriptor.platform_visibility = jsondict['platform_visibility']
+            dirty = True
+
+        if 'premium' in jsondict and jsondict['premium'] != descriptor.premium:
+            descriptor.premium = jsondict['premium']
+            dirty = True
+
+        if 'course_sale_type' in jsondict and jsondict['course_sale_type'] != descriptor.course_sale_type:
+            descriptor.course_sale_type = jsondict['course_sale_type']
+            dirty = True
+
 
         if (descriptor.can_toggle_course_pacing
                 and 'self_paced' in jsondict

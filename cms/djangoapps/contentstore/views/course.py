@@ -1086,6 +1086,8 @@ def settings_handler(request, course_key_string):
 
             # Difficulty Level Options
             # difficulty_level_options = [('beginner', 'Beginner'), ('intermediate','Intermediate'), ('advanced','Advanced')]
+            course_sale_type_options = [('Free', 'Free'), ('Paid','Paid'), ('Premium','Premium')]
+            platform_visibility_options = [('Mobile', 'Mobile'), ('Web','Web'), ('Both','Both')]
             difficulty_level_options = DifficultyLevel.objects.all()
             categories = Category.objects.all()
             subcategories = SubCategory.objects.all()
@@ -1116,6 +1118,8 @@ def settings_handler(request, course_key_string):
                 'categories': categories,
                 'subcategories': subcategories,
                 'subcat_dict': subcat_dict,
+                'course_sale_type_options' : course_sale_type_options,
+                'platform_visibility_options' : platform_visibility_options,
                 'credit_eligibility_enabled': credit_eligibility_enabled,
                 'is_credit_course': False,
                 'show_min_grade_warning': False,

@@ -34,6 +34,9 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('#course-difficulty-level').val(this.model.get('difficulty_level'));
                    this.$el.find('#course-category').val(this.model.get('new_category'));
                    this.$el.find('#course-subcategory').val(this.model.get('subcategory'));
+                   this.$el.find('#course-platform-visibility').val(this.model.get('platform_visibility'));
+                   this.$el.find('#course-premium').val(this.model.get('premium'));
+                   this.$el.find('#course-course-sale-type').val(this.model.get('course_sale_type'));
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));
                    this.$el.find('#course-name').val(this.model.get('run'));
@@ -155,6 +158,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        instructorPacedButton.attr('disabled', true);
                        paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
                    }
+                   if (this.model.get('premium') == true)
+			{
+                         this.$('#' + this.fieldToSelectorMap.premium).attr('checked', this.model.get('premium'));
+                       }
 
                    this.licenseView.render();
                    this.learning_info_view.render();
@@ -167,6 +174,9 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    difficulty_level: 'course-difficulty-level',
                    new_category: 'course-category',
                    subcategory: 'course-subcategory',
+                   platform_visibility: 'course-platform-visibility',
+                   premium: 'course-premium',
+                   course_sale_type: 'course-course-sale-type',
                    start_date: 'course-start',
                    end_date: 'course-end',
                    enrollment_start: 'enrollment-start',
@@ -338,6 +348,9 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    case 'course-difficulty-level':
                    case 'course-category':
                    case 'course-subcategory':
+                   case 'course-platform-visibility':
+                   case 'course-premium':
+                   case 'course-course-sale-type':
                    case 'course-effort':
                    case 'course-title':
                    case 'course-subtitle':

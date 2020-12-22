@@ -844,6 +844,26 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    platform_visibility = String(
+        display_name=_("Platform visibility"),
+        help=_("Specify the visibility of the course for mobile, web or both."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    premium = Boolean(
+        display_name=_("Premium"),
+        help=_("Whether it is a premium course or not."),
+        default=False,
+        scope=Scope.settings
+    )
+
+    course_sale_type = String(
+        display_name=_("Sale Type"),
+        help=_("Specify the sale type of the course for free, paid or premium."),
+        default=None,
+        scope=Scope.settings
+    )
 
     teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),

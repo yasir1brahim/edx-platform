@@ -27,19 +27,19 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 class CreateCourseReviewUser(APIView):
     authentication_classes = (BearerAuthentication,)
-
+    permission_classes = (IsAuthenticated,)
     # Post request to create course review
     # Endpoint : /api/course_reviews/v2/create_course_review_user/
 
     def post(self,request):
         """
         """
+        course_data = CourseOverview.objects.filter(id=request.data['course_id'])
         try:
-            course_data = CourseOverview.objects.filter(id=request.data['course_id'])
             review_object = CourseReviewModel.objects.create(user_id=request.user, course_id=course_data[0], rating=request.data['rating'], review=request.data['review'])
             response = "success"
         except Exception as e:
-            response = "Authentication credentials were not provided."
+            response = "feedback already submitted"
             return Response(response, status=status.HTTP_201_CREATED)
         return Response(response, status=status.HTTP_201_CREATED)
 

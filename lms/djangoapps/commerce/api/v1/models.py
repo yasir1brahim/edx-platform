@@ -178,11 +178,45 @@ class Course(object):
 
     @property
     def sale_type(self):
-        if self.discounted_price == 0.0:
-            return "free"
-        else:
-            return "paid"
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).course_sale_type
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
  
+
+    @property
+    def is_premium(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).premium
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None 
+
+
+    @property
+    def platform_visibility(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).platform_visibility
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None 
+
+
+
+
     def get_paid_mode_price(self):
         for mode in self.modes:
             if mode.mode_slug != 'honor':

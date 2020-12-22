@@ -9,7 +9,7 @@ from ..v1.models import Course
 from ..v1.serializers import CourseSerializer
 import logging
 log = logging.getLogger(__name__)
-
+import json
 class CourseListView(ListAPIView):
     """ List courses and modes. """
     class CourseListPageNumberPagination(LazyPageNumberPagination):
@@ -25,13 +25,17 @@ class CourseListView(ListAPIView):
     def get_queryset(self):
         filtered_courses = []
         filter = False
-        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None,'discount_applicable': None}
+        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None,'discount_applicable': None, 'is_premium': 'Boolean'}
         request_filters = {}
         for f,val in filters.items():
             filter_val = self.request.query_params.get(f, None)
             if not filter_val == "all":
                 filter = True
-                request_filters[f] = filter_val.split(',')
+                if val == 'Boolean':
+                    boolean_result = [json.loads(filter_val.split(',')[0].lower())]
+                    request_filters[f] = boolean_result
+                else:
+                    request_filters[f] = filter_val.split(',')
         courses = list(Course.iterator(self.request.META.get('HTTP_AUTHORIZATION', None)))
         ordering_filter=self.request.query_params.get('ordering', None)
         if ordering_filter:

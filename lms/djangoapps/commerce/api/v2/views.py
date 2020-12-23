@@ -29,7 +29,7 @@ class CourseListView(ListAPIView):
         request_filters = {}
         for f,val in filters.items():
             filter_val = self.request.query_params.get(f, None)
-            if not filter_val == "all":
+            if filter_val is not None:
                 filter = True
                 if val == 'Boolean':
                     boolean_result = [json.loads(filter_val.split(',')[0].lower())]

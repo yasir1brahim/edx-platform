@@ -2405,6 +2405,9 @@ INSTALLED_APPS = [
     # for managing course reviews.
     'feedback.apps.FeedbackConfig',
 
+    # for authentication
+    'gsauthentication.apps.GSAuthenticationConfig',
+
     # for managing terms and conditions.
     'terms_conditions.apps.TermsConditionsConfig',
 

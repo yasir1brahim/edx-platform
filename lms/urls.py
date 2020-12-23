@@ -2,6 +2,7 @@
 URLs for LMS
 """
 
+from django.views.decorators.csrf import csrf_exempt
 from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.conf.urls import include, url
@@ -55,7 +56,8 @@ from staticbook import views as staticbook_views
 from student import views as student_views
 from util import views as util_views
 
-
+#custom token authentication
+from lms.djangoapps.gsauthentication.views import CustomObtainAuthToken
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -860,6 +862,7 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
         # views directly, but should rather use the wrapped views at /oauth2/
         url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+        url(r'^gs-auth/', include('lms.djangoapps.gsauthentication.urls', namespace='gsauthentication')),
     ]
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):

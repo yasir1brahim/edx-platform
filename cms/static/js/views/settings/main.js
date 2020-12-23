@@ -79,7 +79,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        el: $('.course-instructor-details-fields'),
                        model: this.model
                    });
-                   this.updateSubCategory();
+                   this.initSubCategory();
                },
 
                render: function() {
@@ -242,6 +242,36 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
 
                    $(e.currentTarget).attr('title', currentTimeText);
                },
+              initSubCategory: function() {
+                var $categorySelect = this.$el.find('#' + this.fieldToSelectorMap.new_category)
+                var $subCategorySelect = this.$el.find('#' + this.fieldToSelectorMap.subcategory)
+
+                // find selected category
+                var selectedCategoryValue = $categorySelect.val();
+                var selectedSubCategoryValue = $subCategorySelect.val();
+
+                // clean subcategory select from older options
+                $subCategorySelect.empty();
+
+                // if category found - populate subcategory select
+                if (selectedCategoryValue) {
+                    var subcat_list = ['-']
+                    var subcat_list = subcat_list.concat(subcategories[selectedCategoryValue])
+                    console.log(subcat_list)
+                    subcat_list.forEach(function(subcategory) {
+
+                        // you can extract this line into separate function
+                        var $option = $('<option/>').attr('value', subcategory).html(subcategory);
+
+                        $subCategorySelect.append($option);
+                    });
+                }
+               if (selectedSubCategoryValue)
+                {
+                  $('#course-subcategory option[value="'+selectedSubCategoryValue+'"]').attr('selected','selected');    
+                 }
+                //$subCategorySelect.value=selectedSubCategoryValue;
+              },
               updateSubCategory: function() {
                 //var $categorySelect =  $("#course-category");
                 //var $subCategorySelect =  $("#course-subcategory");
@@ -257,7 +287,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
 
                 // if category found - populate subcategory select
                 if (selectedCategoryValue) {
-                    subcategories[selectedCategoryValue].forEach(function(subcategory) {
+                    var subcat_list = ['-']
+                    var subcat_list = subcat_list.concat(subcategories[selectedCategoryValue])
+                    console.log(subcat_list)
+                    subcat_list.forEach(function(subcategory) {
 
                         // you can extract this line into separate function
                         var $option = $('<option/>').attr('value', subcategory).html(subcategory);

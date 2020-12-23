@@ -24,6 +24,7 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from openedx.core.lib.api.authentication import BearerAuthentication
 from django.contrib.auth.models import User
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
 
 class CreateCourseReviewUser(APIView):
     authentication_classes = (BearerAuthentication,)
@@ -34,13 +35,17 @@ class CreateCourseReviewUser(APIView):
     def post(self,request):
         """
         """
-        course_data = CourseOverview.objects.filter(id=request.data['course_id'])
-        try:
-            review_object = CourseReviewModel.objects.create(user_id=request.user, course_id=course_data[0], rating=request.data['rating'], review=request.data['review'])
-            response = "success"
-        except Exception as e:
-            response = "feedback already submitted"
+        if CourseEnrollment.objects.filter(user=request.user, course_id=request.data['course_id']).exists():
+            course_data = CourseOverview.objects.filter(id=request.data['course_id'])
+            try:
+                review_object = CourseReviewModel.objects.create(user_id=request.user, course_id=course_data[0], rating=request.data['rating'], review=request.data['review'])
+                response = "success"
+            except Exception as e:
+                response = "feedback already submitted"
+                return Response(response, status=status.HTTP_201_CREATED)
             return Response(response, status=status.HTTP_201_CREATED)
-        return Response(response, status=status.HTTP_201_CREATED)
+        else:
+            response = "user not enrolled"
+            return Response(response, status=status.HTTP_201_CREATED)
 
 

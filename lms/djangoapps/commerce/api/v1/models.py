@@ -181,6 +181,8 @@ class Course(object):
         course_id = CourseKey.from_string(six.text_type(self.id))
 
         try:
+            if CourseOverview.get_from_id(course_id).course_sale_type:
+                return CourseOverview.get_from_id(course_id).course_sale_type.lower()
             return CourseOverview.get_from_id(course_id).course_sale_type
         except CourseOverview.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
@@ -207,7 +209,8 @@ class Course(object):
         course_id = CourseKey.from_string(six.text_type(self.id))
 
         try:
-            return CourseOverview.get_from_id(course_id).platform_visibility
+            if CourseOverview.get_from_id(course_id).platform_visibility:
+                return CourseOverview.get_from_id(course_id).platform_visibility.lower()
         except CourseOverview.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.

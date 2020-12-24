@@ -830,6 +830,14 @@ class CourseFields(object):
         default=None,
         scope=Scope.settings
     )
+
+    course_org = String(
+        display_name=_("Organization"),
+        help=_("Specify the organization of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
     new_category = String(
         display_name=_("Category"),
         help=_("Specify the Category of course."),

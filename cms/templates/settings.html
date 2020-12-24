@@ -346,6 +346,19 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
               </select>
               <span class="tip tip-stacked">Please enter difficulty level</span>
             </li>
+
+            <li class="field" id="field-course_org_options">
+              <label for="course-orgs">${_("Organization")}</label>
+              <select id="course-orgs">
+                <option value="" selected> - </option>
+                % for option in course_org_options:
+                  <option value="${option.id}">${option.name}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please select organization</span>
+            </li>
+
+
             <li class="field" id="field-course-platform-visibility">
               <label for="course-platform-visibility">${_("Platform Visibility")}</label>
               <select id="course-platform-visibility">

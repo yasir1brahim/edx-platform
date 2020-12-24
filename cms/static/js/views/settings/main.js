@@ -32,6 +32,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
         // fill in fields
                    this.$el.find('#course-language').val(this.model.get('language'));
                    this.$el.find('#course-difficulty-level').val(this.model.get('difficulty_level'));
+                   this.$el.find('#course-orgs').val(this.model.get('course_org'));
                    this.$el.find('#course-category').val(this.model.get('new_category'));
                    this.$el.find('#course-subcategory').val(this.model.get('subcategory'));
                    this.$el.find('#course-platform-visibility').val(this.model.get('platform_visibility'));
@@ -172,6 +173,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                fieldToSelectorMap: {
                    language: 'course-language',
                    difficulty_level: 'course-difficulty-level',
+                   course_org: 'course-orgs',
                    new_category: 'course-category',
                    subcategory: 'course-subcategory',
                    platform_visibility: 'course-platform-visibility',
@@ -379,6 +381,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        break;
                    case 'course-language':
                    case 'course-difficulty-level':
+                   case 'course-orgs':
                    case 'course-category':
                    case 'course-subcategory':
                    case 'course-platform-visibility':

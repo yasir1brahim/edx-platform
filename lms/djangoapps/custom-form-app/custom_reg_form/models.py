@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from openedx.core.djangoapps.content.course_overviews.models import Category
+from organizations.models import Organization
 
 # Backwards compatible settings.AUTH_USER_MODEL
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
@@ -21,6 +22,8 @@ class UserExtraInfo(models.Model):
         null=True
     )
     industry = models.ForeignKey(Category, related_name='users_industry', 
+        on_delete=models.SET_NULL, null=True)
+    organization = models.ForeignKey(Organization, related_name='instructor_org', 
         on_delete=models.SET_NULL, null=True)
 
     class Meta:

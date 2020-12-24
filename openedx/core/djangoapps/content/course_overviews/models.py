@@ -35,7 +35,7 @@ from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
-
+from organizations.models import Organization
 
 log = logging.getLogger(__name__)
 
@@ -155,6 +155,7 @@ class CourseOverview(TimeStampedModel):
 
     language = TextField(null=True)
     difficulty_level = TextField(null=True)
+    organization = models.ForeignKey(Organization, related_name='course_org', on_delete=models.SET_NULL, null=True)
     new_category = TextField(null=True)
     subcategory = TextField(null=True)
     platform_visibility = TextField(null=True)
@@ -272,6 +273,12 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_sale_type = course.course_sale_type
         course_overview.platform_visibility = course.platform_visibility
         course_overview.premium = course.premium
+        logging.info('===== course.organiztion ===')
+        logging.info(course.course_org)
+        course_org_object = None
+        if  course.course_org and course.course_org != '-':
+            course_org_object = Organization.objects.filter(id=int(course.course_org)).first()
+        course_overview.organization = course_org_object
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language

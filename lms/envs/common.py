@@ -1482,6 +1482,7 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 ################################# Middleware ###################################
 
 MIDDLEWARE = [
+    'openedx.core.custom_exception_handler.ExceptionMiddleware',
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
     # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
@@ -2591,6 +2592,7 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
+    'EXCEPTION_HANDLER': 'openedx.core.custom_exception_handler.handle_exception',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),

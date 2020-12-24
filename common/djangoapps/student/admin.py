@@ -45,6 +45,7 @@ from student.models import (
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
+from custom_reg_form.models import UserExtraInfo
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -299,6 +300,11 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
         """
         return super(CourseEnrollmentAdmin, self).has_module_permission(request)
 
+class UserExtraInfoInline(admin.StackedInline):
+    """ Inline admin interface for UserExtraInfo model. """
+    model = UserExtraInfo
+    can_delete = False
+    verbose_name_plural = 'User Extra Info'
 
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
@@ -337,7 +343,7 @@ class UserChangeForm(BaseUserChangeForm):
 
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
-    inlines = (UserProfileInline, AccountRecoveryInline)
+    inlines = (UserProfileInline, AccountRecoveryInline, UserExtraInfoInline)
     form = UserChangeForm
 
     def get_readonly_fields(self, request, obj=None):

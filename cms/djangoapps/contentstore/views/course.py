@@ -98,6 +98,8 @@ from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
 from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel, Category, SubCategory
+from organizations.models import Organization
+
 
 from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
@@ -502,7 +504,6 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-
     optimization_enabled = GlobalStaff().has_user(request.user) and \
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
 
@@ -549,6 +550,11 @@ def course_listing(request):
     split_archived = settings.FEATURES.get(u'ENABLE_SEPARATE_ARCHIVED_COURSES', False)
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+    organization_short_name = ""
+    try:
+        organization_short_name = user.user_extra_info.organization.short_name
+    except:
+        organization_short_name = ""
 
     return render_to_response(u'index.html', {
         u'courses': active_courses,
@@ -558,6 +564,7 @@ def course_listing(request):
         u'libraries': [format_library_for_view(lib) for lib in libraries],
         u'show_new_library_button': get_library_creator_status(user),
         u'user': user,
+        u'organization_short_name': organization_short_name,
         u'request_course_creator_url': reverse('request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),
         u'rerun_creator_status': GlobalStaff().has_user(user),
@@ -1086,9 +1093,10 @@ def settings_handler(request, course_key_string):
 
             # Difficulty Level Options
             # difficulty_level_options = [('beginner', 'Beginner'), ('intermediate','Intermediate'), ('advanced','Advanced')]
-            course_sale_type_options = [('Free', 'Free'), ('Paid','Paid')]
+            course_sale_type_options = [('free', 'Free'), ('paid','Paid')]
             platform_visibility_options = [('Mobile', 'Mobile'), ('Web','Web'), ('Both','Both')]
             difficulty_level_options = DifficultyLevel.objects.all()
+            course_org_options = Organization.objects.all()
             categories = Category.objects.all()
             subcategories = SubCategory.objects.all()
 
@@ -1115,6 +1123,7 @@ def settings_handler(request, course_key_string):
                 'course_handler_url': reverse_course_url('course_handler', course_key),
                 'language_options': settings.ALL_LANGUAGES,
                 'difficulty_level_options': difficulty_level_options,
+                'course_org_options': course_org_options,
                 'categories': categories,
                 'subcategories': subcategories,
                 'subcat_dict': subcat_dict,

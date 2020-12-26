@@ -164,8 +164,6 @@ class CourseOverview(TimeStampedModel):
 
 
 
-
-
     history = HistoricalRecords()
 
     @classmethod
@@ -224,6 +222,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.id = course.id
         course_overview._location = course.location
         course_overview.org = course.location.org
+        #organization = Organization.objects.get(short_name=course.location.org)
+        #course_overview.organization_id = organization.id
         course_overview.display_name = display_name
         course_overview.display_number_with_default = course.display_number_with_default
         course_overview.display_org_with_default = course.display_org_with_default
@@ -314,7 +314,12 @@ class CourseOverview(TimeStampedModel):
                 try:
                     course_overview = cls._create_or_update(course)
                     with transaction.atomic():
+                        course_overview.org = course.location.org
+                        organization = Organization.objects.get(short_name=course.location.org)
+                        course_overview.organization_id = organization.id
+                        course_overview.organization = organization
                         course_overview.save()
+                        logging.info("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- overview saved: %s", vars(course_overview))
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([

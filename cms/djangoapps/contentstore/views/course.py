@@ -462,9 +462,11 @@ def _accessible_courses_list_from_groups(request):
     def filter_ccx(course_access):
         """ CCXs cannot be edited in Studio and should not be shown in this dashboard """
         return not isinstance(course_access.course_id, CCXLocator)
-
-    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
-    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+    user_org = None
+    if request.user.user_extra_info.organization:
+        user_org = request.user.user_extra_info.organization.short_name
+    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role_and_org(user_org)
+    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role_and_org(user_org)
     all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
     courses_list = []
     course_keys = {}
@@ -490,6 +492,8 @@ def _accessible_libraries_iter(user, org=None):
         string will result in no libraries, and otherwise only libraries with the
         specified org will be returned. The default value is None.
     """
+    if user.user_extra_info.organization and not user.is_staff:
+        org = user.user_extra_info.organization.short_name
     if org is not None:
         libraries = [] if org == '' else modulestore().get_libraries(org=org)
     else:
@@ -506,7 +510,6 @@ def course_listing(request):
     """
     optimization_enabled = GlobalStaff().has_user(request.user) and \
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
-
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
@@ -1099,6 +1102,13 @@ def settings_handler(request, course_key_string):
             course_org_options = Organization.objects.all()
             categories = Category.objects.all()
             subcategories = SubCategory.objects.all()
+            current_org = None
+            
+            try:
+                if request.user.user_extra_info.organization:
+                    current_org = CourseOverview.objects.get(id=course_module.id).organization.name
+            except:
+                current_org = None
 
             subcat_dict = {}
             for obj in subcategories:
@@ -1108,6 +1118,7 @@ def settings_handler(request, course_key_string):
                     subcat_dict[obj.category.name]=[obj.name]
 
             settings_context = {
+                'current_org': current_org,
                 'context_course': course_module,
                 'course_locator': course_key,
                 'lms_link_for_about_page': get_link_for_about_page(course_module),

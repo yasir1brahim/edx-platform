@@ -32,7 +32,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
         // fill in fields
                    this.$el.find('#course-language').val(this.model.get('language'));
                    this.$el.find('#course-difficulty-level').val(this.model.get('difficulty_level'));
-                   this.$el.find('#course-orgs').val(this.model.get('course_org'));
+                   this.$el.find('#course-orgs').val(this.model.get('org'));
                    this.$el.find('#course-category').val(this.model.get('new_category'));
                    this.$el.find('#course-subcategory').val(this.model.get('subcategory'));
                    this.$el.find('#course-platform-visibility').val(this.model.get('platform_visibility'));

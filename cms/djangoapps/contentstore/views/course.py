@@ -492,8 +492,9 @@ def _accessible_libraries_iter(user, org=None):
         string will result in no libraries, and otherwise only libraries with the
         specified org will be returned. The default value is None.
     """
-    if user.user_extra_info.organization and not user.is_staff:
-        org = user.user_extra_info.organization.short_name
+    if hasattr(user, 'user_extra_info'):
+        if user.user_extra_info.organization and not user.is_staff:
+            org = user.user_extra_info.organization.short_name
     if org is not None:
         libraries = [] if org == '' else modulestore().get_libraries(org=org)
     else:

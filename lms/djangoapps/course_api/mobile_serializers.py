@@ -10,6 +10,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.content.course_overviews.models import SubCategory
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
@@ -146,7 +147,10 @@ class CategorySerializer(serializers.Serializer):  # pylint: disable=abstract-me
         return self.context['request'].build_absolute_uri(base_url)
 
 
-
+class SubCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategory
+        fields = '__all__'
 
 class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-method
     """

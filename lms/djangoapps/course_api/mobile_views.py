@@ -15,7 +15,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .mobile_api import list_courses
 from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
-from .mobile_serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer, CategorySerializer
+from .mobile_serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer, CategorySerializer, SubCategorySerializer
 #from openedx/core/djangoapps/content import Category, SubCategory
 from openedx.core.djangoapps.content.course_overviews.models import Category, SubCategory, CourseOverview
 from openedx.core.lib.api.view_utils import LazySequence
@@ -447,6 +447,23 @@ class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
         est_len=categories_count.count()
         )
 
+@view_auth_classes(is_authenticated=False)
+class SubCategoryListView(DeveloperErrorViewMixin, ListAPIView):
+
+    class SubCategoryListPageNumberPagination(LazyPageNumberPagination):
+        max_page_size = 100
+
+    pagination_class = SubCategoryListPageNumberPagination
+    serializer_class = SubCategorySerializer
+
+    def get_queryset(self, *args, **kwargs):
+        category = self.request.GET.get('category',None)
+        qs = None
+        if category:
+            qs = SubCategory.objects.filter(category=category)
+        else:
+            qs = SubCategory.objects.all()
+        return qs
 
 
 class CourseIdListUserThrottle(UserRateThrottle):

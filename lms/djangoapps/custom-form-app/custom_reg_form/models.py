@@ -22,9 +22,9 @@ class UserExtraInfo(models.Model):
         null=True
     )
     industry = models.ForeignKey(Category, related_name='users_industry', 
-        on_delete=models.SET_NULL, null=True)
+        on_delete=models.SET_NULL, blank=True, null=True)
     organization = models.ForeignKey(Organization, related_name='instructor_org', 
-        on_delete=models.SET_NULL, null=True)
+        on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         app_label = 'custom_reg_form'

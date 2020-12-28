@@ -14,15 +14,20 @@
       <h1 class="branding">
         <a class="brand-link" href="/">
           % if not user.is_anonymous:
-          	% if user.user_extra_info.organization:
-			% if user.user_extra_info.organization.logo:
-                            <img class="brand-image" src="http://134.209.96.11/media/${user.user_extra_info.organization.logo}" alt="${settings.STUDIO_NAME}" />
-                        % else:
-                            <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
-                        % endif
-                % else:
-                        <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
-                % endif:
+                % if hasattr(user, 'user_extra_info'):
+          		% if user.user_extra_info.organization:
+				% if user.user_extra_info.organization.logo:
+                           	 <img class="brand-image" src="http://134.209.96.11/media/${user.user_extra_info.organization.logo}" alt="${settings.STUDIO_NAME}" />
+                        	% else:
+                            	<img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+                        	% endif
+                
+                	% else:
+                        	<img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+               		 % endif:
+		% else:
+			<img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+		% endif
           % else:
               <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
           % endif

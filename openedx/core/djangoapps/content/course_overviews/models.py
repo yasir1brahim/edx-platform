@@ -315,9 +315,10 @@ class CourseOverview(TimeStampedModel):
                     course_overview = cls._create_or_update(course)
                     with transaction.atomic():
                         course_overview.org = course.location.org
-                        organization = Organization.objects.get(short_name=course.location.org)
-                        course_overview.organization_id = organization.id
-                        course_overview.organization = organization
+                        if Organization.objects.filter(short_name=course.location.org).exists():
+                            organization = Organization.objects.get(short_name=course.location.org)
+                            course_overview.organization_id = organization.id
+                            course_overview.organization = organization
                         course_overview.save()
                         logging.info("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- overview saved: %s", vars(course_overview))
                         # Remove and recreate all the course tabs

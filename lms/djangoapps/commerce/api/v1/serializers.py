@@ -83,7 +83,7 @@ class CourseSerializer(serializers.Serializer):
     ratings = serializers.FloatField(required=False)
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
-    discount_applicable = serializers.CharField(required=False)
+    discount_applicable = serializers.BooleanField(required=False)
     discounted_price = serializers.FloatField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)

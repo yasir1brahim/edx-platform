@@ -158,7 +158,7 @@ class Course(object):
 
     @property
     def discount_applicable(self):
-        return str(self.discount_info['discount_applicable'])
+        return self.discount_info['discount_applicable']
 
     @property
     def discounted_price(self):

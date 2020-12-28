@@ -25,7 +25,7 @@ class CourseListView(ListAPIView):
     def get_queryset(self):
         filtered_courses = []
         filter = False
-        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None,'discount_applicable': None, 'is_premium': 'Boolean'}
+        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None,'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
         request_filters = {}
         for f,val in filters.items():
             filter_val = self.request.query_params.get(f, None)

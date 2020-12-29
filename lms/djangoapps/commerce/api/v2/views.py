@@ -46,8 +46,19 @@ class CourseListView(ListAPIView):
                 is_filter = [True if getattr(course,f) in val and val is not None else False for f,val in request_filters.items()]
                 if all(is_filter):
                     filtered_courses.append(course)
+        if self.request.query_params.get('coursename', None):
+            filtered_courses_list = []
+            course_list = filtered_courses if len(filtered_courses) > 0 else courses
+            for course in course_list:
+                search_string = self.request.query_params.get('coursename').lower()
+                if course.name.lower().find(search_string) > -1 and course.platform_visibility in ['mobile', 'both']:
+                    filtered_courses_list.append(course)
+
+            return filtered_courses_list
+
         else:
             return courses
+
         return filtered_courses
 
     def order_courses(self,course_list, ordering):

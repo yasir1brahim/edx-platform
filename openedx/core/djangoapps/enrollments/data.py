@@ -34,6 +34,54 @@ from student.roles import RoleCache
 log = logging.getLogger(__name__)
 
 
+def get_mobile_course_enrollments(username, include_inactive=False):
+    """Retrieve a list representing all aggregated data for a user's course enrollments.
+
+    Construct a representation of all course enrollment data for a specific user.
+
+    Args:
+        username: The name of the user to retrieve course enrollment information for.
+        include_inactive (bool): Determines whether inactive enrollments will be included
+
+
+    Returns:
+        A serializable list of dictionaries of all aggregated enrollment data for a user.
+
+    """
+    qset = CourseEnrollment.objects.filter(
+        user__username=username,
+    ).order_by('created')
+
+    if not include_inactive:
+        qset = qset.filter(is_active=True)
+
+    #enrollments = CourseEnrollmentSerializer(qset, many=True).data
+
+    # Find deleted courses and filter them out of the results
+    deleted = []
+    valid = []
+    for enrollment in qset:
+        if enrollment.course_overview is not None:
+            valid.append(enrollment.id)
+        else:
+            deleted.append(enrollment)
+
+    if deleted:
+        log.warning(
+            (
+                u"Course enrollments for user %s reference "
+                u"courses that do not exist (this can occur if a course is deleted)."
+            ), username,
+        )
+    qset1 = CourseEnrollment.objects.filter(
+        user__username=username,pk__in=valid
+    ).order_by('created')
+    return  qset1
+
+
+
+
+
 def get_course_enrollments(username, include_inactive=False):
     """Retrieve a list representing all aggregated data for a user's course enrollments.
 

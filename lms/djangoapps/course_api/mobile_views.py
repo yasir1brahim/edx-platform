@@ -9,6 +9,8 @@ from edx_rest_framework_extensions.paginators import NamespacedPageNumberPaginat
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.exceptions import NotFound
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
@@ -455,6 +457,8 @@ class SubCategoryListView(DeveloperErrorViewMixin, ListAPIView):
 
     pagination_class = SubCategoryListPageNumberPagination
     serializer_class = SubCategorySerializer
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self, *args, **kwargs):
         category = self.request.GET.get('category',None)

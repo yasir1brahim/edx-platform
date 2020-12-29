@@ -352,10 +352,7 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
               <label for="course-orgs">${_("Organization")}</label>
 
               % if current_org:
-               <select id="" disabled>
-                  <option value="">${current_org}</option>
-              </select>
-
+              <input value="${current_org}" disabled style="width:19.5%" />
               % else:
               <select id="course-orgs">
                 <option value="" selected> - </option>
@@ -363,9 +360,8 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
                   <option value="${option.short_name}">${option.name}</option>
                 % endfor
               </select>
-             
+             <span class="tip tip-stacked">Please select organization</span>
               % endif
-              <span class="tip tip-stacked">Please select organization</span>
             </li>
 
             <li class="field" id="field-course-platform-visibility">

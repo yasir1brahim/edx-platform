@@ -14,7 +14,7 @@ from course_modes.models import CourseMode
 from xmodule.modulestore.django import modulestore
 
 from .models import UNDEFINED, Course
-
+from openedx.core.lib.api.fields import AbsoluteURLField
 
 class CourseModeSerializer(serializers.ModelSerializer):
     """ CourseMode serializer. """
@@ -72,6 +72,44 @@ class PossiblyUndefinedDateTimeField(serializers.DateTimeField):
         return super(PossiblyUndefinedDateTimeField, self).to_representation(value)
 
 
+class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Nested serializer to represent a media object.
+    """
+
+    def __init__(self, uri_attribute, *args, **kwargs):
+        super(_MediaSerializer, self).__init__(*args, **kwargs)
+        self.uri_attribute = uri_attribute
+
+    uri = serializers.SerializerMethodField(source='*')
+
+    def get_uri(self, course_overview):
+        """
+        Get the representation for the media resource's URI
+        """
+        return getattr(course_overview, self.uri_attribute)
+
+class ImageSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Collection of URLs pointing to images of various sizes.
+
+    The URLs will be absolute URLs with the host set to the host of the current request. If the values to be
+    serialized are already absolute URLs, they will be unchanged.
+    """
+    raw = AbsoluteURLField()
+    small = AbsoluteURLField()
+    large = AbsoluteURLField()
+
+
+class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Nested serializer to represent a collection of media objects
+    """
+    #course_image = _MediaSerializer(source='*', uri_attribute='course_image_url')
+    #course_video = _MediaSerializer(source='*', uri_attribute='course_video_url')
+    image = ImageSerializer(source='image_urls')
+
+
 class CourseSerializer(serializers.Serializer):
     """ Course serializer. """
     id = serializers.CharField(validators=[validate_course_id])  # pylint: disable=invalid-name
@@ -89,7 +127,7 @@ class CourseSerializer(serializers.Serializer):
     subcategory_id = serializers.CharField(required=False)
     platform_visibility = serializers.CharField(required=False)
     is_premium = serializers.BooleanField(required=False)
-
+    media = _CourseApiMediaCollectionSerializer(source='*',required=False)
 
 
     class Meta(object):

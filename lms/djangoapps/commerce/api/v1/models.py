@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SubCategory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SubCategory, CourseOverviewImageSet
 from student.models import CourseEnrollment
 from django.db.models import Avg
 
@@ -217,6 +217,17 @@ class Course(object):
             log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
             return None 
 
+    @property
+    def image_urls(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        try:
+            if CourseOverview.get_from_id(course_id).image_urls:
+                return CourseOverview.get_from_id(course_id).image_urls
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None 
 
 
 

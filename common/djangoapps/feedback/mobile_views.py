@@ -24,6 +24,8 @@ from openedx.core.lib.api.view_utils import LazySequence
 import importlib
 custom_reg_form = importlib.import_module('lms.djangoapps.custom-form-app', 'custom_reg_form')
 from custom_reg_form.models import UserExtraInfo
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from opaque_keys.edx.keys import CourseKey
 
 
 import logging
@@ -152,20 +154,12 @@ class ReviewListView(DeveloperErrorViewMixin, ListAPIView):
         """
         Yield courses visible to the user.
         """
-        #form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
-        #if not form.is_valid():
-        #    raise ValidationError(form.errors)
-        categories = CourseReview.objects.all()
+        log.info("=====course_review=====")
+        course_id = self.kwargs['course_key_string']
+        course_key = CourseKey.from_string(course_id)
+        course_reviews = CourseOverview.get_from_id(course_key).course_reviews.all()
+        # course_reviews = CourseReview.objects.all()
         return LazySequence(
-        (c for c in categories ),
-        est_len=categories.count()
+        (c for c in course_reviews ),
+        est_len=course_reviews.count()
         )
-
-        #result= list_courses(
-            #self.request,
-            #form.cleaned_data['username'],
-            #org=form.cleaned_data['org'],
-            #filter_=form.cleaned_data['filter_'],
-            #search_term=form.cleaned_data['search_term']
-        #)
-        #return result

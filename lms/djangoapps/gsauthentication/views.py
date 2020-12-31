@@ -16,7 +16,8 @@ class CustomObtainAuthToken(APIView):
             if user.is_active:
                 response = requests.post('http://134.209.96.11/oauth2/access_token', params=request.POST)
                 resp_json = response.json()
-                resp_json['username'] = user.username
+                if "access_token" in resp_json:
+                    resp_json['username'] = user.username
                 return Response(resp_json)
             else:
                 return Response({"error": "Email not verified."})

@@ -736,7 +736,9 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
             'rerun_link': _get_rerun_link_for_item(course.id),
             'org': course.display_org_with_default,
             'number': course.display_number_with_default,
-            'run': course.location.run
+            'run': course.location.run,
+            'platform_visibility': course.platform_visibility,
+            'premium': course.premium
         }
 
     in_process_action_course_keys = {uca.course_key for uca in in_process_course_actions}

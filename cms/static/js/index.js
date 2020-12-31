@@ -144,6 +144,32 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
             });
         };
 
+    var platformShow = function() {
+        var p_visibility = this.value;
+
+        //show all 
+        $('.list-courses')
+         .children()
+         .filter(function(){
+            return true;
+         })
+         .hide();
+        
+        //hide selected
+        $('.list-courses')
+         .children()
+         .filter(function(){
+             if ($(this)[0].attributes[2])
+                if (p_visibility !== '-')
+                    return $(this)[0].attributes[2].value === p_visibility;
+                else
+                    return true
+             else
+                return false
+         })
+         .show();
+    }
+
         var addNewLibrary = function(e) {
             e.preventDefault();
             $('.new-library-button').addClass('is-disabled').attr('aria-disabled', true);
@@ -174,6 +200,8 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
         var onReady = function() {
             $('.new-course-button').bind('click', addNewCourse);
             $('.new-library-button').bind('click', addNewLibrary);
+
+            $('#new-platform-visibility').bind('change', platformShow);
 
             $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function() {
                 ViewUtils.reload();

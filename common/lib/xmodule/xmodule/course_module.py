@@ -1615,10 +1615,10 @@ class CourseSummary(object):
     A lightweight course summary class, which constructs split/mongo course summary without loading
     the course. It is used at cms for listing courses to global staff user.
     """
-    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization', 'end']
+    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization', 'end', 'platform_visibility', 'premium']
 
     def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None,
-                 end=None):
+                 end=None, platform_visibility="Both", premium=False):
         """
         Initialize and construct course summary
 
@@ -1644,6 +1644,8 @@ class CourseSummary(object):
 
         self.id = course_locator  # pylint: disable=invalid-name
         self.location = course_locator.make_usage_key('course', 'course')
+        self.platform_visibility = platform_visibility
+        self.premium = premium
         self.end = end
         if end is not None and not isinstance(end, datetime):
             self.end = dateutil.parser.parse(end)

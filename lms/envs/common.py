@@ -316,6 +316,9 @@ FEATURES = {
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
 
+    # Set organization course visibility
+    'ENABLE_CREATOR_GROUP': True,
+
     # Setting for overriding default filtering facets for Course discovery
     # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 
@@ -2575,6 +2578,7 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+    'cms.djangoapps.course_creators',
 ]
 
 ######################### CSRF #########################################

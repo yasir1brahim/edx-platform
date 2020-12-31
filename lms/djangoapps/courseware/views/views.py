@@ -46,6 +46,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from six import text_type
 from web_fragments.fragment import Fragment
+from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 
 import survey.views
 from course_modes.models import CourseMode, get_course_prices
@@ -250,7 +251,11 @@ def courses(request):
     filter_ = None
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+        log.info("====course_creator===")
+        # log.info(_get_course_creator_status(request.user))
         if not request.user.id:
+            filter_ = {'organization' : None }
+        elif _get_course_creator_status(request.user) != 'granted':
             filter_ = {'organization' : None }
         courses_list = get_courses(request.user,filter_=filter_)
 
@@ -272,6 +277,30 @@ def courses(request):
         }
     )
 
+def _get_course_creator_status(user):
+    """
+    Helper method for returning the course creator status for a particular user,
+    taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
+
+    If the user passed in has not previously visited the index page, it will be
+    added with status 'unrequested' if the course creator group is in use.
+    """
+
+    if user.is_staff:
+        course_creator_status = 'granted'
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
+        course_creator_status = 'disallowed_for_this_site'
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        course_creator_status = get_course_creator_status(user)
+        if course_creator_status is None:
+            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
+            # Add the user to the course creator admin table with status 'unrequested'.
+            add_user_with_status_unrequested(user)
+            course_creator_status = get_course_creator_status(user)
+    else:
+        course_creator_status = 'granted'
+
+    return course_creator_status
 
 class PerUserVideoMetadataThrottle(UserRateThrottle):
     """

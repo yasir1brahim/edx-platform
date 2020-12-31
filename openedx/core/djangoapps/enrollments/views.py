@@ -52,6 +52,8 @@ from student.roles import CourseStaffRole, GlobalStaff
 from util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.lib.api.view_utils import LazySequence
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from openedx.core.lib.api.view_utils import  view_auth_classes
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
     "credit": ["credit:provider_id"],
@@ -477,18 +479,20 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
 
 @can_disable_rate_limit
+@view_auth_classes(is_authenticated=True)
 class EnrollmentListViewMobile(DeveloperErrorViewMixin, ListAPIView):
 
 
     class EnrollmentListViewMobilePagination(LazyPageNumberPagination):
         max_page_size = 100
 
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        EnrollmentCrossDomainSessionAuth,
-    )
-    permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    #authentication_classes = (
+        #JwtAuthentication,
+        #BearerAuthenticationAllowInactiveUser,
+        #EnrollmentCrossDomainSessionAuth,
+    #)
+    #permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = MobileCourseEnrollmentSerializer
     pagination_class = EnrollmentListViewMobilePagination

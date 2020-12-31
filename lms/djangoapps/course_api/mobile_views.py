@@ -443,14 +443,17 @@ class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
-        categories_count = CourseOverview.objects.filter(new_category__isnull=False).values('new_category').order_by().annotate(Count('new_category')).values('new_category__count','new_category').annotate(course_count=F('new_category__count'),category=F('new_category')).values('category','course_count')
+        categories_count = CourseOverview.objects.filter(new_category__isnull=False).values('new_category','id').order_by().annotate(Count('new_category')).values('new_category__count','new_category').annotate(course_count=F('new_category__count'),category=F('new_category')).values('category','course_count')
+        categories = []
         for cat in categories_count:
-            cat_id = Category.objects.filter(name=cat['category']).values()[0]
-            cat['id'] =  cat_id['id']
-            cat['category_image'] = cat_id['category_image']
+            if Category.objects.filter(name=cat['category']).exists():
+                cat_id = Category.objects.filter(name=cat['category']).values()[0]
+                cat['id'] =  cat_id['id']
+                cat['category_image'] = cat_id['category_image']
+                categories.append(cat)
         return LazySequence(
-        (c for c in categories_count),
-        est_len=categories_count.count()
+        (c for c in categories),
+        est_len=len(categories)
         )
 
 class CustomAPIException(ValidationError):

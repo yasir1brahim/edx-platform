@@ -14,7 +14,7 @@ class CourseListView(ListAPIView):
     """ List courses and modes. """
     class CourseListPageNumberPagination(LazyPageNumberPagination):
         max_page_size = 100
-    authentication_classes = (JwtAuthentication,)
+    authentication_classes = (JwtAuthentication,BearerAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = CourseSerializer
     pagination_class = CourseListPageNumberPagination
@@ -56,7 +56,7 @@ class CourseListView(ListAPIView):
 
             return filtered_courses_list
 
-        else:
+        if not self.request.query_params.get('coursename', None) and not filter:
             return courses
 
         return filtered_courses

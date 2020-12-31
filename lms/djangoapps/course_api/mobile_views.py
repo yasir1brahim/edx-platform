@@ -11,7 +11,11 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.exceptions import NotFound
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.exceptions import APIException
+from rest_framework.serializers import ValidationError
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
@@ -449,6 +453,18 @@ class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
         est_len=categories_count.count()
         )
 
+class CustomAPIException(ValidationError):
+    """
+    raises API exceptions with custom messages and custom status codes
+    """
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = 'error'
+
+    def __init__(self, detail, status_code=None):
+        self.detail = detail
+        if status_code is not None:
+            self.status_code = status_code
+
 @view_auth_classes(is_authenticated=False)
 class SubCategoryListView(DeveloperErrorViewMixin, ListAPIView):
 
@@ -463,12 +479,11 @@ class SubCategoryListView(DeveloperErrorViewMixin, ListAPIView):
     def get_queryset(self, *args, **kwargs):
         category = self.request.GET.get('category',None)
         qs = None
-        if category:
+        if category.isnumeric():
             qs = SubCategory.objects.filter(category=category)
+            return qs
         else:
-            qs = SubCategory.objects.all()
-        return qs
-
+            raise CustomAPIException("Invalid course ID.", status_code=status.HTTP_404_NOT_FOUND)
 
 class CourseIdListUserThrottle(UserRateThrottle):
     """Limit the number of requests users can make to the course list id API."""

@@ -65,8 +65,8 @@ class ExceptionMiddleware(object):
         response = self.get_response(request)
         if not re.match(r'[\s\S]*\/v2', request.path):
             return response
-
-
+       
+        response_message = response.content.decode("utf-8") if response.content else ""
         if response.status_code == 500:
             response = \
                 get_response(message='Internal server error, please try again later'
@@ -82,7 +82,7 @@ class ExceptionMiddleware(object):
             return JsonResponse(response, status=response['status_code'
                                 ])
         elif response.status_code == 200:
-            response_dict = json.loads(response.content.decode('utf-8'))
+            response_dict = json.loads(response.content.decode('utf-8')) if response.content else {}
             if not 'pagination' in response_dict.keys():
                 response_dict['pagination']= None
             if not 'results' in response_dict.keys():
@@ -91,8 +91,20 @@ class ExceptionMiddleware(object):
                 get_response(message='',status=True,
                              status_code=response.status_code,result=response_dict)
             return JsonResponse(response, status=response['status_code'])
+        elif response.status_code == 403:
+            response = \
+                get_response(message=response_message,
+                             status_code=response.status_code)
+            return JsonResponse(response, status=response['status_code'])
+
+        elif response.status_code == 400:
+            response = \
+                get_response(message=response_message,
+                             status_code=response.status_code)
+            return JsonResponse(response, status=response['status_code'
+                                ])
+
         else:
             pass
-
         return response
 

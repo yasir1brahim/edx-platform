@@ -643,6 +643,7 @@ XQUEUE_INTERFACE = {
 ################################# Middleware ###################################
 
 MIDDLEWARE = [
+    'openedx.core.custom_exception_handler.ExceptionMiddleware',
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
     'crum.CurrentRequestUserMiddleware',

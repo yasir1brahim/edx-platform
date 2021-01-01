@@ -305,6 +305,7 @@ class UserExtraInfoInline(admin.StackedInline):
     model = UserExtraInfo
     can_delete = False
     verbose_name_plural = 'User Extra Info'
+    extra = 0
 
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """

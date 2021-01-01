@@ -21,7 +21,7 @@ class CourseReview(models.Model):
 
     review = models.CharField(max_length=1000)
 
-    created_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateField(auto_now=True)
 
     class Meta:
         #app_label = 'common.djangoapps.feedback'

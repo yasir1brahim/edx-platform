@@ -15,6 +15,8 @@ class UserExtraInfo(models.Model):
     user = models.OneToOneField(USER_MODEL, null=True, related_name='user_extra_info',
         on_delete=models.CASCADE)
 
+    date_of_birth = models.DateField(verbose_name="Date of birth")
+
     nric = models.CharField(
         verbose_name="NRIC",
         max_length=100,

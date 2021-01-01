@@ -17,9 +17,9 @@ class CourseReview(models.Model):
 
     course_id = models.ForeignKey(CourseOverview, db_index=True, on_delete=models.CASCADE, related_name='course_reviews')
 
-    rating = models.DecimalField(default=1.0, max_digits=2, decimal_places=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
+    rating = models.DecimalField(max_digits=2, decimal_places=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
 
-    review = models.CharField(null=True, blank=True, max_length=1000)
+    review = models.CharField(max_length=1000)
 
     created_at = models.DateTimeField(auto_now=True)
 

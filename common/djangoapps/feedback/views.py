@@ -35,17 +35,24 @@ class CreateCourseReviewUser(APIView):
     def post(self,request):
         """
         """
-        if CourseEnrollment.objects.filter(user=request.user, course_id=request.data['course_id']).exists():
-            course_data = CourseOverview.objects.filter(id=request.data['course_id'])
-            try:
-                review_object = CourseReviewModel.objects.create(user_id=request.user, course_id=course_data[0], rating=request.data['rating'], review=request.data['review'])
-                response = "success"
-            except Exception as e:
-                response = "feedback already submitted"
+        if ('course_id' in request.data) and ('rating' in request.data) and ('review' in request.data):
+            if CourseEnrollment.objects.filter(user=request.user, course_id=request.data['course_id']).exists():
+                course_data = CourseOverview.objects.filter(id=request.data['course_id'])
+                response = { "result":{}, "message": "Unknown error occured please try again later.", "status_code":500, "status":False  }
+                try:
+                    review_object = CourseReviewModel.objects.create(user_id=request.user, course_id=course_data[0], rating=request.data['rating'], review=request.data['review'])
+                    message = "Feedback submitted successfully."
+                    response = { "result":{}, "message": message, "status_code":200, "status":True  }
+                    return Response(response, status=status.HTTP_201_CREATED)
+                except Exception as e:
+                    message = "feedback already submitted."
+                    response = { "result":{}, "message": message, "status_code":401, "status":False  }
+                    return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                message = "user not enrolled."
+                response = { "result":{}, "message": message, "status_code":401, "status":False  }
                 return Response(response, status=status.HTTP_201_CREATED)
-            return Response(response, status=status.HTTP_201_CREATED)
         else:
-            response = "user not enrolled"
+            response = { "result":{}, "message": "Missing one of the required field (course_id, rating, review).", "status_code":401, "status":False  }
             return Response(response, status=status.HTTP_201_CREATED)
-
 

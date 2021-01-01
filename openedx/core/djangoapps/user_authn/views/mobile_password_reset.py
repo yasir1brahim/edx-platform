@@ -549,7 +549,7 @@ def password_change_request_handler(request):
 
     password_reset_email_limiter = PasswordResetEmailRateLimiter()
 
-    if password_reset_email_limiter.is_rate_limit_exceeded(request):
+    if password_reset_email_limiter.is_rate_limit_exceeded(request) and request.POST.get('email',None) is not None:
         AUDIT_LOG.warning("Password reset rate limit exceeded")
         return HttpResponse(
             _("Your previous request is in progress, please try again in a few moments."),
@@ -558,8 +558,7 @@ def password_change_request_handler(request):
 
     user = request.user
     # Prefer logged-in user's email
-    email = user.email if user.is_authenticated else request.POST.get('email')
-
+    email = request.POST.get('email')
     if email:
         try:
             request_password_change(email, request.is_secure())

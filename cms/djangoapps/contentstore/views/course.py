@@ -29,6 +29,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 from six.moves import filter
+from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -455,6 +456,32 @@ def _accessible_courses_iter_for_tests(request):
     return courses, in_process_course_actions
 
 
+def _get_course_creator_status(user):
+    """
+    Helper method for returning the course creator status for a particular user,
+    taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
+
+    If the user passed in has not previously visited the index page, it will be
+    added with status 'unrequested' if the course creator group is in use.
+    """
+
+    if user.is_staff:
+        course_creator_status = 'granted'
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
+        course_creator_status = 'disallowed_for_this_site'
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        course_creator_status = get_course_creator_status(user)
+        if course_creator_status is None:
+            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
+            # Add the user to the course creator admin table with status 'unrequested'.
+            add_user_with_status_unrequested(user)
+            course_creator_status = get_course_creator_status(user)
+    else:
+        course_creator_status = 'granted'
+
+    return course_creator_status
+
+
 def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
@@ -462,6 +489,9 @@ def _accessible_courses_list_from_groups(request):
     def filter_ccx(course_access):
         """ CCXs cannot be edited in Studio and should not be shown in this dashboard """
         return not isinstance(course_access.course_id, CCXLocator)
+    if _get_course_creator_status(request.user) != 'granted' and not request.user.is_staff:
+        return [],[]
+
     user_org = None
     if request.user.user_extra_info.organization:
         user_org = request.user.user_extra_info.organization.short_name

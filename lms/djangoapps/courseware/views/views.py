@@ -257,7 +257,10 @@ def courses(request):
         elif request.user.is_staff:
             filter_ = {}
         elif _get_course_creator_status(request.user) == 'granted':
-            filter_ = {'organization' : request.user.user_extra_info.organization.id }
+            if request.user.user_extra_info.organization:
+                filter_ = {'organization' : request.user.user_extra_info.organization.id }
+            else:
+                filter_ = {'organization': None}
         else:
             filter_ = {'organization': None}
         courses_list = get_courses_with_extra_info(request.user,filter_=filter_)

@@ -66,6 +66,7 @@ from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
+    get_courses_with_extra_info,
     get_current_child,
     get_permission_for_course_about,
     get_studio_url,
@@ -251,13 +252,15 @@ def courses(request):
     filter_ = None
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        log.info("====course_creator===")
-        # log.info(_get_course_creator_status(request.user))
         if not request.user.id:
             filter_ = {'organization' : None }
-        elif _get_course_creator_status(request.user) != 'granted':
-            filter_ = {'organization' : None }
-        courses_list = get_courses(request.user,filter_=filter_)
+        elif request.user.is_staff:
+            filter_ = {}
+        elif _get_course_creator_status(request.user) == 'granted':
+            filter_ = {'organization' : request.user.user_extra_info.organization.id }
+        else:
+            filter_ = {'organization': None}
+        courses_list = get_courses_with_extra_info(request.user,filter_=filter_)
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):

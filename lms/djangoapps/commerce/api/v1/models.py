@@ -14,6 +14,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SubCategory, CourseOverviewImageSet
 from student.models import CourseEnrollment
 from django.db.models import Avg
+from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
 
 log = logging.getLogger(__name__)
 
@@ -158,23 +159,77 @@ class Course(object):
 
     @property
     def discount_applicable(self):
-        return self.discount_info['discount_applicable']
+        return self.discount_info['discount_applicable'] if self.discount_info else False
+
+    @property
+    def web_discount_applicable(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        configured_percentage = DiscountPercentageConfig.objects.filter(course=course_id).order_by('-id')
+        if len(configured_percentage) and configured_percentage[0].percentage > 0:
+            return True
+        return False
+
+
+    @property
+    def web_discounted_price(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        configured_percentage = DiscountPercentageConfig.objects.filter(course=course_id).order_by('-id')
+        course_mode_price = self.get_paid_mode_price()
+        if len(configured_percentage) and configured_percentage[0].percentage > 0:
+            #course_mode_price = self.get_paid_mode_price()
+            if course_mode_price:
+                return (configured_percentage[0].percentage/100) * course_mode_price
+            else:
+                return 0.0
+
+        return course_mode_price
+
+    @property
+    def web_discount_percentage(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        configured_percentage = DiscountPercentageConfig.objects.filter(course=course_id).order_by('-id')
+        course_mode_price = self.get_paid_mode_price()
+        if len(configured_percentage) and configured_percentage[0].percentage > 0:
+            if course_mode_price:
+                return configured_percentage[0].percentage 
+            else:
+                return 0.0
+
+        return 0.0
+
+
+
 
     @property
     def discounted_price(self):
-        #return 2.5
         course_mode_price = self.get_paid_mode_price()
-        if self.discount_info['discount_applicable']:
+        if self.discount_info and self.discount_info['discount_applicable']:
             jwt_token = self.discount_info['jwt']
             decoded_jwt = jwt.decode(jwt_token, verify=False)
             discount_percentage = decoded_jwt['discount_percent']
-            #course_mode_price = self.get_paid_mode_price()
+            course_mode_price = self.get_paid_mode_price()
             if course_mode_price:
                 return (discount_percentage/100) * course_mode_price
             else:
                 return 0.0
 
         return course_mode_price
+
+
+    @property
+    def discount_percentage(self):
+        course_mode_price = self.get_paid_mode_price()
+        if self.discount_info and  self.discount_info['discount_applicable']:
+            jwt_token = self.discount_info['jwt']
+            decoded_jwt = jwt.decode(jwt_token, verify=False)
+            discount_percentage = decoded_jwt['discount_percent']
+            course_mode_price = self.get_paid_mode_price()
+            if course_mode_price:
+                return discount_percentage
+            else:
+                return 0.0
+        return 0.0
+
 
     @property
     def sale_type(self):

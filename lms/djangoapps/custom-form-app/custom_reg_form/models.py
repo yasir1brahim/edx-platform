@@ -22,7 +22,7 @@ class UserExtraInfo(models.Model):
         null=True
     )
     industry = models.ForeignKey(Category, related_name='users_industry', 
-        on_delete=models.SET_NULL, blank=True, null=True)
+        on_delete=models.DO_NOTHING)
     organization = models.ForeignKey(Organization, related_name='instructor_org', 
         on_delete=models.SET_NULL, blank=True, null=True)
 

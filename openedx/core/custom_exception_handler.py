@@ -103,6 +103,17 @@ class ExceptionMiddleware(object):
                              status_code=response.status_code)
             return JsonResponse(response, status=response['status_code'
                                 ])
+        elif response.status_code == 401:
+            response_dict = json.loads(response.content.decode('utf-8')) if response.content else {}
+            msg_json = response_dict['developer_message']
+            if not type(response_dict['developer_message']) == str:
+                msg_json = response_dict['developer_message']['developer_message']
+
+            response = \
+                get_response(message=msg_json,
+                             status_code=response.status_code)
+            return JsonResponse(response, status=response['status_code'
+                                ])
 
         else:
             pass

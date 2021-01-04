@@ -252,6 +252,14 @@
                             })
                         },
                         {
+                            view: new AccountSettingsFieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('Date of birth'),
+                                valueAttribute: 'date_of_birth',
+                                persistChanges: true
+                            })
+                        },
+                        {
                             view: new AccountSettingsFieldViews.DropdownFieldView({
                                 model: userAccountModel,
                                 title: gettext('Industry'),

@@ -193,7 +193,8 @@ class UserReadOnlySerializer(serializers.Serializer):
             data.update(
                 {
                     "nric": user_extra_info.nric,
-                    "industry": getattr(user_extra_info.industry, 'id', None)
+                    "industry": getattr(user_extra_info.industry, 'id', None),
+                    "date_of_birth": user_extra_info.date_of_birth,
                 }
             )
 
@@ -248,7 +249,7 @@ class AccountUserExtraInfoSerializer(serializers.HyperlinkedModelSerializer, Rea
 
     class Meta(object):
         model = UserExtraInfo
-        fields = ("nric","industry")
+        fields = ("nric","industry","date_of_birth")
         # read_only_fields = ("nric","industry")
         explicit_read_only_fields = ()
 
@@ -688,7 +689,8 @@ class UserExtraFieldReadOnlySerializer(serializers.Serializer):
             data.update(
                 {
                     "nric": user_extra_info.nric,
-                    "industry": getattr(user_extra_info.industry, 'name', None)
+                    "industry": getattr(user_extra_info.industry, 'name', None),
+                    "date_of_birth": user_extra_info.date_of_birth,
                 }
             )
 

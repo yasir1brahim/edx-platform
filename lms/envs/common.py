@@ -3331,6 +3331,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "phone_number",
         "nric",
         "industry",
+        "date_of_birth",
     ]
 )
 

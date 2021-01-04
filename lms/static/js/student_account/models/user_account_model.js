@@ -19,6 +19,7 @@
                 mailing_address: '',
                 year_of_birth: null,
 		nric: '',
+                date_of_birth: null,
 		industry: null,
                 bio: null,
                 social_links: [],

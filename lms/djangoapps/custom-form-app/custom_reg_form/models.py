@@ -15,7 +15,7 @@ class UserExtraInfo(models.Model):
     user = models.OneToOneField(USER_MODEL, null=True, related_name='user_extra_info',
         on_delete=models.CASCADE)
 
-    date_of_birth = models.DateField(verbose_name="Date of birth")
+    date_of_birth = models.DateField(verbose_name="Date of birth", null=True, blank=True)
 
     nric = models.CharField(
         verbose_name="NRIC",
@@ -24,7 +24,7 @@ class UserExtraInfo(models.Model):
         null=True
     )
     industry = models.ForeignKey(Category, related_name='users_industry', 
-        on_delete=models.DO_NOTHING)
+        on_delete=models.DO_NOTHING, blank=True, null=True)
     organization = models.ForeignKey(Organization, related_name='instructor_org', 
         on_delete=models.SET_NULL, blank=True, null=True)
 

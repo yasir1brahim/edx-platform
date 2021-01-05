@@ -4,6 +4,8 @@
 import logging
 from itertools import groupby
 
+from babel.numbers import get_currency_symbol
+
 import six
 from django.db import transaction
 from opaque_keys import InvalidKeyError
@@ -178,7 +180,7 @@ class Course(object):
         if len(configured_percentage) and configured_percentage[0].percentage > 0:
             #course_mode_price = self.get_paid_mode_price()
             if course_mode_price:
-                return (configured_percentage[0].percentage/100) * course_mode_price
+                return (course_mode_price - ( (configured_percentage[0].percentage/100) * course_mode_price))
             else:
                 return 0.0
 
@@ -197,6 +199,15 @@ class Course(object):
 
         return 0.0
 
+
+    @property
+    def currency(self):
+        try:
+            currency = self.modes[0].currency.upper()
+            symbol = get_currency_symbol(currency)
+            return symbol
+        except:
+            return "S$"
 
 
 

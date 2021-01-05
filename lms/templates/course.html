@@ -38,7 +38,7 @@ font-size: 12px;
 line-height: 0;
 margin: 0px 20px 0px 0px;
 display: inline-block;
-font-weight: 600;
+font-weight: 400;
 color: #000000;
 }
 
@@ -57,6 +57,136 @@ padding-left: 0px !important;
 .coure-label span {
 margin-left: 7px;
 }
+
+.courses-container .courses .course .course-info {
+
+    height: 300px;
+
+}
+
+.find-courses .courses-container .courses .courses-listing .courses-listing-item, .university-profile .courses-container .courses .courses-listing .courses-listing-item {
+
+    max-height: 450px;
+
+}
+
+.course-date.localized_datetime {
+
+    position: absolute;
+
+    bottom: 10px;
+
+}
+
+.cut-price {
+
+    text-decoration: line-through;
+
+}
+
+.price_details ul li {
+
+    list-style-type: none;
+
+    font-size: 12px;
+
+    padding:2px 0px !important;
+
+    color:#000;
+
+        font-weight: 500;
+
+}
+
+
+
+.price_details ul {
+
+    padding: 0px;
+
+    margin: 5px 0px;
+
+}
+
+
+
+.price_details ul li:last-child {
+
+    border: none;
+
+}
+
+.price_details ul li:first-child {
+
+    padding-left: 0px !important;
+
+}
+
+
+
+.price_details ul li .cut_price {
+
+    text-decoration: line-through;
+
+    color: red;
+
+}
+
+
+
+.price_details ul li span {
+
+    font-weight: 600;
+
+}
+
+
+
+.price_details ul li .main_price {
+
+    font-size: 16px;
+
+}
+
+
+
+
+
+.course_number .total_chapters, .course_number .completed_chapters {
+
+    background: #0075b4;
+
+    color: #fff;
+
+    font-weight: 600;
+
+    padding: 2px;
+
+    border-radius: 50%;
+
+    width: 25px;
+
+    height: 25px;
+
+    display: inline-block;
+
+    vertical-align: middle;
+
+    text-align: center;
+
+    line-height: 1.5;
+
+}
+
+
+
+.course_number {
+
+    vertical-align: bottom;
+
+}
+
+
 
 </style>
 
@@ -77,7 +207,40 @@ margin-left: 7px;
         <p class="coure-label">Enrollment Count:<span class="course-enrollments_count">${course.enrollments_count}</span></p>
         <p class="coure-label">Rating:<span class="course-ratings">${course.ratings}</span></p>
         <p class="coure-label">Comments Count:<span class="course-comments_count">${course.comments_count}</span></p>
-        <p class="coure-label">Price:<span class="course-price">${course.price}</span></p>
+      % if course.discount_applicable:
+          <div class="price_details">
+
+    <ul>
+
+    <li> Discount Percentage: <span>${course.discount_percentage}%</span></li>
+
+    <li>Price: <span class="cut_price">${course.price}S$</span></li>
+
+       % if course.discounted_price == 0:
+	    <li>Discount Price: <span class="main_price">Free</span></li>
+       % else:
+            <li>Discount Price: <span class="main_price">${course.discounted_price}S$</span></li>
+       % endif
+
+	</ul>
+
+          </div>
+      % else:
+         <div class="price_details">
+
+    <ul>
+    
+    % if course.price == 0:
+        <li>Price: <span class="main_price">Free</span></li>
+    % else:
+        <li>Price: <span class="main_price">${course.price}S$</span></li>
+    %endif
+	</ul>
+
+</div>
+
+       
+      % endif
       </h2>
       <%
       if course.start is not None:

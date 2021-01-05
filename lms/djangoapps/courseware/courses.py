@@ -659,6 +659,7 @@ def get_courses_with_extra_info(user, org=None, filter_=None):
         course.discount_applicable = course_extra_info.web_discount_applicable
         course.discount_percentage = course_extra_info.web_discount_percentage
         course.discounted_price = course_extra_info.web_discounted_price
+        course.currency = course_extra_info.currency
         if len(course_extra_info.modes) == 0:
             course.price = 0
         else:

@@ -244,12 +244,11 @@
                             })
                         },
                         {
-                            view: new AccountSettingsFieldViews.TextFieldView({
+                            view: new AccountSettingsFieldViews.ReadonlyFieldView({
                                 model: userAccountModel,
                                 title: gettext('NRIC'),
                                 valueAttribute: 'nric',
-                                persistChanges: true,
-                                checkNull: true
+                                persistChanges: true
                             })
                         },
                         {

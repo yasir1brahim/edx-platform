@@ -187,6 +187,7 @@ def update_account_settings(requesting_user, update, username=None):
     if requesting_user.username != username:
         raise errors.UserNotAuthorized()
     user, user_profile = _get_user_and_profile(username)
+    user_extra_info = user.user_extra_info
     # Validate fields to update
     field_errors = {}
     _validate_read_only_fields(user, update, field_errors)
@@ -201,6 +202,9 @@ def update_account_settings(requesting_user, update, username=None):
     _validate_secondary_email(user, update, field_errors)
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
+    #_validate_nric_change(user_extra_info,update, field_errors)
+    _validate_dob_change(user_extra_info,update, field_errors)
+    _validate_industry_change(user_extra_info,update, field_errors)
 
     if field_errors:
         raise errors.AccountValidationError(field_errors)
@@ -244,6 +248,57 @@ def _validate_read_only_fields(user, data, field_errors):
         }
         del data[read_only_field]
 
+def _validate_nric_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "nric" not in data:
+        return
+
+    nric = data["nric"]
+    try:
+        if nric == '' or len(nric) != 4:
+            raise ValueError('Please enter a valid 4-digit NRIC.')
+    except ValueError as err:
+        field_errors["nric"] = {
+            "developer_message": u"Error thrown from NRIC: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
+
+def _validate_dob_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "date_of_birth" not in data:
+        return
+    log.info("===date_of_birth===")
+    log.info(data)
+    date_of_birth = data["date_of_birth"]
+    try:
+        if date_of_birth == '':
+            raise ValueError('Please enter your Date of Birth.')
+    except ValueError as err:
+        field_errors["date_of_birth"] = {
+            "developer_message": u"Error thrown from Date of Birth: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
+
+def _validate_industry_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "industry" not in data:
+        return
+
+    industry = data["industry"]
+    try:
+        if industry == '':
+            raise ValueError('Please select an Industry of your choice.')
+    except ValueError as err:
+        field_errors["industry"] = {
+            "developer_message": u"Error thrown from Industry: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
 
 def _validate_email_change(user, data, field_errors):
     # If user has requested to change email, we must call the multi-step process to handle this.
@@ -480,6 +535,9 @@ def get_country_validation_error(country):
     """
     return _validate(_validate_country, errors.AccountCountryInvalid, country)
 
+def get_nric_validation_error(nric):
+    return _validate(_validate_nric, errors.AccountNricInvalid, nric)
+
 
 def get_username_existence_validation_error(username):
     """Get the built-in validation error message for when
@@ -645,6 +703,15 @@ def _validate_country(country):
     if country == '' or country == '--':
         raise errors.AccountCountryInvalid(accounts.REQUIRED_FIELD_COUNTRY_MSG)
 
+def _validate_country(nric):
+    """Validate the NRIC input.
+
+    :param nric: The proposed nric value.
+    :return: None
+
+    """
+    if nric == '' or nric == '--':
+        raise errors.AccountNricInvalid(accounts.REQUIRED_FIELD_NRIC_MSG)
 
 def _validate_username_doesnt_exist(username):
     """Validate that the username is not associated with an existing user.

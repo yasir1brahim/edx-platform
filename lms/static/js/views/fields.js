@@ -313,7 +313,8 @@
             },
 
             updateValueInField: function() {
-                this.$('.u-field-value ').text(this.modelValue());
+                var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? 'Unverified' : this.modelValue();
+                this.$('.u-field-value ').text(value);
             }
         });
 
@@ -349,6 +350,7 @@
             }
         });
 
+
         FieldViews.TextFieldView = FieldViews.EditableFieldView.extend({
 
             fieldType: 'text',
@@ -374,6 +376,7 @@
                     placeholder: this.options.placeholder || ''
                 }));
                 this.delegateEvents();
+                this.updateValueInField();
                 return this;
             },
 
@@ -384,6 +387,12 @@
             updateValueInField: function() {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
                 this.$('.u-field-value input').val(value);
+                if (this.options.valueAttribute=="date_of_birth"){
+                  var attributes = {};
+                  var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
+                  attributes[this.options.valueAttribute] = value
+                  this.saveAttributes(attributes);
+                }
             },
 
             saveValue: function() {
@@ -486,6 +495,13 @@
                     value = this.options.placeholderValue || '';
                 }
                 this.$('.u-field-value-readonly').text(value);
+
+                if (this.options.valueAttribute==="industry"){
+                  var attributes = {};
+                  var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
+                  attributes[this.options.valueAttribute] = value
+                  this.saveAttributes(attributes);
+                }
 
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();

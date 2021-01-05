@@ -248,7 +248,8 @@
                                 model: userAccountModel,
                                 title: gettext('NRIC'),
                                 valueAttribute: 'nric',
-                                persistChanges: true
+                                persistChanges: true,
+                                checkNull: true
                             })
                         },
                         {
@@ -256,6 +257,7 @@
                                 model: userAccountModel,
                                 title: gettext('Date of birth'),
                                 valueAttribute: 'date_of_birth',
+                                placeholder: 'YYYY-MM-DD',
                                 persistChanges: true
                             })
                         },

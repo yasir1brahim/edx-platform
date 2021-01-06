@@ -5,6 +5,15 @@ from django.http import JsonResponse
 import logging
 import json
 import re
+
+def is_json(myjson):
+  try:
+    json_object = json.loads(myjson)
+  except ValueError as e:
+    return False
+  return True
+
+
 def get_response(
     message='',
     result={},
@@ -98,22 +107,63 @@ class ExceptionMiddleware(object):
             return JsonResponse(response, status=response['status_code'])
 
         elif response.status_code == 400:
-            response = \
-                get_response(message=response_message,
-                             status_code=response.status_code)
-            return JsonResponse(response, status=response['status_code'
-                                ])
-        elif response.status_code == 401:
-            response_dict = json.loads(response.content.decode('utf-8')) if response.content else {}
-            msg_json = response_dict['developer_message']
-            if not type(response_dict['developer_message']) == str:
-                msg_json = response_dict['developer_message']['developer_message']
+            response_dict = {}
+            if is_json(response.content.decode('utf-8')):
+                response_dict = json.loads(response.content.decode('utf-8')) if response.content else {}
+            msg_json = response_message
+            if response_dict and 'developer_message' in response_dict:
+                msg_json = response_dict['developer_message']
+                if not type(response_dict['developer_message']) == str:
+                    msg_json = response_dict['developer_message']['developer_message']
+            elif response_dict and 'message' in response_dict:
+                msg_json = response_dict['message']
+                if not type(response_dict['message']) == str:
+                    msg_json = response_dict['message']['message']
+            elif response_dict and 'field_errors' in response_dict:
+                msg_json = response_dict['field_errors']
+                #if not type(response_dict['field_errors']) == str:
+                #    msg_json = response_dict['field_errors']['developer_message']
 
             response = \
                 get_response(message=msg_json,
                              status_code=response.status_code)
             return JsonResponse(response, status=response['status_code'
                                 ])
+        elif response.status_code == 401:
+            response_dict = json.loads(response.content.decode('utf-8')) if response.content else {}
+            msg_json = response_message
+            if response_dict and 'developer_message' in response_dict:
+                msg_json = response_dict['developer_message']
+                if not type(response_dict['developer_message']) == str:
+                    msg_json = response_dict['developer_message']['developer_message']
+            elif response_dict and 'message' in response_dict:
+                msg_json = response_dict['message']
+                if not type(response_dict['message']) == str:
+                    msg_json = response_dict['message']['message']
+
+            response = \
+                get_response(message=msg_json,
+                             status_code=response.status_code)
+            return JsonResponse(response, status=response['status_code'
+                                ])
+        elif response.status_code == 409:
+            response_dict = json.loads(response.content.decode('utf-8')) if response.content else {}
+            msg_json = response_message
+            if response_dict and 'developer_message' in response_dict:
+                msg_json = response_dict['developer_message']
+                if not type(response_dict['developer_message']) == str:
+                    msg_json = response_dict['developer_message']['developer_message']
+            elif response_dict and 'message' in response_dict:
+                msg_json = response_dict['message']
+                if not type(response_dict['message']) == str:
+                    msg_json = response_dict['message']['message']
+
+            response = \
+                get_response(message=msg_json,
+                             status_code=response.status_code)
+            return JsonResponse(response, status=response['status_code'
+                                ])
+
 
         else:
             pass

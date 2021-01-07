@@ -8,22 +8,53 @@ import requests
 import json 
 from django.conf import settings
 
+def get_response(
+    message='',
+    result={},
+    status=False,
+    status_code=200
+    ):
+    return {
+        'message': message,
+        'result': result,
+        'status': status,
+        'status_code': status_code
+    }
+
+
+
 class CustomObtainAuthToken(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
+            data = dict(request.POST.lists())
+            undata = {}
+            for key, value in data.items():
+                undata[key] = value[0]
+
+            logging.info("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= undata: %s",undata)
             user_exist = User.objects.filter(email=request.POST.get("username")).exists()
             if user_exist:
                 user = User.objects.get(email=request.POST.get("username"))
             else:
                 user = User.objects.get(username=request.POST.get("username"))
             if user.is_active:
-                response = requests.post(settings.LMS_ROOT_URL+"/oauth2/access_token", params=request.POST)
-                resp_json = response.json()
-                if "access_token" in resp_json:
-                    resp_json['username'] = user.username
+                response = requests.post(settings.LMS_ROOT_URL+"/oauth2/access_token", data=undata)
+                resp_json = {}
+                response_json = response.json()
+                if "error" in response_json:
+                    resp_json['message'] = response_json['error']
+                    resp_json['status_code']=400
+                    resp_json['result']={}
+                    resp_json['status']="false"
+                if "access_token" in response_json:
+                    response_json['username'] = user.username
+                    resp_json['result'] = response_json
+                    resp_json['message'] = "Success"
+                    resp_json['status_code']=200
+                    resp_json['status']="true"
                 return Response(resp_json)
             else:
-                return Response({"error": "Email not verified."})
-        except:
-                return Response({"error": "Invalid username."})
+                return Response({"status":"false","status_code":400,"result":{},"message": "Email not verified."})
+        except Exception as e:
+                return Response({"status":"false","status_code":400,"result":{},"message": str(e)})

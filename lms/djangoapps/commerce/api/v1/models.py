@@ -17,6 +17,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from student.models import CourseEnrollment
 from django.db.models import Avg
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -148,7 +149,7 @@ class Course(object):
         course_id = CourseKey.from_string(six.text_type(self.id))
 
         try:
-            url = 'http://134.209.96.11/api/discounts/course/' + str(course_id)
+            url = settings.LMS_ROOT_URL + '/api/discounts/course/' + str(course_id)
             headers={'Authorization': self.jwt_token}
             response = json.loads(requests.get(url=url,headers=headers).text)
             return response

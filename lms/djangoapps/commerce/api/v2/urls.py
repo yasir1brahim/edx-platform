@@ -16,4 +16,5 @@ app_name = 'v2'
 
 urlpatterns = [
     url(r'^courses/', include(COURSE_URLS)),
+    url(r'^courses/{}'.format(settings.COURSE_KEY_PATTERN), views.CourseDetailView.as_view(), name="course-detail"),
 ]

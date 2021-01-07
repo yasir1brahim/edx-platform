@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from openedx.core.lib.api.authentication import BearerAuthentication
 from rest_framework.authentication import SessionAuthentication
@@ -6,10 +6,20 @@ from rest_framework.permissions import IsAuthenticated
 from .filters import LazyPageNumberPagination
 from operator import attrgetter
 from ..v1.models import Course
-from ..v1.serializers import CourseSerializer
+from ..v1.serializers import CourseSerializer, CourseDetailSerializer
 import logging
 log = logging.getLogger(__name__)
 import json
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from opaque_keys.edx.keys import CourseKey
+from course_modes.models import CourseMode
+from rest_framework.serializers import ValidationError
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.course_api.blocks.api import get_blocks
+from xmodule.modulestore.django import modulestore
+
 class CourseListView(ListAPIView):
     """ List courses and modes. """
     class CourseListPageNumberPagination(LazyPageNumberPagination):
@@ -84,3 +94,40 @@ class CourseListView(ListAPIView):
                     course_list.sort(key=lambda x: (x.discounted_price is None, x.discounted_price))
 
         return course_list
+
+
+@view_auth_classes(is_authenticated=True)
+class CourseDetailView(RetrieveAPIView):
+    serializer_class = CourseDetailSerializer
+    def get_object(self):
+        course_key = self.kwargs['course_key_string']
+        course_id = CourseKey.from_string(course_key)
+        course = get_course_by_id(course_id)
+
+        try:
+            course_modes = CourseMode.objects.filter(course_id=course_id)
+            course.modes = course_modes
+            course_overview = CourseOverview.get_from_id(course_id)
+            course.image_urls = course_overview.image_urls
+            course_extra_info = Course(course.id,list(course_modes))
+            course.enrollments_count = course_extra_info.enrollments_count
+            course.ratings = float("{:.2f}".format(course_extra_info.ratings)) if course_extra_info.ratings else None
+            course.comments_count = course_extra_info.comments_count
+            course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
+            course.discount_applicable = course_extra_info.web_discount_applicable
+            course.discount_percentage = course_extra_info.web_discount_percentage
+            course.discounted_price = course_extra_info.web_discounted_price
+            course.currency = course_extra_info.currency
+            course.description = course_overview.short_description
+            course_usage_key = modulestore().make_course_usage_key(course_id)
+            response = get_blocks(self.request,course_usage_key,self.request.user,requested_fields=['completion'],block_types_filter='vertical')
+            course.chapter_count = len(response['blocks'])
+
+            if len(course_extra_info.modes) == 0:
+                course.price = 0
+            else:
+                course.price = course_extra_info.modes[0].min_price
+            return course
+        except Exception as e:
+            response = {"status": False, "message":e, "result":None, "status_code": 500}
+            return response

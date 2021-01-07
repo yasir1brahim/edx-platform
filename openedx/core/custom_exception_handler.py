@@ -120,7 +120,10 @@ class ExceptionMiddleware(object):
                 if not type(response_dict['message']) == str:
                     msg_json = response_dict['message']['message']
             elif response_dict and 'field_errors' in response_dict:
-                msg_json = response_dict['field_errors']
+                msg_json = 'Error thrown from fields'
+                for key in response_dict['field_errors']:
+                    msg_json = msg_json +', '+ key
+                msg_json = msg_json + ': Please select valid values for the fields.'
                 #if not type(response_dict['field_errors']) == str:
                 #    msg_json = response_dict['field_errors']['developer_message']
 

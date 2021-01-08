@@ -32,29 +32,33 @@ class CustomObtainAuthToken(APIView):
             for key, value in data.items():
                 undata[key] = value[0]
 
-            logging.info("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= undata: %s",undata)
             user_exist = User.objects.filter(email=request.POST.get("username")).exists()
             if user_exist:
                 user = User.objects.get(email=request.POST.get("username"))
             else:
                 user = User.objects.get(username=request.POST.get("username"))
-            if user.is_active:
-                response = requests.post(settings.LMS_ROOT_URL+"/oauth2/access_token", data=undata)
-                resp_json = {}
-                response_json = response.json()
-                if "error" in response_json:
-                    resp_json['message'] = response_json['error']
-                    resp_json['status_code']=400
-                    resp_json['result']={}
-                    resp_json['status']="false"
-                if "access_token" in response_json:
-                    response_json['username'] = user.username
-                    resp_json['result'] = response_json
-                    resp_json['message'] = "Success"
-                    resp_json['status_code']=200
-                    resp_json['status']="true"
-                return Response(resp_json)
+
+            if user.check_password(request.POST.get("password")):
+                if user.is_active:
+                    response = requests.post(settings.LMS_ROOT_URL+"/oauth2/access_token", data=undata)
+                    resp_json = {}
+                    response_json = response.json()
+                    if "error" in response_json:
+                        resp_json['message'] = response_json['error']
+                        resp_json['status_code']=400
+                        resp_json['result']={}
+                        resp_json['status']="false"
+                    if "access_token" in response_json:
+                        response_json['username'] = user.username
+                        resp_json['result'] = response_json
+                        resp_json['message'] = "Success"
+                        resp_json['status_code']=200
+                        resp_json['status']="true"
+                    return Response(resp_json)
+                else:
+                    return Response({"status":"false","status_code":400,"result":{},"message": "Email not verified."})
             else:
-                return Response({"status":"false","status_code":400,"result":{},"message": "Email not verified."})
+                return Response({"status":"false","status_code":400,"result":{},"message": "Invalid username or password."})
+
         except Exception as e:
                 return Response({"status":"false","status_code":400,"result":{},"message": str(e)})

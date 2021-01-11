@@ -18,7 +18,7 @@ class ReviewSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     
     """
 
-    created_at = serializers.DateTimeField()
+    created_at = serializers.DateField()
     id = serializers.CharField()  # pylint: disable=invalid-name
     review = serializers.CharField()
     rating = serializers.CharField()

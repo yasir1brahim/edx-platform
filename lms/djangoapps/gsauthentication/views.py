@@ -1,3 +1,4 @@
+
 from openedx.core.djangoapps.oauth_dispatch.views import AccessTokenView
 from oauth2_provider.models import AccessToken as Token
 from rest_framework.response import Response
@@ -31,6 +32,9 @@ class CustomObtainAuthToken(APIView):
             undata = {}
             for key, value in data.items():
                 undata[key] = value[0]
+            
+            if not request.POST.get("token_type"):
+                return Response({"status":"false","status_code":400,"result":{},"message": "Missing data token_type."})
 
             user_exist = User.objects.filter(email=request.POST.get("username")).exists()
             if user_exist:

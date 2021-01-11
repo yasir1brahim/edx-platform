@@ -10,6 +10,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.exceptions import NotFound
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from openedx.core.lib.api.authentication import BearerAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
@@ -289,8 +290,7 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
         return super(LazyPageNumberPagination, self).get_paginated_response(data)
 
-
-@view_auth_classes(is_authenticated=True)
+#@view_auth_classes(is_authenticated=True)
 class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
     **Use Cases**
@@ -357,6 +357,9 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
               }
             ]
     """
+    authentication_classes = (BearerAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     class CourseListPageNumberPagination(LazyPageNumberPagination):
         max_page_size = 100
 

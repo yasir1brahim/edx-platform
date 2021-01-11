@@ -13,7 +13,7 @@ from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthoriz
 class AccountViewSet(ViewSet):
 
     authentication_classes = (
-        JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+        BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)

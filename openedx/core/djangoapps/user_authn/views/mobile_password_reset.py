@@ -547,19 +547,24 @@ def password_change_request_handler(request):
 
     """
 
-    password_reset_email_limiter = PasswordResetEmailRateLimiter()
+    #password_reset_email_limiter = PasswordResetEmailRateLimiter()
 
-    if password_reset_email_limiter.is_rate_limit_exceeded(request) and request.POST.get('email',None) is not None:
-        AUDIT_LOG.warning("Password reset rate limit exceeded")
-        return HttpResponse(
-            _("Your previous request is in progress, please try again in a few moments."),
-            status=403
-        )
+    #if password_reset_email_limiter.is_rate_limit_exceeded(request) and request.POST.get('email',None) is not None:
+    #    AUDIT_LOG.warning("Password reset rate limit exceeded")
+    #    return HttpResponse(
+    #        _("Your previous request is in progress, please try again in a few moments."),
+    #        status=403
+    #    )
 
     user = request.user
     # Prefer logged-in user's email
     email = request.POST.get('email')
+
     if email:
+        test = User.objects.filter(email=request.POST.get('email'))
+        if not test.exists():
+            return HttpResponseBadRequest(_("User with email "+email+" not found."))
+
         try:
             request_password_change(email, request.is_secure())
             user = user if user.is_authenticated else _get_user_from_email(email=email)
@@ -590,7 +595,7 @@ def password_change_request_handler(request):
                           .format(email=email, error=err))
             return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
 
-        password_reset_email_limiter.tick_request_counter(request)
+        #password_reset_email_limiter.tick_request_counter(request)
         return HttpResponse(status=200)
     else:
         return HttpResponseBadRequest(_("No email address provided."))

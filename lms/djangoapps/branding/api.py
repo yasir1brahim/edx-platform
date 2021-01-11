@@ -568,7 +568,6 @@ def get_organization_logo_url(username):
     Arguments:
         username the login username
     """
-    logging.info("=-=-=-=-=-=-=-=-=-=-=-=-=- user: %s", username)
     try:
         user = User.objects.get(username=username)
         organization = user.user_extra_info.organization

@@ -432,7 +432,7 @@ class PopularCourseListView(DeveloperErrorViewMixin, ListAPIView):
 
 
 
-@view_auth_classes(is_authenticated=False)
+@view_auth_classes(is_authenticated=True)
 class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
 
     class CategoryListPageNumberPagination(LazyPageNumberPagination):

@@ -471,7 +471,7 @@ class CustomAPIException(ValidationError):
         if status_code is not None:
             self.status_code = status_code
 
-@view_auth_classes(is_authenticated=False)
+@view_auth_classes(is_authenticated=True)
 class SubCategoryListView(DeveloperErrorViewMixin, ListAPIView):
 
     class SubCategoryListPageNumberPagination(LazyPageNumberPagination):
@@ -485,11 +485,15 @@ class SubCategoryListView(DeveloperErrorViewMixin, ListAPIView):
     def get_queryset(self, *args, **kwargs):
         category = self.request.GET.get('category',None)
         qs = None
-        if category.isnumeric():
-            qs = SubCategory.objects.filter(category=category)
-            return qs
+        if category:
+            if category.isnumeric():
+                qs = SubCategory.objects.filter(category=category)
+                return qs
+            else:
+                raise CustomAPIException("Invalid course ID.", status_code=status.HTTP_404_NOT_FOUND)
         else:
-            raise CustomAPIException("Invalid course ID.", status_code=status.HTTP_404_NOT_FOUND)
+            return SubCategory.objects.all()
+
 
 class CourseIdListUserThrottle(UserRateThrottle):
     """Limit the number of requests users can make to the course list id API."""

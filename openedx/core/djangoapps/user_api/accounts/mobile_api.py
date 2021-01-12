@@ -7,8 +7,9 @@ from openedx.core.lib.api.parsers import MergePatchParser
 from rest_framework.response import Response
 from django.db import transaction
 from rest_framework.viewsets import ViewSet
-
+import logging
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
+import datetime
 
 class AccountViewSet(ViewSet):
 
@@ -25,6 +26,8 @@ class AccountViewSet(ViewSet):
         try:
             account_settings = get_account_extra_settings(
                 request, [username], view=request.query_params.get('view'))
+            if account_settings[0]['date_of_birth']:
+                account_settings[0]['age'] = datetime.date.today().year - account_settings[0]['date_of_birth'].year
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -42,6 +45,8 @@ class AccountViewSet(ViewSet):
             with transaction.atomic():
                 update_account_settings(request.user, request.data, username=username)
                 account_settings = get_account_extra_settings(request, [username])[0]
+                if account_settings['date_of_birth']:
+                    account_settings['age'] = datetime.date.today().year - account_settings['date_of_birth'].year
         except UserNotAuthorized:
             return Response(status=status.HTTP_403_FORBIDDEN)
         except UserNotFound:

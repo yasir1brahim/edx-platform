@@ -123,7 +123,15 @@ class ExceptionMiddleware(object):
                 msg_json = 'Error thrown from fields'
                 for key in response_dict['field_errors']:
                     msg_json = msg_json +', '+ key
-                msg_json = msg_json + ': Please select valid values for the fields.'
+
+                if 'date_of_birth' in response_dict['field_errors']:
+                    dob_error = response_dict['field_errors']['date_of_birth']['developer_message']
+                    if dob_error:
+                        msg_json = dob_error
+                else:
+                    msg_json = msg_json + ': Please select valid values for the fields.'
+
+                #msg_json = msg_json + ': Please select valid values for the fields.'
                 #if not type(response_dict['field_errors']) == str:
                 #    msg_json = response_dict['field_errors']['developer_message']
 

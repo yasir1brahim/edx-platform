@@ -2,10 +2,20 @@ from django.conf import settings
 from django.db import models
 from openedx.core.djangoapps.content.course_overviews.models import Category
 from organizations.models import Organization
+from datetime import datetime 
+from django.core.exceptions import ValidationError
 
 # Backwards compatible settings.AUTH_USER_MODEL
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
+def age_validator(date):
+    dob = date.year
+    year = datetime.today().year
+    age = year - dob
+    if age < 18:
+        raise ValidationError("Age can't be less than 18.")
+    else:
+        return date
 
 class UserExtraInfo(models.Model):
     """
@@ -15,7 +25,7 @@ class UserExtraInfo(models.Model):
     user = models.OneToOneField(USER_MODEL, null=True, related_name='user_extra_info',
         on_delete=models.CASCADE)
 
-    date_of_birth = models.DateField(verbose_name="Date of birth", null=True, blank=True)
+    date_of_birth = models.DateField(verbose_name="Date of birth", null=True, blank=True, validators=[age_validator])
 
     nric = models.CharField(
         verbose_name="NRIC",

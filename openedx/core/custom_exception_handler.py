@@ -127,7 +127,8 @@ class ExceptionMiddleware(object):
                 if 'date_of_birth' in response_dict['field_errors']:
                     dob_error = response_dict['field_errors']['date_of_birth']['developer_message']
                     if dob_error:
-                        msg_json = dob_error
+                        if "Age can't be less than 18." in dob_error:
+                            msg_json = "Age can't be less than 18."
                 else:
                     msg_json = msg_json + ': Please select valid values for the fields.'
 

@@ -101,6 +101,13 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel, Category, SubCategory
 from organizations.models import Organization
 
+from django.contrib.auth import get_user_model
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from opaque_keys.edx.locator import CourseLocator
+import json
+
+from requests.exceptions import ConnectionError, Timeout
+from edx_rest_api_client.exceptions import SlumberBaseException
 
 from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
@@ -121,6 +128,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
 
 WAFFLE_NAMESPACE = 'studio_home'
 
+User = get_user_model()
 
 class AccessListFallback(Exception):
     """
@@ -829,6 +837,8 @@ def course_outline_initial_state(locator_to_show, course_structure):
     }
 
 
+
+
 @expect_json
 def _create_or_rerun_course(request):
     """
@@ -1223,6 +1233,20 @@ def settings_handler(request, course_key_string):
             # For every other possible method type submitted by the caller...
             else:
                 # if pre-requisite course feature is enabled set pre-requisite course
+                course = modulestore().get_course(course_key)
+                course_details = CourseDetails.fetch(course_key)
+                if not course_details.course_sale_type:
+                    course_details.course_sale_type = ""
+                if request.json['course_sale_type'].lower() != course_details.course_sale_type.lower():
+                    if request.json['course_sale_type'].lower() == 'free':
+                        course_sale_type = 'audit'
+                    else:
+                        course_sale_type = 'professional'
+                    course_price = int(course_details.course_price)
+                    course_name = course.display_name_with_default
+                    #course_id = CourseLocator.from_string(course_key)
+                    course_id = six.text_type(course_key)
+                    publish_course_ecommerce(course_id, course_name, course_sale_type, course_price)
                 if is_prerequisite_courses_enabled():
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
                     if prerequisite_course_keys:
@@ -1272,6 +1296,46 @@ def settings_handler(request, course_key_string):
                     encoder=CourseSettingsEncoder
                 )
 
+def publish_course_ecommerce(course_key, display_name, course_type='audit', course_price=0.0):
+    """
+    calling function eg:
+    publish_course_ecommerce('course-v1:edX+DemoX+2020-t2','Demonstration Course 2')
+
+    for audit/free:
+        {"id":"course-v1:edx+cs870+2020-t2","name":"Test Course 12","verification_deadline":null,
+        "products":[{"course":{"id":"course-v1:edx+cs870+2020-t2","name":"Test Course 11","type":"audit",
+        "verification_deadline":null,"honor_mode":false},"expires":null,"price":0,"product_class":"Seat",
+        "attribute_values":[{"name":"id_verification_required","value":false}]}]}
+
+    for professional/paid:
+        {"id":"course-v1:edX+DemoX+2020-t2","name":"Demonstration Course 2","verification_deadline":null,
+        "products":[{"course":{"id":"course-v1:edX+DemoX+2020-t2","name":"Demonstration Course 2","type":"professional",
+        "verification_deadline":null,"honor_mode":null},"expires":null,"price":"20","product_class":"Seat",
+        "attribute_values":[{"name":"certificate_type","value":"professional"},{"name":"id_verification_required","value":false}]}]}
+    """
+    product_list = []
+    attribute_values_list = []
+    attribute_values = {'name': 'id_verification_required', 'value': False}
+    if course_type == 'professional':
+        attribute_values_list.append({'name': 'certificate_type', 'value': 'professional'})
+    attribute_values_list.append(attribute_values)
+    product = {'course': {'id': course_key, 'name': display_name, 'type': course_type,
+        'verification_deadline': None, 'honor_mode': False}, 'expires': None,
+        'price': course_price, 'product_class': 'Seat', 'attribute_values': attribute_values_list}
+    product_list.append(product)
+    data = {'id': course_key, 'name': display_name, 'verification_deadline': None,
+        'products': product_list}
+    # print(data)
+
+    user = User.objects.get(username="ecommerce_worker")
+    api_user = user
+    api = ecommerce_api_client(api_user)
+    try:
+        res = api.publication.post(data)
+        return True
+    except (ConnectionError, SlumberBaseException, Timeout):
+        log.exception('Failed to publish the course: %s',course_key)
+        return False
 
 @login_required
 @ensure_csrf_cookie

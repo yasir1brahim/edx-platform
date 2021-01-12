@@ -161,8 +161,8 @@ class CourseOverview(TimeStampedModel):
     platform_visibility = TextField(null=True)
     course_sale_type = TextField(null=True)
     premium = BooleanField(default=False)
-
-
+    indexed_in_discovery = BooleanField(default=False)
+    course_price = FloatField(default=0.0)
 
     history = HistoricalRecords()
 
@@ -273,8 +273,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_sale_type = course.course_sale_type
         course_overview.platform_visibility = course.platform_visibility
         course_overview.premium = course.premium
-        logging.info('===== course.organiztion ===')
-        logging.info(course.course_org)
+        course_overview.course_price = course.course_price
         course_org_object = None
         if  course.course_org and course.course_org != '-':
             course_org_object = Organization.objects.filter(id=int(course.course_org)).first()

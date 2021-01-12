@@ -873,6 +873,15 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    course_price = Float(
+        display_name=_("Course Price"),
+        help=_("Specify the price for the course"),
+        default=0.0,
+        scope=Scope.settings
+    )
+
+
+
     teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".

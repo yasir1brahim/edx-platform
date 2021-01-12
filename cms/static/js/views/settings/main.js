@@ -37,7 +37,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('#course-subcategory').val(this.model.get('subcategory'));
                    this.$el.find('#course-platform-visibility').val(this.model.get('platform_visibility'));
                    this.$el.find('#course-premium').val(this.model.get('premium'));
+                   this.$el.find('#course-indexed-in-discovery').val(this.model.get('indexed_in_discovery'));
                    this.$el.find('#course-course-sale-type').val(this.model.get('course_sale_type'));
+                   this.$el.find('#course-course-price').val(this.model.get('course_price'));
+
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));
                    this.$el.find('#course-name').val(this.model.get('run'));
@@ -164,6 +167,14 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                          this.$('#' + this.fieldToSelectorMap.premium).attr('checked', this.model.get('premium'));
                        }
 
+
+                   if (this.model.get('indexed_in_discovery') == true)
+                        {
+                         this.$('#' + this.fieldToSelectorMap.indexed_in_discovery).attr('checked', this.model.get('indexed_in_discovery'));
+                       }
+
+
+
                    this.licenseView.render();
                    this.learning_info_view.render();
                    this.instructor_info_view.render();
@@ -178,7 +189,9 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    subcategory: 'course-subcategory',
                    platform_visibility: 'course-platform-visibility',
                    premium: 'course-premium',
+                   indexed_in_discovery: 'course-indexed-in-discovery',
                    course_sale_type: 'course-course-sale-type',
+                   course_price: 'course-course-price',
                    start_date: 'course-start',
                    end_date: 'course-end',
                    enrollment_start: 'enrollment-start',
@@ -385,7 +398,9 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    case 'course-category':
                    case 'course-subcategory':
                    case 'course-platform-visibility':
+                   case 'course-course-price':
                    case 'course-premium':
+                   case 'course-indexed-in-discovery':
                    case 'course-course-sale-type':
                    case 'course-effort':
                    case 'course-title':

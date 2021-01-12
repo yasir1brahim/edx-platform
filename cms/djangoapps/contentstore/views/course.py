@@ -98,14 +98,14 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundErr
 from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
-from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel, Category, SubCategory
+from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel, Category, SubCategory, CourseOverview
 from organizations.models import Organization
 
 from django.contrib.auth import get_user_model
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from opaque_keys.edx.locator import CourseLocator
 import json
-
+import requests
 from requests.exceptions import ConnectionError, Timeout
 from edx_rest_api_client.exceptions import SlumberBaseException
 
@@ -838,6 +838,23 @@ def course_outline_initial_state(locator_to_show, course_structure):
 
 
 
+def refresh_course_metadata(request,course_id):
+    data = {'client_id': 'discovery-backend-service-key', 'client_secret': 'discovery-backend-service-secret', 'grant_type': 'client_credentials', 'token_type': 'jwt'}
+    response = requests.post(url = settings.LMS_ROOT_URL + '/oauth2/access_token', data=data)
+    json_response = json.loads(response.text)
+    if "access_token" in json_response.keys():
+        jwt_token = json_response['access_token']
+        param_dict = {'course_id':course_id}
+        headers = {'Authorization' : 'JWT ' + jwt_token}
+        URL = settings.DISCOVERY_ROOT_URL + '/api/v1/refresh_course_metadata'
+        response = requests.get(url = URL, headers = headers, params = param_dict)
+        json_response = json.loads(response.text)
+        result = json_response['is_successful']
+        if result == True:
+            CourseOverview.objects.filter(id=course_id).update(indexed_in_discovery=True)
+    return result
+
+
 
 @expect_json
 def _create_or_rerun_course(request):
@@ -881,6 +898,7 @@ def _create_or_rerun_course(request):
         if source_course_key:
             source_course_key = CourseKey.from_string(source_course_key)
             destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields)
+            response = refresh_course_metadata(six.text_type(request,destination_course_key))
             return JsonResponse({
                 'url': reverse_url('course_handler'),
                 'destination_course_key': six.text_type(destination_course_key)
@@ -888,6 +906,7 @@ def _create_or_rerun_course(request):
         else:
             try:
                 new_course = create_new_course(request.user, org, course, run, fields)
+                response = refresh_course_metadata(request,six.text_type(new_course.id))
                 return JsonResponse({
                     'url': reverse_course_url('course_handler', new_course.id),
                     'course_key': six.text_type(new_course.id),

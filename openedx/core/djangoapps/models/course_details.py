@@ -13,7 +13,7 @@ from openedx.core.lib.courses import course_image_url
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-
+from django.apps import apps
 import logging
 log = logging.getLogger(__name__)
 
@@ -55,6 +55,8 @@ class CourseDetails(object):
         self.platform_visibility = None
         self.premium = None
         self.course_sale_type = None
+        self.course_price = None
+        self.indexed_in_discovery = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -139,6 +141,9 @@ class CourseDetails(object):
         course_details.platform_visibility = course_descriptor.platform_visibility
         course_details.premium = course_descriptor.premium
         course_details.course_sale_type = course_descriptor.course_sale_type
+        course_details.course_price = course_descriptor.course_price
+        CourseOverview = apps.get_model('course_overviews', 'CourseOverview')
+        course_details.indexed_in_discovery = CourseOverview.get_from_id(course_key).indexed_in_discovery
         course_details.self_paced = course_descriptor.self_paced
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info
@@ -326,6 +331,10 @@ class CourseDetails(object):
             descriptor.course_sale_type = jsondict['course_sale_type']
             dirty = True
 
+
+        if 'course_price' in jsondict and jsondict['course_price'] != descriptor.course_price:
+            descriptor.course_price = jsondict['course_price']
+            dirty = True
 
         if (descriptor.can_toggle_course_pacing
                 and 'self_paced' in jsondict

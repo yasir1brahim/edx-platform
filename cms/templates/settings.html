@@ -79,11 +79,20 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
                 class="short" id="course-number" readonly>
             </li>
 
-            <li class="field text is-not-editable" id="field-course-name">
+            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
               <label for="course-name">${_("Course Run")}</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-name" readonly />
             </li>
+
+
+            <li class="field text is-not-editable" id="field-course-indexed-in-discovery">
+              <input type="checkbox" class="field-radio" disabled="disabled"  name="Indexed in Discovery" id="course-indexed-in-discovery" value="true" aria-labelledby="course-pace-indexed-in-discovery-label"/>
+              <label id="course-indexed-in-discovery-label" class="course-label" for="course-indexed-in-discovery">${_("Indexed in Discovery")}</label>
+              <span class="tip">${_("Indexed in Discovery")}</span>
+            </li>
+
+
           </ol>
 
           % if not marketing_enabled:
@@ -391,9 +400,16 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
             </li>
 
 
+            <li class="field" id="field-course-course-price">
+              <label for="course-course-price">${_("Course Price")}</label>
+               <input type="text" id="course-course-price" class="short" />
+              <span class="tip tip-stacked">Please enter price</span>
+            </li>
+
+
             <li class="field" id="field-course-category">
               <label for="course-category">${_("Category")}</label>
-              <select id="course-category">
+              <select id="course-category" name="course-category" required>
                 <option value="" selected> - </option>
                 % for category in categories:
                   <option value="${category.name}">${category.name}</option>

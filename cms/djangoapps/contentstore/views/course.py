@@ -1165,9 +1165,9 @@ def settings_handler(request, course_key_string):
             categories = Category.objects.all()
             subcategories = SubCategory.objects.all()
             current_org = None
-            display_name = CourseOverview.objects.get(id=course_module.id).display_name
-            id = CourseOverview.objects.get(id=course_module.id).id
-            
+            course_overview = CourseOverview.objects.get(id=course_module.id)
+            display_name = course_overview.display_name
+            id = course_overview.id
 
             try:
                 if request.user.user_extra_info.organization:

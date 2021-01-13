@@ -1165,7 +1165,10 @@ def settings_handler(request, course_key_string):
             categories = Category.objects.all()
             subcategories = SubCategory.objects.all()
             current_org = None
+            display_name = CourseOverview.objects.get(id=course_module.id).display_name
+            id = CourseOverview.objects.get(id=course_module.id).id
             
+
             try:
                 if request.user.user_extra_info.organization:
                     current_org = CourseOverview.objects.get(id=course_module.id).organization.name
@@ -1180,6 +1183,8 @@ def settings_handler(request, course_key_string):
                     subcat_dict[obj.category.name]=[obj.name]
 
             settings_context = {
+                'course_id': id,
+                'display_name': display_name,
                 'current_org': current_org,
                 'context_course': course_module,
                 'course_locator': course_key,

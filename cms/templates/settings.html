@@ -47,6 +47,25 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
 </%block>
 
 <%block name="content">
+<style>
+
+.group-settings.basic .field.text.is-not-editable:nth-child(1), .group-settings.basic .field.text.is-not-editable:nth-child(2), .group-settings.basic .field.text.is-not-editable:nth-child(3) {
+
+width: 25% !important;
+margin-right: 1% !important;
+}
+
+.group-settings.basic .field.text.is-not-editable:nth-child(6) {
+width: 25% !important;
+margin-right: 1% !important;
+}
+
+.group-settings.basic .field.text.is-not-editable:nth-child(7) {
+width: 70% !important;
+}
+
+</style>
+
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
@@ -91,7 +110,20 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
               <label id="course-indexed-in-discovery-label" class="course-label" for="course-indexed-in-discovery">${_("Indexed in Discovery")}</label>
               <span class="tip">${_("Indexed in Discovery")}</span>
             </li>
+            <br>
 
+            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
+              <label for="course-name">${_("Course Name")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                class="long" id="course-name" value="${display_name}" readonly />
+            </li>
+
+
+            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
+              <label for="course-name">${_("Course ID")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                class="long" id="course-name" value="${course_id}" readonly />
+            </li>
 
           </ol>
 

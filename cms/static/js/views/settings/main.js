@@ -15,6 +15,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    'change textarea': 'updateModel',
                    'change select': 'updateModel',
                    'change #course-category': 'updateSubCategory',
+                   'change #course-course-sale-type': 'disableCoursePrice',
                    'click .remove-course-introduction-video': 'removeVideo',
                    'focus #course-overview': 'codeMirrorize',
                    'focus #course-about-sidebar-html': 'codeMirrorize',
@@ -84,6 +85,17 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        model: this.model
                    });
                    this.initSubCategory();
+                   //Disable course sale type if already exist or not indexed in discovery
+                    console.log(this.model.get('indexed_in_discovery'))
+                    console.log(this.model.get('course_sale_type'))
+                    if (this.model.get('indexed_in_discovery') && this.model.get('course_sale_type') === null) {
+                        this.$el.find('#course-course-sale-type').prop("disabled", false)
+                        this.$el.find('#course-course-price').prop("disabled", false)
+                    }
+                    else {
+                        this.$el.find('#course-course-sale-type').prop("disabled", true)
+                        this.$el.find('#course-course-price').prop("disabled", false)
+                    }
                },
 
                render: function() {
@@ -312,6 +324,14 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
 
                         $subCategorySelect.append($option);
                     });
+                }
+            },
+            disableCoursePrice: function() {
+                if (this.$el.find('#course-course-sale-type').val() === "free") {
+                    this.$el.find('#course-course-price').prop("disabled", true)
+                }
+                else {
+                    this.$el.find('#course-course-price').prop("disabled", false)
                 }
             },
                updateModel: function(event) {

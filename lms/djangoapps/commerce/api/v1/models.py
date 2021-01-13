@@ -87,7 +87,11 @@ class Course(object):
         course_id = CourseKey.from_string(six.text_type(self.id))
 
         try:
-            return CourseOverview.get_from_id(course_id).course_reviews.aggregate(Avg('rating'))['rating__avg']
+            ratings = CourseOverview.get_from_id(course_id).course_reviews.aggregate(Avg('rating'))['rating__avg']
+            if ratings:
+                return ratings
+            else:
+                return 0.0
         except CourseOverview.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.

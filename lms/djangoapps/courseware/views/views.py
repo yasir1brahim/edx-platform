@@ -137,6 +137,7 @@ from xmodule.x_module import STUDENT_VIEW
 from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+from commerce.api.v1.models import Course
 
 log = logging.getLogger("edx.courseware")
 
@@ -991,6 +992,8 @@ def course_about(request, course_id):
 
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
+        mode = course_modes = CourseMode.objects.filter(course_id=course.id)
+        course_extra_info = Course(course.id,list(course_modes))
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.
@@ -1001,6 +1004,7 @@ def course_about(request, course_id):
 
         context = {
             'course': course,
+            'course_extra_info': course_extra_info,
             'course_details': course_details,
             'staff_access': staff_access,
             'studio_url': studio_url,

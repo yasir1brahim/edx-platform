@@ -58,6 +58,14 @@ from six import string_types
 
 <%block name="pagetitle">${course.display_name_with_default}</%block>
 
+<style>
+span.cut_price {
+text-decoration: line-through;
+color: red;
+margin-right: 10px;
+}
+</style>
+
 <section class="course-info">
 
   <%block name="course_about_header">
@@ -244,10 +252,21 @@ from six import string_types
           <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
           <span class="important-dates-item-text prerequisites">${course_price}</span></li>
          % else:
-          <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
-          <span class="important-dates-item-text prerequisites">S${course_price}</span></li>
-         % endif
 
+           % if course_extra_info.web_discount_applicable:
+          <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
+          <span class="cut_price important-dates-item-text prerequisites"> S${course_price} </span></li>
+
+
+          <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Discounted Price")}</p>
+          <span class=" important-dates-item-text prerequisites"> S$${ course_extra_info.web_discounted_price } </span>
+          % else:
+           <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
+          <span class="important-dates-item-text prerequisites"> S${course_price} </span></li>
+
+          % endif
+
+        % endif
 
         </ol>
         </%block>

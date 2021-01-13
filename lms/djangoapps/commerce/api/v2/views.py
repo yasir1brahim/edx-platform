@@ -122,6 +122,7 @@ class CourseDetailView(RetrieveAPIView):
             course_usage_key = modulestore().make_course_usage_key(course_id)
             response = get_blocks(self.request,course_usage_key,self.request.user,requested_fields=['completion'],block_types_filter='vertical')
             course.chapter_count = len(response['blocks'])
+            course.name = course_overview.display_name
 
             if len(course_extra_info.modes) == 0:
                 course.price = 0

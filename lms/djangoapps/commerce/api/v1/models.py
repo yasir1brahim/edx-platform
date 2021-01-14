@@ -89,7 +89,7 @@ class Course(object):
         try:
             ratings = CourseOverview.get_from_id(course_id).course_reviews.aggregate(Avg('rating'))['rating__avg']
             if ratings:
-                return ratings
+                return round(ratings,1)
             else:
                 return 0.0
         except CourseOverview.DoesNotExist:

@@ -653,7 +653,7 @@ def get_courses_with_extra_info(user, org=None, filter_=None):
         course_modes = CourseMode.objects.filter(course_id=course.id)
         course_extra_info = Course(course.id,list(course_modes))
         course.enrollments_count = course_extra_info.enrollments_count
-        course.ratings =  float("{:.2f}".format(course_extra_info.ratings)) if course_extra_info.ratings else None
+        course.ratings =  course_extra_info.ratings if course_extra_info.ratings else None
         course.comments_count = course_extra_info.comments_count
         course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
         course.discount_applicable = course_extra_info.web_discount_applicable

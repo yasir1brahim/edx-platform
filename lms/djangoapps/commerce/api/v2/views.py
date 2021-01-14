@@ -34,6 +34,7 @@ class CourseListView(ListAPIView):
 
     def get_queryset(self):
         filtered_courses = []
+        mobile_courses = []
         filter = False
         filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None,'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
         request_filters = {}
@@ -64,16 +65,31 @@ class CourseListView(ListAPIView):
                 if course.name.lower().find(search_string) > -1 and course.platform_visibility in ['mobile', 'both']:
                     filtered_courses_list.append(course)
 
-            return filtered_courses_list
+            for course in filtered_courses_list:
+                platform = course.platform_visibility
+                if platform == None or platform == "Mobile" or platform == "Both":
+                    mobile_courses.append(course)
+
+            return mobile_courses
 
         if not self.request.query_params.get('coursename', None) and not filter:
-            return courses
+            for course in courses:
+                platform = course.platform_visibility
+                if platform == None or platform == "Mobile" or platform == "Both":
+                    mobile_courses.append(course)
 
-        return filtered_courses
+            return mobile_courses
+
+        for course in filtered_courses_list:
+            platform = course.platform_visibility
+            if platform == None or platform == "Mobile" or platform == "Both":
+                mobile_courses.append(course)  
+
+        return mobile_courses
 
     def order_courses(self,course_list, ordering):
         allowed_ordering = ["ratings", "-ratings", "enrollments_count", "-enrollments_count", "created", "-created", "discounted_price", "-discounted_price"]
-        
+        mobile_courses = []
         for order in ordering:
             if order in allowed_ordering:
                 if order == "-ratings":
@@ -93,7 +109,12 @@ class CourseListView(ListAPIView):
                 elif order == "discounted_price":
                     course_list.sort(key=lambda x: (x.discounted_price is None, x.discounted_price))
 
-        return course_list
+        for course in course_list:
+            platform = course.platform_visibility
+            if platform == None or platform == "Mobile" or platform == "Both":
+                mobile_courses.append(course)
+
+        return mobile_courses
 
 
 @view_auth_classes(is_authenticated=True)
@@ -108,6 +129,8 @@ class CourseDetailView(RetrieveAPIView):
             course_modes = CourseMode.objects.filter(course_id=course_id)
             course.modes = course_modes
             course_overview = CourseOverview.get_from_id(course_id)
+            if course_overview.platform_visibility == "Web":
+                response = {"status": False, "message":"Course platform doesn't match the requirments", "result":None, "status_code": 404}
             course.image_urls = course_overview.image_urls
             course_extra_info = Course(course.id,list(course_modes))
             course.enrollments_count = course_extra_info.enrollments_count

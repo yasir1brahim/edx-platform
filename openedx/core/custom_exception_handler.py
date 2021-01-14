@@ -106,6 +106,13 @@ class ExceptionMiddleware(object):
                              status_code=response.status_code)
             return JsonResponse(response, status=response['status_code'])
 
+        elif response.status_code == 409:
+            remove_String = ['{', '}', '[', ']', '\n', '"', '           user_message: ', '      ']
+            for r in remove_String:
+                response_message = response_message.replace(r, '')
+                response = get_response(message=response_message,status_code=409)
+            return JsonResponse(response, status=response['status_code'])
+
         elif response.status_code == 400:
             response_dict = {}
             if is_json(response.content.decode('utf-8')):

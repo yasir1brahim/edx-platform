@@ -847,6 +847,12 @@ def student_dashboard(request):
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
+    web_course_enrollments=[]
+    for course in course_enrollments:
+        platform = course._course_overview.platform_visibility
+        if platform == None or platform == 'Web' or platform == 'Both':
+            web_course_enrollments.append(course)
+
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -857,7 +863,7 @@ def student_dashboard(request):
         'redirect_message': Text(redirect_message),
         'account_activation_messages': account_activation_messages,
         'activate_account_message': activate_account_message,
-        'course_enrollments': course_enrollments,
+        'course_enrollments': web_course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,

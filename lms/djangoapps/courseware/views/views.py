@@ -17,7 +17,7 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q, prefetch_related_objects
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
@@ -254,12 +254,12 @@ def courses(request):
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         if not request.user.id:
-            filter_ = {'organization' : None }
+            filter_ = {'organization' : None}
         elif request.user.is_staff:
             filter_ = {}
         elif _get_course_creator_status(request.user) == 'granted':
             if request.user.user_extra_info.organization:
-                filter_ = {'organization' : request.user.user_extra_info.organization.id }
+                filter_ = {'organization' : request.user.user_extra_info.organization.id}
             else:
                 filter_ = {'organization': None}
         else:
@@ -273,12 +273,19 @@ def courses(request):
             courses_list = sort_by_announcement(courses_list)
 
     # Add marketable programs to the context.
+    web_couses = []
+
+    for course in courses_list:
+        platform = course.platform_visibility
+        if platform == None or platform == "Web" or platform == "Both":
+            web_couses.append(course)
+
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
     return render_to_response(
         "courseware/courses.html",
         {
-            'courses': courses_list,
+            'courses': web_couses,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
         }
@@ -987,6 +994,9 @@ def course_about(request, course_id):
 
         # Overview
         overview = CourseOverview.get_from_id(course.id)
+
+        if overview.platform_visibility == "Mobile":
+            return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
 
         sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
 

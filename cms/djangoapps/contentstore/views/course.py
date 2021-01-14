@@ -1261,7 +1261,7 @@ def settings_handler(request, course_key_string):
                 course_details = CourseDetails.fetch(course_key)
                 if not course_details.course_sale_type:
                     course_details.course_sale_type = ""
-                if request.json['course_sale_type'].lower() != course_details.course_sale_type.lower():
+                if request.json['course_sale_type'] and request.json['course_sale_type'].lower() != course_details.course_sale_type.lower():
                     if request.json['course_sale_type'].lower() == 'free':
                         course_sale_type = 'audit'
                     else:

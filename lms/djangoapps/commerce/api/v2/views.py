@@ -80,7 +80,7 @@ class CourseListView(ListAPIView):
 
             return mobile_courses
 
-        for course in filtered_courses_list:
+        for course in filtered_courses:
             platform = course.platform_visibility
             if platform == None or platform == "Mobile" or platform == "Both":
                 mobile_courses.append(course)  

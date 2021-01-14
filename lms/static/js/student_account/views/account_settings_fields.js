@@ -445,7 +445,8 @@
                         orderDate: this.options.orderDate,
                         receiptUrl: this.options.receiptUrl,
                         valueAttribute: this.options.valueAttribute,
-                        lines: this.options.lines
+                        lines: this.options.lines,
+                        courseUrl: this.options.orderId != 'ORDER NUMBER' ? window.location.protocol + '//'  + window.location.host + '/courses/' + this.options.lines[0].product.attribute_values[1]['value'] + '/course' :  null
                     }));
                     this.delegateEvents();
                     return this;

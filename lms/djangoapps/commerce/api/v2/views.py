@@ -47,7 +47,17 @@ class CourseListView(ListAPIView):
                     request_filters[f] = boolean_result
                 else:
                     request_filters[f] = filter_val.split(',')
+
         courses = list(Course.iterator(self.request.META.get('HTTP_AUTHORIZATION', None)))
+        mobile_courses_list = []
+
+        for course in courses:
+            course_overview = CourseOverview.get_from_id(course.id)
+            platform = course_overview.platform_visibility
+            if not platform == 'Web':
+                mobile_courses_list.append(course) 
+
+        courses = mobile_courses_list
         ordering_filter=self.request.query_params.get('ordering', None)
         if ordering_filter:
             ordering_filter_list = ordering_filter.split(',')
@@ -62,30 +72,15 @@ class CourseListView(ListAPIView):
             course_list = filtered_courses if len(filtered_courses) > 0 else courses
             for course in course_list:
                 search_string = self.request.query_params.get('coursename').lower()
-                if course.name.lower().find(search_string) > -1 and course.platform_visibility in ['mobile', 'both']:
+                if course.name.lower().find(search_string) > -1: #and course.platform_visibility in ['mobile', 'both', 'Mobile', 'Both', None]:
                     filtered_courses_list.append(course)
 
-            for course in filtered_courses_list:
-                platform = course.platform_visibility
-                if platform == None or platform == "Mobile" or platform == "Both":
-                    mobile_courses.append(course)
-
-            return mobile_courses
+            return filtered_courses_list
 
         if not self.request.query_params.get('coursename', None) and not filter:
-            for course in courses:
-                platform = course.platform_visibility
-                if platform == None or platform == "Mobile" or platform == "Both":
-                    mobile_courses.append(course)
+            return courses
 
-            return mobile_courses
-
-        for course in filtered_courses:
-            platform = course.platform_visibility
-            if platform == None or platform == "Mobile" or platform == "Both":
-                mobile_courses.append(course)  
-
-        return mobile_courses
+        return filtered_courses
 
     def order_courses(self,course_list, ordering):
         allowed_ordering = ["ratings", "-ratings", "enrollments_count", "-enrollments_count", "created", "-created", "discounted_price", "-discounted_price"]

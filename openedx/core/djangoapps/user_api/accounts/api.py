@@ -188,6 +188,11 @@ def update_account_settings(requesting_user, update, username=None):
         raise errors.UserNotAuthorized()
     user, user_profile = _get_user_and_profile(username)
     user_extra_info = user.user_extra_info
+
+    if 'date_of_birth' in update:
+        birth_year = str(update['date_of_birth']).split("-")[0]
+        update['year_of_birth'] = birth_year
+
     # Validate fields to update
     field_errors = {}
     _validate_read_only_fields(user, update, field_errors)

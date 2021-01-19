@@ -17,6 +17,11 @@ def age_validator(date):
     else:
         return date
 
+def default_dob():
+    import datetime
+    dob = datetime.date(2000, 1, 1)
+    return dob
+
 class UserExtraInfo(models.Model):
     """
     This model contains two extra fields that will be saved when a user registers.
@@ -25,7 +30,7 @@ class UserExtraInfo(models.Model):
     user = models.OneToOneField(USER_MODEL, null=True, related_name='user_extra_info',
         on_delete=models.CASCADE)
 
-    date_of_birth = models.DateField(verbose_name="Date of birth", null=True, blank=True, validators=[age_validator])
+    date_of_birth = models.DateField(verbose_name="Date of birth", validators=[age_validator], default=default_dob())
 
     nric = models.CharField(
         verbose_name="NRIC",

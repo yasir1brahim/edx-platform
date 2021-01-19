@@ -656,6 +656,8 @@ def do_create_account(form, custom_form=None):
     extended_profile = form.cleaned_extended_profile
     if extended_profile:
         profile.meta = json.dumps(extended_profile)
+    if not profile.country:
+        profile.country = "SG"
     try:
         profile.save()
     except Exception:

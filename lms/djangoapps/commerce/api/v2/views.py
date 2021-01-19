@@ -49,15 +49,41 @@ class CourseListView(ListAPIView):
                     request_filters[f] = filter_val.split(',')
 
         courses = list(Course.iterator(self.request.META.get('HTTP_AUTHORIZATION', None)))
-        mobile_courses_list = []
+        
+        try:
+            mobile_courses_list = []
+            user = self.request.user
+            user_org = user.user_extra_info.organization
 
-        for course in courses:
-            course_overview = CourseOverview.get_from_id(course.id)
-            platform = course_overview.platform_visibility
-            if not platform == 'Web':
-                mobile_courses_list.append(course) 
+            for course in courses:
+                try:
+                    course_overview = CourseOverview.get_from_id(course.id)
+                    platform = course_overview.platform_visibility
+                    organization = course_overview.organization
+                    if not platform == 'Web':
+                        if user.is_staff:
+                            mobile_courses_list.append(course)
+                        elif user_org == organization or organization == None:
+                            mobile_courses_list.append(course)
+                        elif organization == None and user_org == None:
+                            mobile_courses_list.append(course)
+                except:
+                    pass
+            courses = mobile_courses_list
+        except:
+            mobile_courses_list = []
+            for course in courses:
+                try:
+                    course_overview = CourseOverview.get_from_id(course.id)
+                    platform = course_overview.platform_visibility
+                    organization = course_overview.organization
+                    if not platform == 'Web':
+                        if organization == None:
+                            mobile_courses_list.append(course)
+                except:
+                    pass
+            courses = mobile_courses_list
 
-        courses = mobile_courses_list
         ordering_filter=self.request.query_params.get('ordering', None)
         if ordering_filter:
             ordering_filter_list = ordering_filter.split(',')

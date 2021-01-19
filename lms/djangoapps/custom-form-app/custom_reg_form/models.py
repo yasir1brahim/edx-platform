@@ -22,6 +22,10 @@ def default_dob():
     dob = datetime.date(2000, 1, 1)
     return dob
 
+def default_industry():
+    category = Category.objects.filter(id=1)
+    return 1 if category else None
+
 class UserExtraInfo(models.Model):
     """
     This model contains two extra fields that will be saved when a user registers.
@@ -39,7 +43,7 @@ class UserExtraInfo(models.Model):
         null=True
     )
     industry = models.ForeignKey(Category, related_name='users_industry', 
-        on_delete=models.DO_NOTHING, blank=True, null=True)
+        on_delete=models.DO_NOTHING, blank=True, null=True, default=default_industry())
     organization = models.ForeignKey(Organization, related_name='instructor_org', 
         on_delete=models.SET_NULL, blank=True, null=True)
 

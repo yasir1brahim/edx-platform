@@ -658,6 +658,8 @@ def do_create_account(form, custom_form=None):
         profile.meta = json.dumps(extended_profile)
     if not profile.country:
         profile.country = "SG"
+    if not profile.language:
+        profile.language = "English"
     try:
         profile.save()
     except Exception:

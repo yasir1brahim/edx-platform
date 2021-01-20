@@ -315,6 +315,7 @@
             updateValueInField: function() {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? 'Unverified' : this.modelValue();
                 this.$('.u-field-value ').text(value);
+		this.$('.u-field-value ').css('font-size', '15px')
             }
         });
 

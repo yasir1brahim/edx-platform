@@ -297,7 +297,7 @@
             },
 
             render: function() {
-                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
+		 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
@@ -315,7 +315,17 @@
             updateValueInField: function() {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? 'Unverified' : this.modelValue();
                 this.$('.u-field-value ').text(value);
-		this.$('.u-field-value ').css('font-size', '15px')
+		this.$('.u-field-value ').css('font-size', '15px');
+		if (this.options.title == 'NRIC') {
+		    if (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) {
+			HtmlUtils.setHtml(this.$('.u-field-message-help'), "NRIC Not Available. Please click the link to retrieve NRIC:");
+		    }
+		    else {
+			HtmlUtils.setHtml(this.$('.u-field-message-help'), "Problems with NRIC Number? Please click the link below:");
+		    }
+		    HtmlUtils.append(this.$('.u-field-message'), HtmlUtils.HTML('<span class="u-field-message-help-nric-singpass"> <a href="#"> Singpass</a> </span>'));
+		    this.$('.u-field-message-help-nric-singpass ').css('display', 'block').css('text-decoration', 'underline').css('color', '#0075b4');
+                }
             }
         });
 

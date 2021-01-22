@@ -223,6 +223,7 @@ def create_account_with_params(request, params):
     create_or_set_user_attribute_created_on_site(user, request.site)
 
     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
+    preferences_api.set_user_preference(user, 'time_zone', 'Asia/Singapore')
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:

@@ -1,5 +1,6 @@
-<div class="js-form-feedback" aria-live="assertive" tabindex="-1">
+<div class="js-form-feedback" aria-live="assertive" tabindex="-1" id="alert_div">
 </div>
+
 
 <% if ( context.createAccountOption !== false && !context.syncLearnerProfileData && !(context.enterpriseName && context.currentProvider) ) { %>
 <div class="toggle-form">
@@ -78,4 +79,5 @@
     </div>
     <% } %>
 </form>
+
 

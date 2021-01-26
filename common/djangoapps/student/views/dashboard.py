@@ -65,6 +65,9 @@ experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from lms.djangoapps.courseware.courses import get_course_with_access
+from django.http import HttpResponseRedirect
+from django.contrib.auth import logout
+
 def get_org_black_and_whitelist_for_site():
     """
     Returns the org blacklist and whitelist for the current site.
@@ -931,4 +934,9 @@ def student_dashboard(request):
         'resume_button_urls': resume_button_urls
     })
 
-    return render_to_response('dashboard.html', context)
+    user_is_active = request.user.is_active
+    if user_is_active:
+        return render_to_response('dashboard.html', context)
+    else:
+        logout(request)
+        return redirect('/verify_email')

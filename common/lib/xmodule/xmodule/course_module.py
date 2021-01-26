@@ -824,6 +824,13 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    region = String(
+        display_name=_("Region"),
+        help=_("Specify the region."),
+        default=None,
+        scope=Scope.settings
+    )
+
     difficulty_level = String(
         display_name=_("Difficulty Level"),
         help=_("Specify the difficulty level of course."),

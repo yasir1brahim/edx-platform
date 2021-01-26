@@ -112,6 +112,7 @@ from edx_rest_api_client.exceptions import SlumberBaseException
 from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED, get_library_creator_status
+from django_countries.data import COUNTRIES
 
 log = logging.getLogger(__name__)
 
@@ -1164,6 +1165,7 @@ def settings_handler(request, course_key_string):
             course_org_options = Organization.objects.all()
             categories = Category.objects.all()
             subcategories = SubCategory.objects.all()
+            regions = COUNTRIES
             current_org = None
             course_overview = CourseOverview.objects.get(id=course_module.id)
             display_name = course_overview.display_name
@@ -1204,6 +1206,7 @@ def settings_handler(request, course_key_string):
                 'course_org_options': course_org_options,
                 'categories': categories,
                 'subcategories': subcategories,
+                'regions': regions,
                 'subcat_dict': subcat_dict,
                 'course_sale_type_options' : course_sale_type_options,
                 'platform_visibility_options' : platform_visibility_options,

@@ -48,6 +48,7 @@ class CourseDetails(object):
         self.course_id = course_id
         self.run = run
         self.language = None
+        self.region = None
         self.difficulty_level = None
         self.course_org = None
         self.new_category = None
@@ -134,6 +135,7 @@ class CourseDetails(object):
         course_details.video_thumbnail_image_name = course_descriptor.video_thumbnail_image
         course_details.video_thumbnail_image_asset_path = course_image_url(course_descriptor, 'video_thumbnail_image')
         course_details.language = course_descriptor.language
+        course_details.region = course_descriptor.region
         course_details.difficulty_level = course_descriptor.difficulty_level
         course_details.course_org = course_descriptor.course_org
         course_details.new_category = course_descriptor.new_category
@@ -301,6 +303,10 @@ class CourseDetails(object):
 
         if 'language' in jsondict and jsondict['language'] != descriptor.language:
             descriptor.language = jsondict['language']
+            dirty = True
+
+        if 'region' in jsondict and jsondict['region'] != descriptor.region:
+            descriptor.region = jsondict['region']
             dirty = True
 
         if 'difficulty_level' in jsondict and jsondict['difficulty_level'] != descriptor.difficulty_level:

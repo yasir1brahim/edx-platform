@@ -377,6 +377,18 @@ width: 70% !important;
               </select>
               <span class="tip tip-stacked">${_("Identify the course language here. This is used to assist users find courses that are taught in a specific language. It is also used to localize the 'From:' field in bulk emails.")}</span>
             </li>
+
+	    <li class="field" id="field-course-region">
+              <label for="course-region">${_("Region")}</label>
+              <select id="course-region">
+                <option value="" selected> - </option>
+                % for code, country in regions.items():
+                  <option value="${code}">${country}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">${_("Select region of the course")}</span>
+            </li>
+
             <li class="field" id="field-course-difficulty-level">
               <label for="course-difficulty-level">${_("Difficulty Level")}</label>
               <select id="course-difficulty-level">

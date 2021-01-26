@@ -19,6 +19,12 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
 from .exceptions import ImageValidationError
 
+import base64
+from django.core.files.base import ContentFile
+import requests
+from django.conf import settings
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names
+
 ImageType = namedtuple('ImageType', ('extensions', 'mimetypes', 'magic'))
 
 IMAGE_TYPES = {
@@ -246,3 +252,20 @@ def _user_friendly_size(size):
         size //= 1024
         i += 1
     return u'{} {}'.format(size, units[i])
+
+from io import StringIO
+
+def create_base64_profile_images(base64_image_string, username):
+    storage = get_profile_image_storage()
+    image_string = BytesIO(base64.b64decode(base64_image_string))
+    original = Image.open(image_string)
+    image = _set_color_mode_to_rgb(original)
+    image = _crop_image_to_square(image)
+    profile_image_names = get_profile_image_names(username)
+
+    for size, name in profile_image_names.items():
+        scaled = _scale_image(image, size)
+        exif = _get_corrected_exif(scaled, original)
+        with closing(_create_image_file(scaled, exif)) as scaled_image_file:
+            storage.save(name, scaled_image_file)
+

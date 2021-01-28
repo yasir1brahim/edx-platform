@@ -30,7 +30,7 @@ from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApi
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser,BearerAuthentication
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.exceptions import CourseNotFoundError
@@ -479,19 +479,13 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
 
 @can_disable_rate_limit
-@view_auth_classes(is_authenticated=True)
 class EnrollmentListViewMobile(DeveloperErrorViewMixin, ListAPIView):
 
 
     class EnrollmentListViewMobilePagination(LazyPageNumberPagination):
         max_page_size = 100
 
-    #authentication_classes = (
-        #JwtAuthentication,
-        #BearerAuthenticationAllowInactiveUser,
-        #EnrollmentCrossDomainSessionAuth,
-    #)
-    #permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    authentication_classes = (BearerAuthentication,)
     permission_classes = (IsAuthenticated,)
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = MobileCourseEnrollmentSerializer

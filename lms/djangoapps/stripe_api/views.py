@@ -1,0 +1,26 @@
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from django.conf import settings
+from rest_framework.authentication import TokenAuthentication
+from openedx.core.lib.api.authentication import BearerAuthentication
+from rest_framework.permissions import IsAuthenticated
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+import logging
+
+@api_view(['POST'])
+@authentication_classes((BearerAuthentication,))
+@permission_classes([IsAuthenticated])
+def get_customer_id(request):
+
+    """
+    API: /stripe_api/profile/?email={email_address}
+    This function is used to send the stripe customer_id saved in user context and if it doesn't exist create one and return.
+    """
+    if request.method == 'POST':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response = api.stripe_api.post(request.POST)
+            return Response(response)
+        except Exception as e:
+            return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})

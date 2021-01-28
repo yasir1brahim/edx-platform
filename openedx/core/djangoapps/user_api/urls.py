@@ -20,6 +20,7 @@ from .accounts.views import (
 from .accounts.mobile_api import AccountViewSet as AccountMobileViewSet
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
+from .views import get_ephemeral_key
 
 ME = AccountViewSet.as_view({
     'get': 'get',
@@ -72,6 +73,12 @@ RETIREMENT_LMS_POST = LMSAccountRetirementView.as_view({
 })
 
 urlpatterns = [
+    url(
+        r'^v2/get_stipe_ephemeral_key$',
+        get_ephemeral_key,
+        name='get_stipe_ephemeral_key'
+    ),
+
     url(
         r'^v1/me$',
         ME,

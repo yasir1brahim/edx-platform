@@ -32,7 +32,17 @@ from openedx.core.djangoapps.user_api.serializers import (
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
-
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from rest_framework.generics import RetrieveAPIView
+import logging
+from rest_framework.response import Response
+from rest_framework import status    
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from django.contrib.auth import get_user_model
+from django.http import HttpResponseBadRequest
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from django.http import Http404
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -169,3 +179,24 @@ class CountryTimeZoneListView(generics.ListAPIView):
     def get_queryset(self):
         country_code = self.request.GET.get('country_code', None)
         return get_country_time_zones(country_code)
+
+
+
+@api_view()
+@authentication_classes((JwtAuthentication,))
+@permission_classes([IsAuthenticated])
+def get_ephemeral_key(request):
+
+    requested_params = request.query_params.copy()
+    if requested_params.get('stripe_customer_id', None):
+        stripe_customer_id = requested_params.get('stripe_customer_id')
+        User = get_user_model()
+        api_user = User.objects.get(username="ecommerce_worker")
+        api = ecommerce_api_client(api_user)
+        res = api.stripe_get_ephemeral_key.get(stripe_customer_id=stripe_customer_id)
+        if 'result' in res.keys():
+            return Response({"results": [res['result']]})
+        else:
+            logging.info('=====view 404 =====')
+            raise Http404("Customer with this id do not exist")        
+

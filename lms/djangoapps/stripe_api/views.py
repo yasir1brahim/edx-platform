@@ -24,3 +24,20 @@ def get_customer_id(request):
             return Response(response)
         except Exception as e:
             return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+
+@api_view(['POST'])
+@authentication_classes((BearerAuthentication,))
+@permission_classes([IsAuthenticated])
+def checkout_payment(request):
+
+    """
+    This fucntion is used to make payment.
+    """
+    if request.method == 'POST':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response =  api.stripe_payment.post(request.POST)
+            return Response(response)
+        except Exception as e:
+            return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})

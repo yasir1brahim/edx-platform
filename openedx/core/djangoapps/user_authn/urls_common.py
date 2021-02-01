@@ -67,6 +67,7 @@ urlpatterns = [
     ),
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
     url(r'^user_api/v2/account/password_reset$', mobile_password_reset.password_change_request_handler, name='password_change_request_v2'),
+    url(r'^user_api/v1/account/migrate$', register.MigrateUserView.as_view(), name='migrate_user'),
 ]
 
 # password reset django views (see above for password reset views)

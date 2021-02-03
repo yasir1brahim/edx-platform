@@ -41,3 +41,21 @@ def checkout_payment(request):
             return Response(response)
         except Exception as e:
             return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+
+@api_view(['POST'])
+@authentication_classes((BearerAuthentication,))
+@permission_classes([IsAuthenticated])
+def custom_basket(request):
+
+    """
+    This fucntion is used to delete item from basket.
+    """
+    if request.method == 'POST':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response =  api.custom_baskets.post(request.POST)
+            return Response(response)
+        except Exception as e:
+            return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+

@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from .filters import LazyPageNumberPagination
 from operator import attrgetter
 from ..v1.models import Course
-from ..v1.serializers import CourseSerializer, CourseDetailSerializer
+from ..v1.serializers import CourseSerializer, CourseDetailSerializer,CourseDetailCheckoutSerializer
 import logging
 log = logging.getLogger(__name__)
 import json
@@ -19,6 +19,12 @@ from rest_framework.serializers import ValidationError
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from xmodule.modulestore.django import modulestore
+from rest_framework.decorators import api_view
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+
+
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -199,4 +205,59 @@ def add_product_to_basket(request):
             return Response(response)
         except Exception as e:
             return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+
+
+
+
+@view_auth_classes(is_authenticated=True)
+class CourseCheckoutDetailView(RetrieveAPIView):
+    serializer_class = CourseDetailCheckoutSerializer
+    def get_object(self):
+        course_key = self.kwargs['course_key_string']
+        course_id = CourseKey.from_string(course_key)
+        course = get_course_by_id(course_id)
+
+        try:
+            course_modes = CourseMode.objects.filter(course_id=course_id)
+            course.modes = course_modes
+            course_overview = CourseOverview.get_from_id(course_id)
+            if course_overview.platform_visibility == "Web":
+                response = {"status": False, "message":"Course platform doesn't match the requirments", "result":None, "status_code": 404}
+            course.image_urls = course_overview.image_urls
+            course_extra_info = Course(course.id,list(course_modes))
+            course.enrollments_count = course_extra_info.enrollments_count
+            course.ratings = float("{:.2f}".format(course_extra_info.ratings))
+            course.comments_count = course_extra_info.comments_count
+            course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
+            course.discount_applicable = course_extra_info.web_discount_applicable
+            course.discount_percentage = course_extra_info.web_discount_percentage
+            course.discounted_price = course_extra_info.web_discounted_price
+            course.currency = course_extra_info.currency
+            course.description = course_overview.short_description
+            course_usage_key = modulestore().make_course_usage_key(course_id)
+            response = get_blocks(self.request,course_usage_key,self.request.user,requested_fields=['completion'],block_types_filter='vertical')
+            course.chapter_count = len(response['blocks'])
+            course.name = course_overview.display_name
+            course.new_category = course_overview.new_category if course_overview.new_category else "None"
+            if len(course_extra_info.modes) == 0:
+                course.price = 0
+            else:
+                course.price = course_extra_info.modes[0].min_price
+            return course
+        except Exception as e:
+            response = {"status": False, "message":e, "result":None, "status_code": 500}
+            return response
+
+
+
+
+@api_view()
+@authentication_classes((BearerAuthentication,))
+@permission_classes([IsAuthenticated])
+def get_basket_content(request,id):
+
+    user = request.user
+    api = ecommerce_api_client(user)
+    response = api.basket_details.get(id=id)
+    return Response(response)
 

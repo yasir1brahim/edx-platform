@@ -20,6 +20,10 @@ from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from xmodule.modulestore.django import modulestore
 
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+
 class CourseListView(ListAPIView):
     """ List courses and modes. """
     class CourseListPageNumberPagination(LazyPageNumberPagination):
@@ -176,3 +180,23 @@ class CourseDetailView(RetrieveAPIView):
         except Exception as e:
             response = {"status": False, "message":e, "result":None, "status_code": 500}
             return response
+
+
+@api_view(['POST'])
+@authentication_classes((BearerAuthentication,))
+@permission_classes([IsAuthenticated])
+def add_product_to_basket(request):
+
+    """
+    API: /commerce/v2/add_product/
+    This API add a product in the basket of the user.
+    """
+    if request.method == 'POST':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response = api.baskets.post(request.data)
+            return Response(response)
+        except Exception as e:
+            return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+

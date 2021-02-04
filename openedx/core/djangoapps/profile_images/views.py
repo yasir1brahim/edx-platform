@@ -245,30 +245,6 @@ class ProfileImageUploadView(APIView):
         """
         return ProfileImageView().post(request, username)
 
-class ProfileImageUploadViewV2(APIView):
-    """
-    **DEPRECATION WARNING**
-
-        /api/profile_images/v1/{username}/upload is deprecated.
-        All requests should now be sent to
-        /api/user/v1/accounts/{username}/image
-    """
-
-    parser_classes = ProfileImageView.parser_classes
-    authentication_classes = ProfileImageView.authentication_classes
-    permission_classes = ProfileImageView.permission_classes
-
-    def post(self, request, username):
-        """
-        POST /api/profile_images/v2/{username}/upload
-        """
-        serializer = MyImageModelSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-        #return ProfileImageView().post(request, username)
-
 
 class ProfileImageRemoveView(APIView):
     """

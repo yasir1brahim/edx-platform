@@ -195,7 +195,7 @@ def get_ephemeral_key(request):
         api = ecommerce_api_client(api_user)
         res = api.stripe_get_ephemeral_key.get(stripe_customer_id=stripe_customer_id)
         if 'result' in res.keys():
-            return Response({"results": [res['result']]})
+            return Response(res['result'])
         else:
             logging.info('=====view 404 =====')
             raise Http404("Customer with this id do not exist")        

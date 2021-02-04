@@ -74,7 +74,7 @@ RETIREMENT_LMS_POST = LMSAccountRetirementView.as_view({
 
 urlpatterns = [
     url(
-        r'^v2/get_stipe_ephemeral_key$',
+        r'^v1/get_stipe_ephemeral_key$',
         get_ephemeral_key,
         name='get_stipe_ephemeral_key'
     ),

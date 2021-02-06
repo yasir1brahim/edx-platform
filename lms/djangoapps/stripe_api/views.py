@@ -59,3 +59,19 @@ def custom_basket(request):
         except Exception as e:
             return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
 
+@api_view(['GET'])
+@authentication_classes((BearerAuthentication,))
+@permission_classes([IsAuthenticated])
+def basket_item_count(request):
+
+    """
+    This function is used to return number of items in the basket.
+    """
+    if request.method == 'GET':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response =  api.basket_item_count.get()
+            return Response(response)
+        except Exception as e:
+            return Response({'message':e, 'status': False, 'result':{}, 'status_code':400})

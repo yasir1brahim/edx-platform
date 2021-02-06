@@ -23,7 +23,7 @@ from rest_framework.decorators import api_view
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-
+from django.http import HttpResponseNotFound
 
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -259,5 +259,7 @@ def get_basket_content(request,id):
     user = request.user
     api = ecommerce_api_client(user)
     response = api.basket_details.get(id=id)
+    if response['status_code'] == 404:
+        return HttpResponseNotFound(response['message'])
     return Response(response)
 

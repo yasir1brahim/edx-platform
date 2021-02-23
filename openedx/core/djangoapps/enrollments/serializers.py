@@ -9,7 +9,12 @@ from rest_framework import serializers
 from openedx.core.lib.api.fields import AbsoluteURLField
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
-
+from xmodule.modulestore.django import modulestore
+from lms.djangoapps.course_api.blocks.api import get_blocks
+from lms.djangoapps.courseware.module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+from lms.djangoapps.courseware.courses import get_course_with_access
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from six import iteritems, text_type
 log = logging.getLogger(__name__)
 
 
@@ -74,6 +79,9 @@ class MobileCourseSerializer(serializers.Serializer):  # pylint: disable=abstrac
     invite_only = serializers.BooleanField(source="invitation_only")
     course_modes = serializers.SerializerMethodField()
     media = _CourseApiMediaCollectionSerializer(source='*')
+    total_units = serializers.SerializerMethodField()
+    completed_units = serializers.SerializerMethodField()
+
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'enrollment.Course'
@@ -81,6 +89,35 @@ class MobileCourseSerializer(serializers.Serializer):  # pylint: disable=abstrac
     def __init__(self, *args, **kwargs):
         self.include_expired = kwargs.pop("include_expired", False)
         super(MobileCourseSerializer, self).__init__(*args, **kwargs)
+
+    def get_total_units(self, instance):
+        request = self.context.get('request', None)
+        user =  request.user
+        course_usage_key = modulestore().make_course_usage_key(instance.id)
+        response = get_blocks(request, course_usage_key, user, requested_fields=['completion'], block_types_filter='vertical')
+        total_units = len(response['blocks'])
+        return total_units
+
+    def get_completed_units(self, instance):
+        request = self.context.get('request', None)
+        user =  request.user
+        course_usage_key = modulestore().make_course_usage_key(instance.id)
+        response = get_blocks(request, course_usage_key, user, requested_fields=['completion'], block_types_filter='vertical')
+        completed_units = 0
+        for key,block in response['blocks'].items():
+            usage_key = UsageKey.from_string(block['id'])
+            usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+            course_key = usage_key.course_key
+            course = instance
+            block, _ = get_module_by_usage_id(
+            request, text_type(course_key), text_type(usage_key), disable_staff_debug_info=True, course=course
+            )
+            completion_service = block.runtime.service(block, 'completion')
+            complete = completion_service.vertical_is_complete(block)
+            if complete:
+                completed_units+= 1
+        return completed_units
+
 
     def get_course_modes(self, obj):
         """

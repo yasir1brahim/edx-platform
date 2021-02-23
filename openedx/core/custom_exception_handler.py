@@ -83,13 +83,17 @@ class ExceptionMiddleware(object):
             return JsonResponse(response, status=response['status_code'
                                 ])
 
-        if response.status_code == 404 and 'Page not found' \
-            in str(response.content):
-            response = \
-                get_response(message='Page not found, invalid url',
+        if response.status_code == 404:
+            if 'Page not found' in str(response.content):
+                response = \
+                    get_response(message='Page not found, invalid url',
                              status_code=response.status_code)
-            return JsonResponse(response, status=response['status_code'
-                                ])
+            else:
+                response = \
+                    get_response(message=str(response.content.decode("utf-8")),
+                             status_code=response.status_code)
+
+            return JsonResponse(response, status=response['status_code'])
         elif response.status_code == 200:
             response_dict = json.loads(response.content.decode('utf-8')) if response.content else {}
             if not 'pagination' in response_dict.keys():

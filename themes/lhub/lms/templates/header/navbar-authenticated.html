@@ -26,6 +26,57 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     help_link = doc_link
 %>
 <style>
+@media only screen and (min-device-width : 992px) and (max-device-width : 1320px) {
+
+.global-header .header-logo a .logo {
+height: 45px !important;
+margin: 20px 0px 20px 20px;
+}
+.global-header form {
+margin-left: 4%;
+width: 30%;
+}
+.global-header .category-block a.category-item {
+font-size: 14px;
+margin-top: 20px;
+}
+
+.global-header form.search-foam button.search-btn {
+padding: 7px 20px;
+font-size: 14px;
+}
+
+header.global-header .main-header .main .nav-item.nav-tab .tab-nav-link {
+font-size: 14px;
+margin-right: 10px;
+padding: 10px 0px;
+}
+
+
+.global-header .header-logo a {
+margin: 15px 0 0 20px;
+
+}
+header.global-header .main-header .main {
+margin-top: 40px;
+margin-left: 3%;
+}
+.global-header .nav-links .secondary .user-image-frame {
+width: 35px;
+
+}
+
+.global-header .nav-links .secondary .nav-item a.help-link {
+font-size: 14px;
+}
+
+.global-header .nav-links .secondary {
+margin: 35px 0px 0 0;
+}
+.global-header .nav-links .secondary .mobile-nav-item, .global-header .nav-links .secondary .nav-item {
+margin: 0px;
+}
+}
 @media (min-width: 992px) {
 .global-header .nav-links .secondary .nav-item a.help-link {
     color: #ffffff !important;

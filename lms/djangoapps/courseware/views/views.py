@@ -138,6 +138,7 @@ from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from commerce.api.v1.models import Course
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 log = logging.getLogger("edx.courseware")
 
@@ -1004,6 +1005,13 @@ def course_about(request, course_id):
 
         mode = course_modes = CourseMode.objects.filter(course_id=course.id)
         course_extra_info = Course(course.id,list(course_modes))
+        api = ecommerce_api_client(request.user)
+        basket_response = api.basket_details.get()
+        if basket_response['status_code'] == 404:
+            course_extra_info.already_in_cart = False
+        else:
+            courses_in_basket = [product[1]['value'] for product in basket_response['products']]
+            course_extra_info.already_in_cart = six.text_type(course.id) in courses_in_basket
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.

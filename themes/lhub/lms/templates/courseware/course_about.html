@@ -83,6 +83,23 @@ margin-right: 10px;
   <header class="course-profile">
     <div class="intro-inner-wrapper">
       <div class="table">
+
+ % if get_course_about_section(request, course, "video"):
+      <a href="#video-modal" class="media" rel="leanModal">
+        <div class="hero">
+          <img src="${course_image_urls['large']}" alt="" />
+          <div class="play-intro"></div>
+        </div>
+      </a>
+      %else:
+      <div class="media">
+        <div class="hero">
+          <img src="${course_image_urls['large']}" alt="" />
+        </div>
+      </div>
+      % endif
+
+
       <section class="intro">
         <div class="heading-group">
           <h1>
@@ -133,12 +150,14 @@ margin-right: 10px;
             else:
               href_class = "register"
           %>
-          <a href="${reg_href}" class="${href_class}">
-            ${_("Enroll Now")}
-          </a>
           
-          <button style="display:none" id="add_to_cart_btn" type="button">Add to Cart </button>
+          <a><button style="display:none" id="add_to_cart_btn" type="button">Add to Cart </button></a>
           <a href="${settings.ECOMMERCE_PUBLIC_URL_ROOT}/basket"><button id="go_to_cart_btn" style="display:none;">Go to cart</button></a>
+
+          <a href="${reg_href}" class="${href_class}">
+           <button class="register" id="buy_now_btn" type="button">Buy now</button>
+          </a>
+
           <div id="register_error"></div>
         %endif
         </div>
@@ -146,20 +165,6 @@ margin-right: 10px;
        <input id="course_sku" value="${course_extra_info.modes[0].sku}" type="hidden"/>
        <input id="already_in_cart" value="${course_extra_info.already_in_cart}" type="hidden"/>
       </section>
-      % if get_course_about_section(request, course, "video"):
-      <a href="#video-modal" class="media" rel="leanModal">
-        <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
-          <div class="play-intro"></div>
-        </div>
-      </a>
-      %else:
-      <div class="media">
-        <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
-        </div>
-      </div>
-      % endif
     </div>
       </div>
   </header>
@@ -345,3 +350,34 @@ margin-right: 10px;
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized_datetime");
 </%static:require_module_async>
+
+
+<style>
+
+@media screen and (min-width: 991px) {
+header.course-profile .table .media {
+width: 50% !important;
+}
+
+header.course-profile .table section.intro {
+width: 50% !important;
+}
+
+.main-cta a {
+    float: left;
+    background: none !important;
+    padding: 0px !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin-right: 3%;
+    width: 45%;
+    }
+
+.main-cta button {
+    width: 100%;
+    padding: 10px;
+}
+
+
+}
+</style>

@@ -12,8 +12,16 @@ $(document).ready(function() {
     if (isSafari) {
         $('.main-cta').addClass('safari-wrapper');
     }
+
+if ($('.course-price').text() == 'Free')
+{
+$('#add_to_cart_btn').css('display', 'none');
+$('#go_to_cart_btn').css('display', 'none');
+$('#buy_now_btn').text("Enroll now")
+}
+
     
-if($('#already_in_cart').val()== "False")
+else if($('#already_in_cart').val()== "False")
 {
 $('#add_to_cart_btn').css('display', '');
 $('#go_to_cart_btn').css('display', 'none');

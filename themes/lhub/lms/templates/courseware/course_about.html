@@ -162,7 +162,9 @@ margin-right: 10px;
         %endif
         </div>
        <input id="web_csrf_token" value="${csrf_token}" type="hidden"/>
+        % if course_price != "Free":
        <input id="course_sku" value="${course_extra_info.modes[0].sku}" type="hidden"/>
+        %endif
        <input id="already_in_cart" value="${course_extra_info.already_in_cart}" type="hidden"/>
       </section>
     </div>

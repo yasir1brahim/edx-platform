@@ -839,6 +839,71 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    region = String(
+        display_name=_("Region"),
+        help=_("Specify the region."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    difficulty_level = String(
+        display_name=_("Difficulty Level"),
+        help=_("Specify the difficulty level of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    course_org = String(
+        display_name=_("Organization"),
+        help=_("Specify the organization of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    new_category = String(
+        display_name=_("Category"),
+        help=_("Specify the Category of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    subcategory = String(
+        display_name=_("Sub Category"),
+        help=_("Specify the Sub Category of course."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    platform_visibility = String(
+        display_name=_("Platform visibility"),
+        help=_("Specify the visibility of the course for mobile, web or both."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    premium = Boolean(
+        display_name=_("Premium"),
+        help=_("Whether it is a premium course or not."),
+        default=False,
+        scope=Scope.settings
+    )
+
+    course_sale_type = String(
+        display_name=_("Sale Type"),
+        help=_("Specify the sale type of the course for free, paid or premium."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    course_price = Float(
+        display_name=_("Course Price"),
+        help=_("Specify the price for the course"),
+        default=0.0,
+        scope=Scope.settings
+    )
+
+
+
     teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
@@ -1572,10 +1637,10 @@ class CourseSummary(object):
     A lightweight course summary class, which constructs split/mongo course summary without loading
     the course. It is used at cms for listing courses to global staff user.
     """
-    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization', 'end']
+    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization', 'end', 'platform_visibility', 'premium']
 
     def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None,
-                 end=None):
+                 end=None, platform_visibility="Both", premium=False):
         """
         Initialize and construct course summary
 
@@ -1601,6 +1666,8 @@ class CourseSummary(object):
 
         self.id = course_locator  # pylint: disable=invalid-name
         self.location = course_locator.make_usage_key('course', 'course')
+        self.platform_visibility = platform_visibility
+        self.premium = premium
         self.end = end
         if end is not None and not isinstance(end, datetime):
             self.end = dateutil.parser.parse(end)

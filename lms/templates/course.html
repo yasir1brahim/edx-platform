@@ -6,6 +6,192 @@ from django.urls import reverse
 from six import text_type
 %>
 <%page args="course" expression_filter="h"/>
+<style>
+
+.courses article .course-info {
+padding: 0px 15px;
+}
+p.label-course {
+font-size: 12px;
+}
+
+html, body, a, h1, h2, h3, h4, h5, h6, li, button, input, textarea, p, span, div, option, select, label, input, form, ul, ol, strong {
+      font-family: 'Poppins', sans-serif;
+}
+
+.courses-container .courses .course .course-info .course-title {
+    height: 20px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    overflow: hidden;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.coure-label span{
+ color: #646464;
+ font-weight: 300;
+ }
+
+p.coure-label {
+font-size: 12px;
+line-height: 0;
+margin: 0px 20px 0px 0px;
+display: inline-block;
+font-weight: 400;
+color: #000000;
+}
+
+h2.course-name {
+margin: 0px;
+}
+
+.courses-container .courses .course .course-info .course-date {
+padding: 4px 0px 0px 0px;
+margin-top: 12px;
+}
+
+span.course-title, span.course-code, span.course-organization {
+padding-left: 0px !important;
+}
+.coure-label span {
+margin-left: 7px;
+}
+
+.courses-container .courses .course .course-info {
+
+    height: 300px;
+
+}
+
+.find-courses .courses-container .courses .courses-listing .courses-listing-item, .university-profile .courses-container .courses .courses-listing .courses-listing-item {
+
+    max-height: 450px;
+
+}
+
+.course-date.localized_datetime {
+
+    position: absolute;
+
+    bottom: 10px;
+
+}
+
+.cut-price {
+
+    text-decoration: line-through;
+
+}
+
+.price_details ul li {
+
+    list-style-type: none;
+
+    font-size: 12px;
+
+    padding:2px 0px !important;
+
+    color:#000;
+
+        font-weight: 500;
+
+}
+
+
+
+.price_details ul {
+
+    padding: 0px;
+
+    margin: 5px 0px;
+
+}
+
+
+
+.price_details ul li:last-child {
+
+    border: none;
+
+}
+
+.price_details ul li:first-child {
+
+    padding-left: 0px !important;
+
+}
+
+
+
+.price_details ul li .cut_price {
+
+    text-decoration: line-through;
+
+    color: red;
+
+}
+
+
+
+.price_details ul li span {
+
+    font-weight: 600;
+
+}
+
+
+
+.price_details ul li .main_price {
+
+    font-size: 16px;
+
+}
+
+
+
+
+
+.course_number .total_chapters, .course_number .completed_chapters {
+
+    background: #0075b4;
+
+    color: #fff;
+
+    font-weight: 600;
+
+    padding: 2px;
+
+    border-radius: 50%;
+
+    width: 25px;
+
+    height: 25px;
+
+    display: inline-block;
+
+    vertical-align: middle;
+
+    text-align: center;
+
+    line-height: 1.5;
+
+}
+
+
+
+.course_number {
+
+    vertical-align: bottom;
+
+}
+
+.courses-container .courses .courses-listing .courses-listing-item {
+max-height: 100% !important;
+}
+
+</style>
+
 <article class="course" id="${course.id}" role="region" aria-label="${course.display_name_with_default}">
   <a href="${reverse('about_course', args=[text_type(course.id)])}">
     <header class="course-image">
@@ -19,6 +205,44 @@ from six import text_type
         <span class="course-organization">${course.display_org_with_default}</span>
         <span class="course-code">${course.display_number_with_default}</span>
         <span class="course-title">${course.display_name_with_default}</span>
+        <p class="coure-label">Difficulty Level:<span class="course-difficulty_level">${course.difficulty_level}</span></p>
+        <p class="coure-label">Enrollment Count:<span class="course-enrollments_count">${course.enrollments_count}</span></p>
+        <p class="coure-label">Rating:<span class="course-ratings">${course.ratings}</span></p>
+        <p class="coure-label">Comments Count:<span class="course-comments_count">${course.comments_count}</span></p>
+      % if course.discount_applicable:
+          <div class="price_details">
+
+    <ul>
+
+    <li> Discount Percentage: <span>${course.discount_percentage}%</span></li>
+
+    <li>Price: <span class="cut_price">S$${course.price}</span></li>
+
+       % if course.discounted_price == 0:
+	    <li>Discount Price: <span class="main_price">Free</span></li>
+       % else:
+            <li>Discount Price: <span class="main_price">S$${course.discounted_price}</span></li>
+       % endif
+
+	</ul>
+
+          </div>
+      % else:
+         <div class="price_details">
+
+    <ul>
+    
+    % if course.price == 0:
+        <li>Price: <span class="main_price">Free</span></li>
+    % else:
+        <li>Price: <span class="main_price">S$${course.price}</span></li>
+    %endif
+	</ul>
+
+</div>
+
+       
+      % endif
       </h2>
       <%
       if course.start is not None:

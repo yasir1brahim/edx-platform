@@ -17,7 +17,7 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q, prefetch_related_objects
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
@@ -46,6 +46,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from six import text_type
 from web_fragments.fragment import Fragment
+from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 
 from lms.djangoapps.survey import views as survey_views
 from common.djangoapps.course_modes.models import CourseMode, get_course_prices
@@ -66,6 +67,7 @@ from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
+    get_courses_with_extra_info,
     get_current_child,
     get_permission_for_course_about,
     get_studio_url,
@@ -133,6 +135,7 @@ from xmodule.x_module import STUDENT_VIEW
 from ..context_processor import user_timezone_locale_prefs
 from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+from commerce.api.v1.models import Course
 
 log = logging.getLogger("edx.courseware")
 
@@ -254,9 +257,21 @@ def courses(request):
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
     courses_list = []
+    filter_ = None
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        courses_list = get_courses(request.user)
+        if not request.user.id:
+            filter_ = {'organization' : None}
+        elif request.user.is_staff:
+            filter_ = {}
+        elif _get_course_creator_status(request.user) == 'granted':
+            if request.user.user_extra_info.organization:
+                filter_ = {'organization' : request.user.user_extra_info.organization.id}
+            else:
+                filter_ = {'organization': None}
+        else:
+            filter_ = {'organization': None}
+        courses_list = get_courses_with_extra_info(request.user,filter_=filter_)
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
@@ -265,17 +280,48 @@ def courses(request):
             courses_list = sort_by_announcement(courses_list)
 
     # Add marketable programs to the context.
+    web_couses = []
+
+    for course in courses_list:
+        platform = course.platform_visibility
+        if platform == None or platform == "Web" or platform == "Both":
+            web_couses.append(course)
+
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
     return render_to_response(
         "courseware/courses.html",
         {
-            'courses': courses_list,
+            'courses': web_couses,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
         }
     )
 
+def _get_course_creator_status(user):
+    """
+    Helper method for returning the course creator status for a particular user,
+    taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
+
+    If the user passed in has not previously visited the index page, it will be
+    added with status 'unrequested' if the course creator group is in use.
+    """
+
+    if user.is_staff:
+        course_creator_status = 'granted'
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
+        course_creator_status = 'disallowed_for_this_site'
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        course_creator_status = get_course_creator_status(user)
+        if course_creator_status is None:
+            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
+            # Add the user to the course creator admin table with status 'unrequested'.
+            add_user_with_status_unrequested(user)
+            course_creator_status = get_course_creator_status(user)
+    else:
+        course_creator_status = 'granted'
+
+    return course_creator_status
 
 class PerUserVideoMetadataThrottle(UserRateThrottle):
     """
@@ -943,10 +989,15 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
+        if overview.platform_visibility == "Mobile":
+            return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
+
         sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
 
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
+        mode = course_modes = CourseMode.objects.filter(course_id=course.id)
+        course_extra_info = Course(course.id,list(course_modes))
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.
@@ -957,6 +1008,7 @@ def course_about(request, course_id):
 
         context = {
             'course': course,
+            'course_extra_info': course_extra_info,
             'course_details': course_details,
             'staff_access': staff_access,
             'studio_url': studio_url,

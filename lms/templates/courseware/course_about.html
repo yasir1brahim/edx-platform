@@ -58,6 +58,14 @@ from six import string_types
 
 <%block name="pagetitle">${course.display_name_with_default}</%block>
 
+<style>
+span.cut_price {
+text-decoration: line-through;
+color: red;
+margin-right: 10px;
+}
+</style>
+
 <section class="course-info">
 
   <%block name="course_about_header">
@@ -181,6 +189,7 @@ from six import string_types
                   <span class="important-dates-item-text start-date localized_datetime" data-format="shortDate" data-datetime="${course_date_string}" data-language="${LANGUAGE_CODE}"></span>
               % endif
             </li>
+ 
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
@@ -235,8 +244,30 @@ from six import string_types
           % endif
 
           % if get_course_about_section(request, course, "prerequisites"):
-            <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
+            <li class="important-dates-item"><span class="icon fa fa-book" aria-hidden="true"></span><p class="important-dates-item-title">${_("Requirements")}</p>
+            <span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
+
+         % if course_price == "Free":
+          <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
+          <span class="important-dates-item-text prerequisites">${course_price}</span></li>
+         % else:
+
+           % if course_extra_info.web_discount_applicable:
+          <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
+          <span class="cut_price important-dates-item-text prerequisites"> S${course_price} </span></li>
+
+
+          <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Discounted Price")}</p>
+          <span class=" important-dates-item-text prerequisites"> S$${ course_extra_info.web_discounted_price } </span>
+          % else:
+           <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
+          <span class="important-dates-item-text prerequisites"> S${course_price} </span></li>
+
+          % endif
+
+        % endif
+
         </ol>
         </%block>
     </div>

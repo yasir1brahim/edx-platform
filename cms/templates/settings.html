@@ -33,6 +33,7 @@
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
+var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
   </script>
 </%block>
 
@@ -48,6 +49,25 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
 </%block>
 
 <%block name="content">
+<style>
+
+.group-settings.basic .field.text.is-not-editable:nth-child(1), .group-settings.basic .field.text.is-not-editable:nth-child(2), .group-settings.basic .field.text.is-not-editable:nth-child(3) {
+
+width: 25% !important;
+margin-right: 1% !important;
+}
+
+.group-settings.basic .field.text.is-not-editable:nth-child(6) {
+width: 25% !important;
+margin-right: 1% !important;
+}
+
+.group-settings.basic .field.text.is-not-editable:nth-child(7) {
+width: 70% !important;
+}
+
+</style>
+
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
@@ -80,11 +100,33 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 class="short" id="course-number" readonly>
             </li>
 
-            <li class="field text is-not-editable" id="field-course-name">
+            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
               <label for="course-name">${_("Course Run")}</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-name" readonly />
             </li>
+
+
+            <li class="field text is-not-editable" id="field-course-indexed-in-discovery">
+              <input type="checkbox" class="field-radio" disabled="disabled"  name="Indexed in Discovery" id="course-indexed-in-discovery" value="true" aria-labelledby="course-pace-indexed-in-discovery-label"/>
+              <label id="course-indexed-in-discovery-label" class="course-label" for="course-indexed-in-discovery">${_("Indexed in Discovery")}</label>
+              <span class="tip">${_("Indexed in Discovery")}</span>
+            </li>
+            <br>
+
+            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
+              <label for="course-name">${_("Course Name")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                class="long" id="course-name" value="${display_name}" readonly />
+            </li>
+
+
+            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
+              <label for="course-name">${_("Course ID")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
+                class="long" id="course-name" value="${course_id}" readonly />
+            </li>
+
           </ol>
 
           % if not marketing_enabled:
@@ -337,6 +379,101 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               </select>
               <span class="tip tip-stacked">${_("Identify the course language here. This is used to assist users find courses that are taught in a specific language. It is also used to localize the 'From:' field in bulk emails.")}</span>
             </li>
+
+	    <li class="field" id="field-course-region">
+              <label for="course-region">${_("Region")}</label>
+              <select id="course-region">
+                <option value="" selected> - </option>
+                % for code, country in regions.items():
+                  <option value="${code}">${country}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">${_("Select region of the course")}</span>
+            </li>
+
+            <li class="field" id="field-course-difficulty-level">
+              <label for="course-difficulty-level">${_("Difficulty Level")}</label>
+              <select id="course-difficulty-level">
+                <option value="" selected> - </option>
+                % for dl_obj in difficulty_level_options:
+                  <option value="${dl_obj.level}">${dl_obj.label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please enter difficulty level</span>
+            </li>
+
+
+            <li class="field" id="field-course_org_options">
+              <label for="course-orgs">${_("Organization")}</label>
+
+              % if current_org:
+              <input value="${current_org}" disabled style="width:19.5%" />
+              % else:
+              <select id="course-orgs">
+                <option value="" selected> - </option>
+                % for option in course_org_options:
+                  <option value="${option.short_name}">${option.name}</option>
+                % endfor
+              </select>
+             <span class="tip tip-stacked">Please select organization</span>
+              % endif
+            </li>
+
+            <li class="field" id="field-course-platform-visibility">
+              <label for="course-platform-visibility">${_("Platform Visibility")}</label>
+              <select id="course-platform-visibility">
+                <option value="" selected> - </option>
+                % for val, label in platform_visibility_options:
+                  <option value="${val}">${label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please select platform visibility</span>
+            </li>
+            <li class="field">
+                <input type="checkbox" class="field-radio" name="Premium" id="course-premium" value="true" aria-labelledby="course-pace-premium-label"/>
+                <label id="course-premium-label" class="course-label" for="course-premium">${_("Premium")}</label>
+                <span class="tip">${_("Check if course is premium")}</span>
+            </li>
+            <li class="field" id="field-course-course-sale-type">
+              <label for="course-course-sale-type">${_("Course Sale Type")}</label>
+              <select id="course-course-sale-type">
+                <option value="" selected> - </option>
+                % for val, label in course_sale_type_options:
+                  <option value="${val}">${label}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please select sale type</span>
+            </li>
+
+
+            <li class="field" id="field-course-course-price">
+              <label for="course-course-price">${_("Course Price")}</label>
+               <input type="text" id="course-course-price" class="short" />
+              <span class="tip tip-stacked">Please enter price</span>
+            </li>
+
+
+            <li class="field" id="field-course-category">
+              <label for="course-category">${_("Category")}</label>
+              <select id="course-category" name="course-category" required>
+                <option value="" selected> - </option>
+                % for category in categories:
+                  <option value="${category.name}">${category.name}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please enter Category</span>
+            </li>
+            <li class="field" id="field-course-subcategory">
+              <label for="course-subcategory">${_("Sub Category")}</label>
+              <select id="course-subcategory">
+                <option value="" selected> - </option>
+                % for subcategory in subcategories:
+                  <option value="${subcategory.name}">${subcategory.name}</option>
+                % endfor
+              </select>
+              <span class="tip tip-stacked">Please enter Sub Category</span>
+            </li>
+
           </ol>
         </div>
         % endif
@@ -680,3 +817,4 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
   </div>
 </div>
 </%block>
+

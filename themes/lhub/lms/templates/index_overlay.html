@@ -1,0 +1,40 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<style>
+@media (min-width: 992px){
+.home>header .title .heading-group a.getstarted-btn {
+	background: #ffffff;
+	font-size: 16px;
+	color: #18355e;
+	padding: 20px;
+	font-weight: 700;
+	font-family: 'Poppins';
+	width: 190px;
+	border-radius: 14px;
+	display: block;
+	margin: 30px auto;
+	margin-bottom: 0px;
+}
+.home>header .title .heading-group a.getstarted-btn i {
+	font-size: 28px;
+	font-weight: 600;
+	margin-left: 25px;
+}
+.home>header .title .heading-group a.getstarted-btn i {
+vertical-align: middle;
+margin-left: 15px;
+position: relative;
+top: -2px;
+}
+}
+</style>
+
+<h1>Skill Up And Be Ready for Your Future Career</h1>
+## Translators: 'Open edX' is a registered trademark, please keep this untranslated. See http://open.edx.org for more information.
+<div class="mobile-nav-item hidden-mobile nav-item">
+              <a class="getstarted-btn btn" href="/register?next=%2F">Get Started Today <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+            </div>

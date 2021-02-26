@@ -158,9 +158,10 @@ class AccountCreationForm(forms.Form):
     name = forms.CharField(
         min_length=accounts.NAME_MIN_LENGTH,
         error_messages={
-            "required": _NAME_TOO_SHORT_MSG,
+            #"required": _NAME_TOO_SHORT_MSG,
             "min_length": _NAME_TOO_SHORT_MSG,
         },
+        required=False,
         validators=[validate_name]
     )
 

@@ -15,7 +15,7 @@ export function CourseOrLibraryListing(props) {
       {
         props.items.map((item, i) =>
           (
-            <li key={i} className="course-item" data-course-key={item.course_key}>
+            <li key={i} className="course-item" data-course-key={item.course_key} data-platform-visibility={item.platform_visibility} data-premium={item.premium}>
               <a className={linkClass} href={item.url}>
                 <h3 className="course-title" id={`title-${idBase}-${i}`}>{item.display_name}</h3>
                 <div className="course-metadata">

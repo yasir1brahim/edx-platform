@@ -14,6 +14,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    'change input': 'updateModel',
                    'change textarea': 'updateModel',
                    'change select': 'updateModel',
+                   'change #course-category': 'updateSubCategory',
+                   'change #course-course-sale-type': 'disableCoursePrice',
                    'click .remove-course-introduction-video': 'removeVideo',
                    'focus #course-overview': 'codeMirrorize',
                    'focus #course-about-sidebar-html': 'codeMirrorize',
@@ -30,6 +32,17 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    options = options || {};
         // fill in fields
                    this.$el.find('#course-language').val(this.model.get('language'));
+                   this.$el.find('#course-difficulty-level').val(this.model.get('difficulty_level'));
+		   this.$el.find('#course-region').val(this.model.get('region'));
+                   this.$el.find('#course-orgs').val(this.model.get('org'));
+                   this.$el.find('#course-category').val(this.model.get('new_category'));
+                   this.$el.find('#course-subcategory').val(this.model.get('subcategory'));
+                   this.$el.find('#course-platform-visibility').val(this.model.get('platform_visibility'));
+                   this.$el.find('#course-premium').val(this.model.get('premium'));
+                   this.$el.find('#course-indexed-in-discovery').val(this.model.get('indexed_in_discovery'));
+                   this.$el.find('#course-course-sale-type').val(this.model.get('course_sale_type'));
+                   this.$el.find('#course-course-price').val(this.model.get('course_price'));
+
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));
                    this.$el.find('#course-name').val(this.model.get('run'));
@@ -72,6 +85,18 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        el: $('.course-instructor-details-fields'),
                        model: this.model
                    });
+                   this.initSubCategory();
+                   //Disable course sale type if already exist or not indexed in discovery
+                    console.log(this.model.get('indexed_in_discovery'))
+                    console.log(this.model.get('course_sale_type'))
+                    if (this.model.get('indexed_in_discovery') && this.model.get('course_sale_type') === null) {
+                        this.$el.find('#course-course-sale-type').prop("disabled", false)
+                        this.$el.find('#course-course-price').prop("disabled", false)
+                    }
+                    else {
+                        this.$el.find('#course-course-sale-type').prop("disabled", true)
+                        this.$el.find('#course-course-price').prop("disabled", false)
+                    }
                },
 
                render: function() {
@@ -150,6 +175,18 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        instructorPacedButton.attr('disabled', true);
                        paceToggleTip.text(gettext('Course pacing cannot be changed once a course has started.'));
                    }
+                   if (this.model.get('premium') == true)
+			{
+                         this.$('#' + this.fieldToSelectorMap.premium).attr('checked', this.model.get('premium'));
+                       }
+
+
+                   if (this.model.get('indexed_in_discovery') == true)
+                        {
+                         this.$('#' + this.fieldToSelectorMap.indexed_in_discovery).attr('checked', this.model.get('indexed_in_discovery'));
+                       }
+
+
 
                    this.licenseView.render();
                    this.learning_info_view.render();
@@ -159,6 +196,16 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                },
                fieldToSelectorMap: {
                    language: 'course-language',
+                   difficulty_level: 'course-difficulty-level',
+		   region: 'course-region',
+                   course_org: 'course-orgs',
+                   new_category: 'course-category',
+                   subcategory: 'course-subcategory',
+                   platform_visibility: 'course-platform-visibility',
+                   premium: 'course-premium',
+                   indexed_in_discovery: 'course-indexed-in-discovery',
+                   course_sale_type: 'course-course-sale-type',
+                   course_price: 'course-course-price',
                    start_date: 'course-start',
                    end_date: 'course-end',
                    enrollment_start: 'enrollment-start',
@@ -224,6 +271,71 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
 
                    $(e.currentTarget).attr('title', currentTimeText);
                },
+              initSubCategory: function() {
+                var $categorySelect = this.$el.find('#' + this.fieldToSelectorMap.new_category)
+                var $subCategorySelect = this.$el.find('#' + this.fieldToSelectorMap.subcategory)
+
+                // find selected category
+                var selectedCategoryValue = $categorySelect.val();
+                var selectedSubCategoryValue = $subCategorySelect.val();
+
+                // clean subcategory select from older options
+                $subCategorySelect.empty();
+
+                // if category found - populate subcategory select
+                if (selectedCategoryValue) {
+                    var subcat_list = ['-']
+                    var subcat_list = subcat_list.concat(subcategories[selectedCategoryValue])
+                    console.log(subcat_list)
+                    subcat_list.forEach(function(subcategory) {
+
+                        // you can extract this line into separate function
+                        var $option = $('<option/>').attr('value', subcategory).html(subcategory);
+
+                        $subCategorySelect.append($option);
+                    });
+                }
+               if (selectedSubCategoryValue)
+                {
+                  $('#course-subcategory option[value="'+selectedSubCategoryValue+'"]').attr('selected','selected');    
+                 }
+                //$subCategorySelect.value=selectedSubCategoryValue;
+              },
+              updateSubCategory: function() {
+                //var $categorySelect =  $("#course-category");
+                //var $subCategorySelect =  $("#course-subcategory");
+
+                var $categorySelect = this.$el.find('#' + this.fieldToSelectorMap.new_category)
+                var $subCategorySelect = this.$el.find('#' + this.fieldToSelectorMap.subcategory)
+
+                // clean subcategory select from older options
+                $subCategorySelect.empty();
+
+                // find selected category
+                var selectedCategoryValue = $categorySelect.val();
+
+                // if category found - populate subcategory select
+                if (selectedCategoryValue) {
+                    var subcat_list = ['-']
+                    var subcat_list = subcat_list.concat(subcategories[selectedCategoryValue])
+                    console.log(subcat_list)
+                    subcat_list.forEach(function(subcategory) {
+
+                        // you can extract this line into separate function
+                        var $option = $('<option/>').attr('value', subcategory).html(subcategory);
+
+                        $subCategorySelect.append($option);
+                    });
+                }
+            },
+            disableCoursePrice: function() {
+                if (this.$el.find('#course-course-sale-type').val() === "free") {
+                    this.$el.find('#course-course-price').prop("disabled", true)
+                }
+                else {
+                    this.$el.find('#course-course-price').prop("disabled", false)
+                }
+            },
                updateModel: function(event) {
                    var value;
                    var index = event.currentTarget.getAttribute('data-index');
@@ -303,6 +415,16 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        this.model.set('self_paced', JSON.parse(event.currentTarget.value));
                        break;
                    case 'course-language':
+                   case 'course-difficulty-level':
+		   case 'course-region':
+                   case 'course-orgs':
+                   case 'course-category':
+                   case 'course-subcategory':
+                   case 'course-platform-visibility':
+                   case 'course-course-price':
+                   case 'course-premium':
+                   case 'course-indexed-in-discovery':
+                   case 'course-course-sale-type':
                    case 'course-effort':
                    case 'course-title':
                    case 'course-subtitle':

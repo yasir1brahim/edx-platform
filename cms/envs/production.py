@@ -138,6 +138,8 @@ CELERY_QUEUES = {
 
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
+DISCOVERY_ROOT_URL = ENV_TOKENS.get('DISCOVERY_ROOT_URL', None)
+
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:

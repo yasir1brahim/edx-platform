@@ -176,8 +176,15 @@ class RoleBase(AccessRole):
             # Cache a list of tuples identifying the particular roles that a user has
             # Stored as tuples, rather than django models, to make it cheaper to construct objects for comparison
             user._roles = RoleCache(user)
-
         return user._roles.has_role(self._role_name, self.course_key, self.org)
+
+    def has_same_organization(self, user, check_user_activation=True):
+        if user.user_extra_info.organization:
+            return user.user_extra_info.organization.short_name == self.org
+        return False
+
+
+
 
     def add_users(self, *users):
         """
@@ -431,3 +438,16 @@ class UserBasedRole(object):
         * role (will be self.role--thus uninteresting)
         """
         return CourseAccessRole.objects.filter(role=self.role, user=self.user)
+
+
+    def courses_with_role_and_org(self,user_org):
+        """
+        Return a django QuerySet for all of the courses with this user x role. You can access
+        any of these properties on each result record:
+        * user (will be self.user--thus uninteresting)
+        * org
+        * course_id
+        * role (will be self.role--thus uninteresting)
+        """
+        return CourseAccessRole.objects.filter(role=self.role,org=user_org,course_id__contains='course-v1')
+

@@ -1,6 +1,6 @@
 <div class="discussion-article view-discussion-home">
   <section class="home-header">
-    <span class="label"><%- gettext("Discussion Home") %></span>
+    <span class="label"><%- gettext("Q&A Home") %></span>
     <% if (window.courseName) { %>
       <h2 class="home-title"><%- window.courseName %></h2>
     <% } %>
@@ -9,13 +9,13 @@
   <% if (window.ENABLE_DISCUSSION_HOME_PANEL) { %>
     <span class="label label-settings">
       <%- interpolate(
-            gettext("How to use %(platform_name)s discussions"),
+            gettext("How to use %(platform_name)s Q&As"),
             {platform_name: window.PLATFORM_NAME}, true
           ) %>
     </span>
     <table class="home-helpgrid">
       <tr class="helpgrid-row helpgrid-row-navigation">
-        <th scope="row" class="row-title"><%- gettext("Find discussions") %></td>
+        <th scope="row" class="row-title"><%- gettext("Find Q&A") %></td>
         <td class="row-item">
           <span class="icon fa fa-reorder" aria-hidden="true"></span>
           <span class="row-description"><%- gettext("Use the All Topics menu to find specific topics.") %></span>

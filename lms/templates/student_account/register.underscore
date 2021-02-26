@@ -1,3 +1,16 @@
+<style>
+.login-register .form-field label.focus-out {
+position: relative;
+padding-top: 0px;
+padding-left: 0px;
+}
+
+select#register-country, select#register-sector{
+box-shadow: 0 1px 0 0 rgba(255,255,255,0.6), inset 0 0 3px 0 rgba(0,0,0,0.1);
+}
+</style>
+
+
 <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
 
@@ -67,3 +80,15 @@
     	<% if ( context.registerFormSubmitButtonText ) { %><%- context.registerFormSubmitButtonText %><% } else { %><%- gettext("Create Account") %><% } %>
     </button>
 </form>
+
+<script>
+
+document.getElementById('register-email').placeholder = "Enter Your Email.";
+document.getElementById('register-username').placeholder = "Enter Your Username";
+document.getElementById('register-password').placeholder = "Enter Your Password";
+document.getElementById('register-name').placeholder = "Enter Your Name";
+document.getElementById('register-country').placeholder = "Enter Your Country";
+
+
+</script>
+

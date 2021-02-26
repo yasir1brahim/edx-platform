@@ -24,11 +24,12 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
-from .applicability import can_receive_discount, discount_percentage, REV1008_EXPERIMENT_ID
+from .applicability import can_receive_discount, discount_percentage, discount_percentage_configured, REV1008_EXPERIMENT_ID
 
 log = logging.getLogger(__name__)
 
-
+import datetime
+import pytz
 class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
@@ -76,18 +77,15 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
         """
         course_key = CourseKey.from_string(course_key_string)
         course = CourseOverview.get_from_id(course_key)
-        discount_applicable = can_receive_discount(user=request.user, course=course)
+        utc=pytz.UTC
+        discount_applicable = can_receive_discount(user=request.user, course=course) and discount_percentage_configured(course)
         discount_percent = discount_percentage(course)
+        if discount_percent == 0:
+            discount_applicable = False        
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
-
         # Record whether the last basket loaded for this course had a discount
         try:
-            ExperimentData.objects.update_or_create(
-                user=request.user,
-                experiment_id=REV1008_EXPERIMENT_ID,
-                key='discount_' + str(course),
-                value=discount_applicable
-            )
+            pass
         except Exception as e:  # pylint: disable=broad-except
             log.exception(str(e))
 

@@ -25,6 +25,7 @@ from util.json_request import JsonResponse
 from .models import CommerceConfiguration
 
 log = logging.getLogger(__name__)
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 
 
 @csrf_exempt
@@ -124,3 +125,11 @@ def user_verification_status(request):
     is_verification_required = enrollment_mode in CourseMode.VERIFIED_MODES
 
     return JsonResponse({'is_verification_required': is_verification_required})
+
+@csrf_exempt
+def basket_detail(request):
+    api = ecommerce_api_client(request.user)
+    response = api.basket_details.get()
+    logging.info('============== response ===========')
+    logging.info(response)
+    return render_to_response("commerce/basket-detail.html", response)

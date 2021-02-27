@@ -6,6 +6,8 @@ from openedx.core.lib.api.authentication import BearerAuthentication
 from rest_framework.permissions import IsAuthenticated
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 import logging
+from rest_framework.authentication import SessionAuthentication
+
 
 @api_view(['POST'])
 @authentication_classes((BearerAuthentication,))
@@ -43,7 +45,7 @@ def checkout_payment(request):
             return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
 
 @api_view(['POST'])
-@authentication_classes((BearerAuthentication,))
+@authentication_classes((BearerAuthentication,SessionAuthentication))
 @permission_classes([IsAuthenticated])
 def custom_basket(request):
 

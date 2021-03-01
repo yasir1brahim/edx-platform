@@ -1012,6 +1012,7 @@ def course_about(request, course_id):
         else:
             courses_in_basket = [product[1]['value'] for product in basket_response['products']]
             course_extra_info.already_in_cart = six.text_type(course.id) in courses_in_basket
+
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.

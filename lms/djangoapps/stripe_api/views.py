@@ -6,6 +6,8 @@ from openedx.core.lib.api.authentication import BearerAuthentication
 from rest_framework.permissions import IsAuthenticated
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 import logging
+from rest_framework.authentication import SessionAuthentication
+
 
 @api_view(['POST'])
 @authentication_classes((BearerAuthentication,))
@@ -43,7 +45,7 @@ def checkout_payment(request):
             return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
 
 @api_view(['POST'])
-@authentication_classes((BearerAuthentication,))
+@authentication_classes((BearerAuthentication,SessionAuthentication))
 @permission_classes([IsAuthenticated])
 def custom_basket(request):
 
@@ -72,6 +74,51 @@ def basket_item_count(request):
         api = ecommerce_api_client(user)
         try:
             response =  api.basket_item_count.get()
+            return Response(response)
+        except Exception as e:
+            return Response({'message':e, 'status': False, 'result':{}, 'status_code':400})
+
+@api_view(['POST'])
+@authentication_classes((BearerAuthentication,SessionAuthentication))
+@permission_classes([IsAuthenticated])
+def basket_buy_now(request):
+    """
+    This function is used to buyitem without adding it to cart.
+    """
+    if request.method == 'POST':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response = api.basket_buy_now.post(request.data)
+            if "developer_message" in response:
+                return Response({
+                'message': response["developer_message"],
+                'status': False,
+                'result':{},
+                'status_code':400
+            })
+            else:
+                return Response({
+                    'message': '',
+                    'status': True,
+                    'result':response,
+                    'status_code':200
+            })
+        except Exception as e:
+            return Response({'message':e, 'status': False, 'result':{}, 'status_code':400})
+
+@api_view(['DELETE'])
+@authentication_classes((BearerAuthentication,SessionAuthentication))
+@permission_classes([IsAuthenticated])
+def basket_buy_now_cancel(request):
+    """
+    This function is used to remove buyitem without adding it to cart.
+    """
+    if request.method == 'DELETE':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response = api.basket_buy_now.delete()
             return Response(response)
         except Exception as e:
             return Response({'message':e, 'status': False, 'result':{}, 'status_code':400})

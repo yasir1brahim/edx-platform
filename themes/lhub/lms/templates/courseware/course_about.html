@@ -152,8 +152,10 @@ margin-right: 10px;
           %>
           
           <a><button style="display:none" id="add_to_cart_btn" type="button">Add to Cart </button></a>
-          <a href="${settings.ECOMMERCE_PUBLIC_URL_ROOT}/basket"><button id="go_to_cart_btn" style="display:none;">Go to cart</button></a>
-          <button id="buy_now_btn" data-sku="${course_extra_info.modes[0].sku}">Buy now</button> 
+          <a href="${settings.LMS_INTERNAL_ROOT_URL}/commerce/basket-view/"><button id="go_to_cart_btn" style="display:none;">Go to cart</button></a>
+          <a href="${reg_href}" class="${href_class}">
+           <button class="register" id="buy_now_btn" type="button">Buy now</button>
+          </a>
 
           <div id="register_error"></div>
         %endif
@@ -163,6 +165,7 @@ margin-right: 10px;
        <input id="course_sku" value="${course_extra_info.modes[0].sku}" type="hidden"/>
         %endif
        <input id="already_in_cart" value="${course_extra_info.already_in_cart}" type="hidden"/>
+        <input id="user_logged_in" value="${user.is_authenticated}" type="hidden"/>
       </section>
     </div>
       </div>

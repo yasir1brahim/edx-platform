@@ -34,6 +34,11 @@ from django.db.models import Count, F
 #from django.forms.models import model_to_dict
 #from django.db.models import F
 from student.models import CourseEnrollment
+from lms.djangoapps.courseware.courses import get_courses_with_extra_info_json
+from rest_framework.decorators import api_view
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication
+import six
 
 import logging
 log = logging.getLogger(__name__) 
@@ -588,3 +593,29 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
             form.cleaned_data['username'],
             role=form.cleaned_data['role'],
         )
+
+
+@api_view()
+@authentication_classes((BearerAuthentication,SessionAuthentication,))
+@permission_classes([IsAuthenticated])
+def get_recommended_courses_for_web(request,id=None):
+
+    user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
+    if hasattr(user_extra_info, 'industry_id'):
+        user_category = Category.objects.filter(id=user_extra_info.industry_id).first()
+        filter_ = {'new_category':user_category.name}
+
+    courses = get_courses_with_extra_info_json(request.user, filter_=filter_)
+    course_list = []
+    for course in courses:
+        if course.advertised_start:
+            course_start = course.advertised_start.strftime("%b") + " " + str(course.advertised_start.day) +", " + str(course.advertised_start.year)
+        else:
+            course_start = course.start.strftime("%b") + " " + str(course.start.day) + ", " + str(course.start.year)
+        course_dict = {'id': six.text_type(course.id), 'org':course.display_org_with_default, 'name': course.display_name, 'image': course.course_image_url
+        ,'code':course.display_number_with_default,'difficulty_level': course.difficulty_level, 'enrollments_count': course.enrollments_count\
+        ,'ratings': course.ratings, 'comments_count': course.comments_count, 'price': course.price, 'discount_applicable': course.discount_applicable\
+        , 'discounted_price': course.discounted_price, 'discount_percentage':course.discount_percentage, 'start': course_start}
+        course_list.append(course_dict)
+        
+    return Response({'result':course_list})

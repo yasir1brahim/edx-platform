@@ -1005,13 +1005,16 @@ def course_about(request, course_id):
 
         mode = course_modes = CourseMode.objects.filter(course_id=course.id)
         course_extra_info = Course(course.id,list(course_modes))
-        api = ecommerce_api_client(request.user)
-        basket_response = api.basket_details.get()
-        if basket_response['status_code'] == 404:
-            course_extra_info.already_in_cart = False
+        if request.user.id:
+            api = ecommerce_api_client(request.user)
+            basket_response = api.basket_details.get()
+            if basket_response['status_code'] == 404:
+                course_extra_info.already_in_cart = False
+            else:
+                courses_in_basket = [product[1]['value'] for product in basket_response['products']]
+                course_extra_info.already_in_cart = six.text_type(course.id) in courses_in_basket
         else:
-            courses_in_basket = [product[1]['value'] for product in basket_response['products']]
-            course_extra_info.already_in_cart = six.text_type(course.id) in courses_in_basket
+            course_extra_info.already_in_cart = False
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.

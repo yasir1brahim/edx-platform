@@ -45,11 +45,7 @@ return $.ajax({
             console.log(course_id)
            }
        }
-       b = `<div class="row shadow mr-2" style="
-max-height: 150px;
-overflow: hidden;
-border-radius: 30px !important;
-">
+       b = `<div class="row cart-list" >
 <div class="col-md-5 col-lg-3 col-xl-3 px-4 rounded">
 <div class="">
 <img class="img-fluid" src="`+course_details['media']['raw']+`" alt="Sample" style="
@@ -61,7 +57,7 @@ border-radius: 25px !important;
 </div>
 <div class="col-md-7 col-lg-9 col-xl-9">
 <div>
-<div class="d-inline float-left col-8 pt-4">
+<div class="d-inline float-left col-8 pt-4 mt-2">
 <div>
 <h5>`+course_details['title']+`</h5>
 <p class="mb-2 text-muted small">`+course_details['organization']+`</p>
@@ -73,16 +69,21 @@ border-radius: 25px !important;
 </div>`
 if (course_details['discount_applicable'] == true)
 {
+b+=`<div class="price-set">`
 b+=`<p class="mb-0"><span><strong id="summary" style="color: #ff6161;font-weight: 800;">S$`+course_details['discounted_price']+`</strong></span></p>`
-b+=`<p class="mb-0"><span><strong id="summary" style="
+b+=`<p class="m-0"><span><strong id="summary" style="
 color: #8a8a8a;
 font-weight: 500;
 text-decoration: line-through;
 ">S$`+course_details['price']+`</strong></span></p>`
+b+=`</div>`
 }
 else
 {
-b+=`<p class="mb-0"><span><strong id="summary" style="color: #ff6161;font-weight: 800;">S$`+course_details['price']+`</strong></span></p>`
+b+=`<div class="price-set">`
+b+=`<p class="mb-0"><span><strong id="summary" style="color: #ff6161;font-weight: 800;"></strong></span></p>`
+b+=`<p class="m-0"><span><strong id="summary" style="color: #ff6161;font-weight: 800;">S$`+course_details['price']+`</strong></span></p>`
+b+=`</div>`
 }
 console.log('12312312312')
 console.log(course_id)
@@ -103,40 +104,31 @@ color: #8a8a8a;
 </div>
 
 
-<div class="col-md-5 col-lg-3 col-xl-3 px-4 rounded">
-<div class="">
-<img class="img-fluid" src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Vertical/12a.jpg" alt="Sample" style="
-max-height: 150px;
-width: 100%;
-border-radius: 25px !important;
-">
-</div>
-</div>
 </div>`
 $('.wish-list').append(b)
       }
 add_remove_click_function();
      }
 $('.list-group').empty();
-$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 font-weight-bold bg-transparent">Sub Total<span>S$`+response['result']['basket_total']+`</span></li>`)
+$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 font-weight-bold bg-transparent color">Sub Total<span>S$`+response['result']['basket_total']+`</span></li>`)
 $('.list-group').append(`<li class="list-group-item d-flex justify-content-end align-items-center px-0 bg-transparent border-0">
-<span>Gratis</span><span>Gratis</span>
+<span style="color:#8a8a8a;">Gratis</span><span style="width: 100%;color: #8a8a8a;text-align: right;">Gratis</span>
 </li>
 `)
 
 
 $('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
 <div>
-<strong>Tax (7% GST)</strong>
+<strong class="color">Tax (7% GST)</strong>
 </div>
-<span><strong>S$18.90</strong></span>
+<span><strong class="color">S$18.90</strong></span>
 </li>`)
 
 
 
 $('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
 <div>
-<strong>Total</strong>
+<strong class="color">Total</strong>
 </div>
 <span><strong>S$`+response['result']['basket_total']+`</strong></span>
 </li>
@@ -165,6 +157,7 @@ function add_remove_click_function()
 {
 $(".btn-remove").click(function(){
 
+$('#loader-sec').css('display', '')
 $.ajax({
        type:"POST",
        url: "/api/stripe/basket/remove_item/", // + "?course_id=course-v1:edx+cs8789+2021-t1",

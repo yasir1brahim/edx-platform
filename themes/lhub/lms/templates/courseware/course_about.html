@@ -75,6 +75,14 @@ text-decoration: line-through;
 color: red;
 margin-right: 10px;
 }
+
+
+.main-cta a {
+    display: inline-block;
+    float: left;
+    margin-right: 2.5%;
+    margin-left: 2.5%;
+}
 </style>
 
 <section class="course-info">
@@ -153,9 +161,7 @@ margin-right: 10px;
           
           <a><button style="display:none" id="add_to_cart_btn" type="button">Add to Cart </button></a>
           <a href="http://${settings.LMS_BASE}/commerce/basket-view/"><button id="go_to_cart_btn" style="display:none;">Go to cart</button></a>
-          <a href="${reg_href}" class="${href_class}">
-           <button class="register" id="buy_now_btn" type="button">Buy now</button>
-          </a>
+          <a> <button id="buy_now_btn" data-sku="${course_extra_info.modes[0].sku}" type="button">Buy now</button> </a>
 
           <div id="register_error"></div>
         %endif
@@ -371,7 +377,6 @@ width: 50% !important;
     padding: 0px !important;
     border: none !important;
     box-shadow: none !important;
-    margin-right: 3%;
     width: 45%;
     }
 

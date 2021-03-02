@@ -112,13 +112,13 @@ margin-right: 10px;
         <div class="main-cta">
         %if user.is_authenticated and registered:
           %if show_courseware_link:
-            <a href="${course_target}">
+            <a style="width: 100%;" href="${course_target}">
           %endif
 
           <!-- <span class="register disabled">${_("You are enrolled in this course")}</span> -->
 
           %if show_courseware_link:
-            <strong>Go To Course</strong>
+            <strong style="width: 100%;">Go To Course</strong>
             </a>
           %endif
 

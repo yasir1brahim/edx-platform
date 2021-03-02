@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class TermsConditionsConfig(AppConfig):
-    name = 'terms_conditions'
+    name = 'lms.djangoapps.terms_conditions'
+    verbose_name = "Terms & Conditions"

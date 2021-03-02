@@ -157,7 +157,7 @@ urlpatterns = [
             namespace='commerce_api',
         ),
     ),
-    url(r'^api/stripe/', include(('stripe_api.urls', 'lms.djangoapps.stripe_api'), namespace='stripe_api')),
+    url(r'^api/stripe/', include('lms.djangoapps.stripe_api.urls')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
     url(r'^api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),
     url(r'^rss_proxy/', include('lms.djangoapps.rss_proxy.urls')),
@@ -661,7 +661,7 @@ urlpatterns += [
         #),
         #include('common.djangoapps.feedback.urls'),
     #),
-    url(r'^api/course_reviews/', include('feedback.urls')),
+    url(r'^api/course_reviews/', include('common.djangoapps.feedback.urls')),
 
     # Course bookmarks UI in LMS
     url(
@@ -1002,7 +1002,7 @@ urlpatterns.extend(get_plugin_url_patterns(ProjectType.LMS))
 # Course Home API urls
 urlpatterns += [
     url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
-    url("terms-conditions", include('terms_conditions.urls')),
+    url("terms-conditions", include('lms.djangoapps.terms_conditions.urls')),
 ]
 
 # Course Experience API urls

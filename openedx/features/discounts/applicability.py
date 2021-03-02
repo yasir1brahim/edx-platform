@@ -181,3 +181,13 @@ def discount_percentage(course):
     if configured_percentage:
         return configured_percentage
     return 15
+
+
+def discount_percentage_configured(course):
+    """
+    Get the configured discount amount.
+    """
+    configured_percentage = DiscountPercentageConfig.objects.filter(course=course.id).order_by('-id')
+    if len(configured_percentage) and configured_percentage[0].percentage > 0:
+        return True
+    return False

@@ -43,7 +43,7 @@ from student.forms import send_account_recovery_email_for_user
 from student.models import AccountRecovery
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
-from util.request_rate_limiter import PasswordResetEmailRateLimiter
+# from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
@@ -243,10 +243,13 @@ def password_reset(request):
     Attempts to send a password reset e-mail.
     """
 
-    password_reset_email_limiter = PasswordResetEmailRateLimiter()
+    user = request.user
+    # Prefer logged-in user's email
+    email = user.email if user.is_authenticated else request.POST.get('email')
+    AUDIT_LOG.info("Password reset initiated for email %s.", email)
 
-    if password_reset_email_limiter.is_rate_limit_exceeded(request):
-        AUDIT_LOG.warning("Password reset rate limit exceeded")
+    if getattr(request, 'limited', False):
+        AUDIT_LOG.warning("Password reset rate limit exceeded for email %s.", email)
         return JsonResponse(
             {
                 'success': False,

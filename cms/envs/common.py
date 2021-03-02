@@ -1382,6 +1382,9 @@ INSTALLED_APPS = [
     # for managing course modes
     'common.djangoapps.course_modes.apps.CourseModesConfig',
 
+    # for managing course reviews.
+    'common.djangoapps.feedback',
+
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
 

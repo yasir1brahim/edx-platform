@@ -2580,16 +2580,19 @@ INSTALLED_APPS = [
     'common.djangoapps.course_modes.apps.CourseModesConfig',
 
     # for managing course reviews.
-    'feedback.apps.FeedbackConfig',
+    'common.djangoapps.feedback',
 
     # for authentication
-    'gsauthentication.apps.GSAuthenticationConfig',
+    'lms.djangoapps.gsauthentication',
 
     # for managing terms and conditions.
-    'terms_conditions.apps.TermsConditionsConfig',
+    'lms.djangoapps.terms_conditions',
+
+    # for Stripe API for mobile client
+    'lms.djangoapps.stripe_api',
 
     # for HTML editor.
-    'ckeditor', 
+    'ckeditor',
 
     # Enrollment API
     'openedx.core.djangoapps.enrollments',

@@ -46,14 +46,12 @@ return $.ajax({
            }
        }
        b = `<div class="row cart-list" >
-<div class="col-md-5 col-lg-3 col-xl-3 px-4 rounded">
-<div class="">
+<div class="col-md-5 col-lg-3 col-xl-3 px-4 rounded img-container">
 <img class="img-fluid" src="`+course_details['media']['raw']+`" alt="Sample" style="
 max-height: 150px;
 width: 100%;
 border-radius: 25px !important;
 ">
-</div>
 </div>
 <div class="col-md-7 col-lg-9 col-xl-9">
 <div>

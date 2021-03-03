@@ -31,7 +31,6 @@ else if($('#already_in_cart').val()== "True")
 {
 $('#add_to_cart_btn').css('display', 'none');
 $('#go_to_cart_btn').css('display', '');
-$('#buy_now_btn').css('display', 'none');
 }
 
 $("#add_to_cart_btn").click(function(){
@@ -49,7 +48,7 @@ $("#add_to_cart_btn").click(function(){
      {
       $('#go_to_cart_btn').css('display', '');
       $('#add_to_cart_btn').css('display', 'none');
-      $('#buy_now_btn').css('display', 'none');
+      $('#buy_now_btn').css('display', '');
      }
      //else if (response['status_code'] == 500)
      //{

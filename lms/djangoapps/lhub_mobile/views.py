@@ -26,8 +26,7 @@ class UserSessionCookieView(ViewSet):
         session_cookies = MobileUserSessionCookie.objects.filter(user=request.user)
         if session_cookies:
             session_cookie_obj = session_cookies.latest('id')
-            return Response({'session_cookie': session_cookie_obj.session_cookie})
-        return Response({'username': request.user.username})
-        #return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+            return Response({'message': "", 'status': True, 'result':{'session_cookie': session_cookie_obj.session_cookie}, 'status_code':200})
+        return Response({'message': "Session Cookie Not Found", 'status': True, 'result':{}, 'status_code':400})
 
 

@@ -2579,6 +2579,9 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
     'cms.djangoapps.course_creators',
+
+    #LHUB Mobile APIs
+    'lhub_mobile',
 ]
 
 ######################### CSRF #########################################

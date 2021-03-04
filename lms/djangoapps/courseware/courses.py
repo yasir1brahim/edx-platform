@@ -12,6 +12,7 @@ import six
 from crum import get_current_request
 from dateutil.parser import parse as parse_date
 from django.conf import settings
+from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import ugettext as _

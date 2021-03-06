@@ -5,6 +5,7 @@ $(document).ready(function() {
  get_recommended_courses();
 })();
 
+add_checkout_function();
 });
 
 
@@ -25,8 +26,6 @@ return $.ajax({
      if (response['status_code'] == 200)
      {
       $('.wish-list').empty()
-      console.log('============== response =============')
-      console.log(response)
       for (var i = 0; i < response['result']['products'].length; i++)
       {
        for (var j=0; j< response['result']['products'][i].length; j++)
@@ -36,16 +35,16 @@ return $.ajax({
            if (response['result']['products'][i][j]['code'] == "course_details")
            {
              course_details = response['result']['products'][i][j]
-             console.log(course_details);
-              //break;
            }
            if(response['result']['products'][i][j]['code'] == "course_key")
            {
             course_id = response['result']['products'][i][j]['value']
-            console.log(course_id)
            }
        }
-       b = `<div class="row cart-list" >
+       b = `<div class="form-check">
+<input class="form-check-input" type="checkbox" checked=checked data-sku="`+course_details['sku']+`">
+</div>
+<div class="row cart-list" >
 <div class="col-md-5 col-lg-3 col-xl-3 px-4 rounded img-container">
 <img class="img-fluid" src="`+course_details['media']['raw']+`" alt="Sample" style="
 max-height: 150px;
@@ -83,8 +82,6 @@ b+=`<p class="mb-0"><span><strong id="summary" style="color: #ff6161;font-weight
 b+=`<p class="m-0"><span><strong id="summary" style="color: #ff6161;font-weight: 800;">S$`+course_details['price']+`</strong></span></p>`
 b+=`</div>`
 }
-console.log('12312312312')
-console.log(course_id)
 b+=`
 </div>
 <div class="d-inline float-left col-2 pt-4">
@@ -167,7 +164,6 @@ $.ajax({
       //jsonp: "jsonp",
      //contentType: "application/json; charset=utf-8",
      success: function(response){
-      console.log(response);
      if (response['status_code'] == 200)
      {show_basket();}
      }
@@ -176,6 +172,47 @@ $.ajax({
 });
 
 }
+
+function add_checkout_function()
+{
+
+$("#btn-checkout").click(function(){
+
+$('#loader-sec').css('display', '')
+var selected_skus = $(".form-check-input:checked").map(function () {
+    return {'sku':$(this).data('sku')}
+}).get();;
+$.ajax({
+       type:"POST",
+       url: "/api/stripe/basket/buy_now/",
+       data: JSON.stringify({
+       'products':selected_skus,
+       csrfmiddlewaretoken: $('#web_csrf_token').val()
+       }),
+     contentType: "application/json",
+     success: function(response){
+     if (response['status_code'] == 200)
+     {
+       $('#loader-sec').css('display', 'none')
+       window.location.href = $('#ecommerce_url').val() + "/basket"
+     }
+     
+    else
+   {
+   $('#loader-sec').css('display', 'none')
+   alert(response['message']);
+   }
+
+}
+});
+
+});
+
+}
+
+
+
+
 
 
 
@@ -195,7 +232,6 @@ $.ajax({
      {
      $('#heading_recommended_courses').css('display','')
      $('.courses-listing').empty()
-     console.log(response['result'])
      for (var i=0; i <=2; i++)
      {
         course_id = response['result']['result'][i]['id']

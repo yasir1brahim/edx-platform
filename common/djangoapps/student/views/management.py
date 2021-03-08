@@ -718,6 +718,10 @@ def activate_secondary_email(request, key):
     return render_to_response("secondary_email_change_successful.html")
 
 
+
+def verify_email(request):
+    return render_to_response("verify_email.html", {})
+
 @ensure_csrf_cookie
 def confirm_email_change(request, key):
     """

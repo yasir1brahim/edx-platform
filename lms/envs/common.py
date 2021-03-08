@@ -2765,7 +2765,7 @@ INSTALLED_APPS = [
     'cms.djangoapps.course_creators',
 
     #LHUB Mobile APIs
-    'lhub_mobile',
+    'lms.djangoapps.lhub_mobile.apps.LhubMobileConfig',
 ]
 
 ######################### CSRF #########################################

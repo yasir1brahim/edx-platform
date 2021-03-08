@@ -76,7 +76,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from lhub_mobile.models import MobileUserSessionCookie
+from lms.djangoapps.lhub_mobile.models import MobileUserSessionCookie
 from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 

@@ -157,6 +157,7 @@ urlpatterns = [
             namespace='commerce_api',
         ),
     ),
+    url(r'^commerce/', include(('lms.djangoapps.commerce.urls', 'lms.djangoapps.commerce'), namespace='commerce')),
     url(r'^api/stripe/', include('lms.djangoapps.stripe_api.urls')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
     url(r'^api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),

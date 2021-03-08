@@ -18,7 +18,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangolib.markup import HTML
-from shoppingcart.processors.CyberSource2 import is_user_payment_error
+#from shoppingcart.processors.CyberSource2 import is_user_payment_error
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
 

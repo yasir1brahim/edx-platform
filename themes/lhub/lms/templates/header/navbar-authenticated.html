@@ -26,6 +26,16 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     help_link = doc_link
 %>
 <style>
+@media (min-width: 992px){
+.global-header .nav-links .secondary .cart-item-authenticated {
+        display: inline-block;
+        margin-right: 18px;
+}
+
+.global-header .nav-links .secondary .cart-item-authenticated img {
+        width: 32px;
+}
+}
 @media only screen and (min-device-width : 992px) and (max-device-width : 1320px) {
 
 .global-header .header-logo a .logo {
@@ -167,6 +177,18 @@ background: transparent;
     % endif
   </div>
   <div class="secondary">
+    % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
+      <div class="mobile-nav-item hidden-mobile nav-item">
+        <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+          <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+        </a>
+      </div>
+    % endif
+      <div class="cart-item-authenticated">
+	<a href="/commerce/basket-view/">
+        <img class="cart-icon-img" src="${static.url('/static/lhub/images/cart.png')}" alt="cart_icon"/>
+	</a>
+      </div>
     <div class="mobile-nav-item hidden-mobile nav-item">
       <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
     </div>

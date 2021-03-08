@@ -205,6 +205,8 @@ urlpatterns = [
     ),
     url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                     namespace='api_discounts')),
+    # LHUB MOBILE API
+    url(r'^api/lhub_mobile/', include('lhub_mobile.urls')),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):

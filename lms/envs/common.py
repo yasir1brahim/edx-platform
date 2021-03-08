@@ -2763,6 +2763,9 @@ INSTALLED_APPS = [
 
     'ratelimitbackend',
     'cms.djangoapps.course_creators',
+
+    #LHUB Mobile APIs
+    'lhub_mobile',
 ]
 
 ######################### CSRF #########################################

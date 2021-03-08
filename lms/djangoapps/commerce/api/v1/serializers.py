@@ -307,6 +307,7 @@ class CourseDetailCheckoutSerializer(serializers.Serializer):
     chapter_count = serializers.IntegerField(required=False)
     description = serializers.CharField(required=False)
     new_category = serializers.CharField(required=False)
+    organization = serializers.CharField(required=False)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema

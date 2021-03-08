@@ -189,7 +189,7 @@ class CourseDetailView(RetrieveAPIView):
 
 
 @api_view(['POST'])
-@authentication_classes((BearerAuthentication,))
+@authentication_classes((BearerAuthentication,SessionAuthentication,))
 @permission_classes([IsAuthenticated])
 def add_product_to_basket(request):
 
@@ -239,6 +239,7 @@ class CourseCheckoutDetailView(RetrieveAPIView):
             course.chapter_count = len(response['blocks'])
             course.name = course_overview.display_name
             course.new_category = course_overview.new_category if course_overview.new_category else "None"
+            course.organization = course.display_org_with_default
             if len(course_extra_info.modes) == 0:
                 course.price = 0
             else:
@@ -252,13 +253,16 @@ class CourseCheckoutDetailView(RetrieveAPIView):
 
 
 @api_view()
-@authentication_classes((BearerAuthentication,))
+@authentication_classes((BearerAuthentication,SessionAuthentication,))
 @permission_classes([IsAuthenticated])
-def get_basket_content(request,id):
+def get_basket_content(request,id=None):
 
     user = request.user
     api = ecommerce_api_client(user)
-    response = api.basket_details.get(id=id)
+    if id:
+        response = api.basket_details.get(id=id)
+    else:
+        response = api.basket_details.get()
     if response['status_code'] == 404:
         return HttpResponseNotFound(response['message'])
     return Response(response)

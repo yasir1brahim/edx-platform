@@ -731,7 +731,7 @@ padding-top: 0px;
     overflow: hidden;
     border-radius: 30px !important;
     box-shadow: 0 0rem 0.8rem 1px rgb(0 0 0 / 15%);
-    width: 98%;
+    width: 90%;
     margin: 40px auto;
 }
 .r-padding {
@@ -751,6 +751,21 @@ height: 100%;
 display: flex;
 align-items: center;
 }
+
+
+.form-check {
+height: 155px;
+width: auto;
+float: left;
+display: flex;
+align-items: center;
+}
+
+
+
+
+
+
 </style>
 
 
@@ -785,7 +800,7 @@ background: #f2f2f2;
 ">
 <h5 class="mb-3 color">Summary</h5>
 <ul class="list-group list-group-flush"></ul>
-<a href="${settings.ECOMMERCE_PUBLIC_URL_ROOT}/basket" <button="" type="button" class="btn btn-block" style="background: #1a345c;color: #ffffff;font-weight: 700;width: 75%;margin: 0px auto;padding: 10px;">CHECKOUT</a>
+<a href="#" <button="" type="button" id="btn-checkout" class="btn btn-block" style="background: #1a345c;color: #ffffff;font-weight: 700;width: 75%;margin: 0px auto;padding: 10px;">CHECKOUT</a>
 </div>
 </div>
 </div>
@@ -793,6 +808,7 @@ background: #f2f2f2;
 </div>
 </section>
 <input id="web_csrf_token" value="${csrf_token}" type="hidden"/>
+<input id="ecommerce_url" value="${settings.ECOMMERCE_PUBLIC_URL_ROOT}" type="hidden"/>
 </div>
 
 

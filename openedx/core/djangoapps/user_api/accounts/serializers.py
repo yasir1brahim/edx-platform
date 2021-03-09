@@ -630,6 +630,7 @@ class UserExtraFieldReadOnlySerializer(serializers.Serializer):
         :param user: User object
         :return: Dict serialized account
         """
+        user_extra_info = None
         try:
             user_profile = user.profile
             user_extra_info = user.user_extra_info

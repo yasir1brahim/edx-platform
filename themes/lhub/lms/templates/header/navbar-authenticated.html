@@ -26,6 +26,16 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     help_link = doc_link
 %>
 <style>
+@media (min-width: 992px){
+.global-header .nav-links .secondary .cart-item-authenticated {
+        display: inline-block;
+        margin-right: 18px;
+}
+
+.global-header .nav-links .secondary .cart-item-authenticated img {
+        width: 32px;
+}
+}
 @media only screen and (min-device-width : 992px) and (max-device-width : 1320px) {
 
 .global-header .header-logo a .logo {
@@ -174,6 +184,11 @@ background: transparent;
         </a>
       </div>
     % endif
+      <div class="cart-item-authenticated">
+	<a href="/commerce/basket-view/">
+        <img class="cart-icon-img" src="${static.url('/static/lhub/images/cart.png')}" alt="cart_icon"/>
+	</a>
+      </div>
     <div class="mobile-nav-item hidden-mobile nav-item">
       <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
     </div>

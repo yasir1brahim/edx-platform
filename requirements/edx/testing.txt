@@ -213,7 +213,7 @@ pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.txt, drf-jwt, edx-rest-
 pylint-celery==0.3        # via edx-lint
 pylint-django==2.4.2      # via edx-lint
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django
-pylint-pytest==1.0.1      # via -r requirements/edx/testing.in
+pylint-pytest==0.3.0      # via -r requirements/edx/testing.in
 pylint==2.7.2             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils, pylint-pytest
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.txt

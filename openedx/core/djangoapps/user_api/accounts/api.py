@@ -708,7 +708,7 @@ def _validate_country(country):
     if country == '' or country == '--':
         raise errors.AccountCountryInvalid(accounts.REQUIRED_FIELD_COUNTRY_MSG)
 
-def _validate_country(nric):
+def _validate_nric(nric):
     """Validate the NRIC input.
 
     :param nric: The proposed nric value.

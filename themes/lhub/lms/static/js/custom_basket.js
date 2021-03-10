@@ -107,7 +107,6 @@ add_remove_click_function();
 $('.list-group').empty();
 $('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 font-weight-bold bg-transparent color">Sub Total<span>S$`+response['result']['basket_total']+`</span></li>`)
 $('.list-group').append(`<li class="list-group-item d-flex justify-content-end align-items-center px-0 bg-transparent border-0">
-<span style="color:#8a8a8a;">Gratis</span><span style="width: 100%;color: #8a8a8a;text-align: right;">Gratis</span>
 </li>
 `)
 

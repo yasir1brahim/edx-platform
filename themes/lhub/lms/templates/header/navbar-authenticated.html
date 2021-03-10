@@ -26,6 +26,13 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     help_link = doc_link
 %>
 <style>
+@media (max-width: 991px){
+.cart-item-authenticated {
+position: absolute;
+right: 3%;
+top: 12%;
+}
+}
 @media (min-width: 992px){
 .global-header .nav-links .secondary .cart-item-authenticated {
         display: inline-block;
@@ -35,6 +42,14 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 .global-header .nav-links .secondary .cart-item-authenticated img {
         width: 32px;
 }
+header.global-header .main-header .main .nav-item.nav-tab .tab-nav-link {
+padding: 10px;
+margin-right: 15px !important;
+font-size: 14px;
+padding-right: 0px;
+padding-left: 0px;
+}
+
 }
 @media only screen and (min-device-width : 992px) and (max-device-width : 1320px) {
 
@@ -47,7 +62,7 @@ margin-left: 4%;
 width: 30%;
 }
 .global-header .category-block a.category-item {
-font-size: 14px;
+font-size: 12px;
 margin-top: 20px;
 }
 

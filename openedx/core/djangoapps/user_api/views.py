@@ -44,6 +44,7 @@ from django.http import HttpResponseBadRequest
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import Http404
+from openedx.core.lib.api.authentication import BearerAuthentication
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -184,7 +185,7 @@ class CountryTimeZoneListView(generics.ListAPIView):
 
 
 @api_view()
-@authentication_classes((JwtAuthentication,))
+@authentication_classes((BearerAuthentication,))
 @permission_classes([IsAuthenticated])
 def get_ephemeral_key(request):
 

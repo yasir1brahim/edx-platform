@@ -267,3 +267,19 @@ def get_basket_content(request,id=None):
         return HttpResponseNotFound(response['message'])
     return Response(response)
 
+
+@api_view()
+@authentication_classes((BearerAuthentication,SessionAuthentication,))
+@permission_classes([IsAuthenticated])
+def get_basket_content_mobile(request,id=None):
+
+    user = request.user
+    api = ecommerce_api_client(user)
+    if id:
+        response = api.basket_details.get(id=id)
+    else:
+        response = api.basket_details_mobile.get()
+    if response['status_code'] == 404:
+        return HttpResponseNotFound(response['message'])
+    return Response(response)
+

@@ -111,12 +111,12 @@ $('.list-group').append(`<li class="list-group-item d-flex justify-content-end a
 `)
 
 
-$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
-<div>
-<strong class="color">Tax (7% GST)</strong>
-</div>
-<span><strong class="color">S$18.90</strong></span>
-</li>`)
+//$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
+//<div>
+//<strong class="color">Tax (7% GST)</strong>
+//</div>
+//<span><strong class="color">S$18.90</strong></span>
+//</li>`)
 
 
 

@@ -63,6 +63,23 @@ def checkout_payment_intent(request):
 
 
 @api_view(['POST'])
+@authentication_classes((BearerAuthentication,))
+@permission_classes([IsAuthenticated])
+def confirm_payment_intent(request):
+
+    """
+    This fucntion is used to make payment.
+    """
+    if request.method == 'POST':
+        user = request.user
+        api = ecommerce_api_client(user)
+        try:
+            response =  api.confirm_payment_intent.post(request.POST)
+            return Response(response)
+        except Exception as e:
+            return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+
+@api_view(['POST'])
 @authentication_classes((BearerAuthentication,SessionAuthentication))
 @permission_classes([IsAuthenticated])
 def custom_basket(request):

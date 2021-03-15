@@ -89,6 +89,7 @@ REQ_FILES = \
 	requirements/edx/base \
 	requirements/edx/testing \
 	requirements/edx/development \
+	requirements/edx/importlinter \
 	scripts/xblock/requirements
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
@@ -132,3 +133,18 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
 	docker push 'openedx/edx-platform:latest-devstack'
 	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
+
+lint-imports: lint-imports-root lint-imports-common-lib
+
+lint-imports-root:
+	lint-imports
+
+lint-imports-common-lib: \
+	lint-imports-common-lib-capa \
+	lint-imports-common-lib-safe_lxml \
+	lint-imports-common-lib-sandbox-packages \
+	lint-imports-common-lib-symmath \
+	lint-imports-common-lib-xmodule
+
+lint-imports-common-lib-%:
+	cd common/lib/$* && lint-imports

@@ -142,6 +142,7 @@ geoip2==3.0.0             # via -c requirements/edx/../constraints.txt, -r requi
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.14         # via transifex-client
 glob2==0.7                # via -r requirements/edx/base.txt
+grimp==1.2.3              # via import-linter
 gunicorn==20.0.4          # via -r requirements/edx/base.txt
 help-tokens==2.0.0        # via -r requirements/edx/base.txt
 html5lib==1.1             # via -r requirements/edx/base.txt, ora2
@@ -149,6 +150,7 @@ httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requi
 icalendar==4.0.7          # via -r requirements/edx/base.txt
 idna==2.10                # via -r requirements/edx/base.txt, requests
 importlib-metadata==1.7.0  # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, inflect
+import-linter==1.2.1      # via -r requirements/edx/testing.in
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.5.1         # via -r requirements/edx/base.txt, drf-yasg
 iniconfig==1.1.1          # via pytest
@@ -183,6 +185,7 @@ mongoengine==0.23.0       # via -r requirements/edx/base.txt
 more-itertools==8.7.0     # via -r requirements/edx/coverage.txt, zipp
 mpmath==1.2.1             # via -r requirements/edx/base.txt, sympy
 mysqlclient==2.0.3        # via -r requirements/edx/base.txt
+networkx==2.5             # via grimp
 newrelic==6.2.0.156       # via -r requirements/edx/base.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/base.txt, chem
 nodeenv==1.5.0            # via -r requirements/edx/base.txt

@@ -41,7 +41,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('#course-premium').val(this.model.get('premium'));
                    this.$el.find('#course-indexed-in-discovery').val(this.model.get('indexed_in_discovery'));
                    this.$el.find('#course-course-sale-type').val(this.model.get('course_sale_type'));
-                   this.$el.find('#course-course-price').val(this.model.get('course_price'));
+                   var course_price = parseFloat(this.model.get('course_price')).toFixed(2)
+                   this.$el.find('#course-course-price').val(course_price);
 
                    this.$el.find('#course-organization').val(this.model.get('org'));
                    this.$el.find('#course-number').val(this.model.get('course_id'));

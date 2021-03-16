@@ -26,6 +26,11 @@ return $.ajax({
      if (response['status_code'] == 200)
      {
       $('.wish-list').empty()
+
+      if(response['result']['products'].length == 0 || typeof(reponse['result']['products']) === "undefined" ){
+          $('#btn-checkout').hide();
+      }
+
       for (var i = 0; i < response['result']['products'].length; i++)
       {
        for (var j=0; j< response['result']['products'][i].length; j++)

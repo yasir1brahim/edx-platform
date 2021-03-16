@@ -3,6 +3,7 @@ $(document).ready(function() {
 (async ()=>{
  await show_basket();
  get_recommended_courses();
+ onclick_select();
 })();
 
 add_checkout_function();
@@ -110,7 +111,7 @@ $('.wish-list').append(b)
 add_remove_click_function();
      }
 $('.list-group').empty();
-$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 font-weight-bold bg-transparent color">Sub Total<span>S$`+response['result']['basket_total']+`</span></li>`)
+$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 font-weight-bold bg-transparent color">Sub Total<span id="sub_total">S$`+response['result']['basket_total']+`</span></li>`)
 $('.list-group').append(`<li class="list-group-item d-flex justify-content-end align-items-center px-0 bg-transparent border-0">
 </li>
 `)
@@ -125,13 +126,14 @@ $('.list-group').append(`<li class="list-group-item d-flex justify-content-end a
 
 
 
-$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
+$('.list-group').append(`<li id="total" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
 <div>
 <strong class="color">Total</strong>
 </div>
-<span><strong>S$`+response['result']['basket_total']+`</strong></span>
+<span><strong id="cart_total">S$`+response['result']['basket_total']+`</strong></span>
 </li>
 `)
+$('#btn-checkout').attr("disabled", false)
 $('#loader-sec').css('display', 'none')
 
 
@@ -211,6 +213,63 @@ $.ajax({
 });
 
 });
+
+}
+
+
+
+function onclick_select()
+
+{
+//$('#loader-sec').css('display', '')
+
+$(".form-check-input").change(function(){
+
+$('#loader-sec').css('display', '')
+
+//Set timeout is needed because without this, execution is so fast that user will not be able to know that cart total has been updated
+setTimeout(
+function() 
+{
+var selected = $(".form-check-input:checked")
+var cart_total = 0;
+for (var x=0; x<selected.length; x++)
+{
+   var x_selected = selected[x]
+   var cart_list	 = $(x_selected).parent().next();
+   var price_elements = cart_list.children().find('.price-set').find('p')[1];
+   if (selected.length == 1)
+   {
+    var actual_price_element = cart_list.children().find('.price-set').find('p')[0];
+    if($(actual_price_element).text().length > 0)
+    {
+      price_elements = cart_list.children().find('.price-set').find('p')[0];
+    }
+    
+    }
+
+   var price_text = $(price_elements).text();
+   var price  = price_text.substring(2, price_text.length);
+   price = parseInt(price)
+   cart_total += price
+}
+var currency = 'S$'
+$("#cart_total").text(currency + cart_total)
+$("#sub_total").text(currency + cart_total)
+if (selected.length == 0)
+{
+$('#btn-checkout').attr("disabled", true)
+}
+else
+{
+$('#btn-checkout').attr("disabled", false)
+}
+
+$('#loader-sec').css('display', 'none')
+}, 1000);
+
+});
+
 
 }
 
@@ -315,4 +374,5 @@ $('.courses-listing').append(course)
 
 
 }
+
 

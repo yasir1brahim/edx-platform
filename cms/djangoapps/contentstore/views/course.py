@@ -1292,7 +1292,7 @@ def settings_handler(request, course_key_string):
                         course_sale_type = 'audit'
                     else:
                         course_sale_type = 'professional'
-                    course_price = int(request.json['course_price'])
+                    course_price = float(request.json['course_price'])
                     course_name = course.display_name_with_default
                     #course_id = CourseLocator.from_string(course_key)
                     course_id = six.text_type(course_key)

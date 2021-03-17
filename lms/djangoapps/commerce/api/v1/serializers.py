@@ -19,7 +19,7 @@ from openedx.core.lib.api.fields import AbsoluteURLField
 class CourseModeSerializer(serializers.ModelSerializer):
     """ CourseMode serializer. """
     name = serializers.CharField(source='mode_slug')
-    price = serializers.IntegerField(source='min_price')
+    price = serializers.FloatField(source='min_price')
     expires = serializers.DateTimeField(
         source='expiration_datetime',
         required=False,

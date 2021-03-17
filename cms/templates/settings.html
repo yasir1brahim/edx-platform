@@ -51,6 +51,9 @@ var subcategories = JSON.parse('${subcat_dict |n, dump_js_escaped_json}')
 <%block name="content">
 <style>
 
+#course-course-price {
+    width: auto;
+}
 .group-settings.basic .field.text.is-not-editable:nth-child(1), .group-settings.basic .field.text.is-not-editable:nth-child(2), .group-settings.basic .field.text.is-not-editable:nth-child(3) {
 
 width: 25% !important;
@@ -448,7 +451,7 @@ width: 70% !important;
 
             <li class="field" id="field-course-course-price">
               <label for="course-course-price">${_("Course Price")}</label>
-               <input type="text" id="course-course-price" class="short" />
+               <input type="number" placeholder="0.00" step="any" id="course-course-price" class="short" />
               <span class="tip tip-stacked">Please enter price</span>
             </li>
 

@@ -9,10 +9,28 @@ $(document).ready(function() {
 add_checkout_function();
 });
 
-
+//counts the number of item in the cart.
+function getNumberOfItemInCart(){
+    $.ajax({
+        url: '/api/stripe/basket/count_item/',
+        success: function(data){
+            number_of_item = data['result']['number_of_item']
+            if(number_of_item > 0){
+                cart_badge = $('#cart_badge').show()
+                cart_badge.text(number_of_item)
+            }
+            else{  
+                $('#cart_badge').css('display','none');
+            }
+        }
+    });
+}
 
 function show_basket()
 {
+
+getNumberOfItemInCart()
+
 $('#loader-sec').css('display', '')
 return $.ajax({
        type:"GET",
@@ -28,7 +46,7 @@ return $.ajax({
      {
       $('.wish-list').empty()
 
-      if(response['result']['products'].length == 0 || typeof(reponse['result']['products']) === "undefined" ){
+      if(response['result']['products'].length == 0 || typeof(response['result']['products']) === "undefined" ){
           $('#btn-checkout').hide();
       }
 
@@ -170,8 +188,9 @@ $.ajax({
       //jsonp: "jsonp",
      //contentType: "application/json; charset=utf-8",
      success: function(response){
-     if (response['status_code'] == 200)
-     {show_basket();}
+     if (response['status_code'] == 200){
+         show_basket();
+         }
      }
 });
 

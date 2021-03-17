@@ -10,7 +10,7 @@ urlpatterns = [
     path('checkout_payment_intent/', checkout_payment_intent),
     path('confirm_payment_intent/', confirm_payment_intent),
     path('basket/remove_item/', custom_basket),
-    path('basket/coount_item/', basket_item_count),
+    path('basket/count_item/', basket_item_count),
     path('basket/buy_now/', basket_buy_now),
     path('basket/buy_now/cancel/', basket_buy_now_cancel),
 ]

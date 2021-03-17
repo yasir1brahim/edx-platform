@@ -1,3 +1,20 @@
+
+function getNumberOfItemInCart(){
+    $.ajax({
+        url: '/api/stripe/basket/count_item/',
+        success: function(data){
+            number_of_item = data['result']['number_of_item']
+            if(number_of_item > 0){
+                cart_badge = $('#cart_badge').show()
+                cart_badge.text(number_of_item)
+            }
+            else{  
+                $('#cart_badge').css('display','none');
+            }
+        }
+    });
+}
+
 $(document).ready(function() {
     $('ul.tabs li').click(function() {
         $('ul.tabs li').removeClass('enabled');
@@ -49,6 +66,7 @@ $("#add_to_cart_btn").click(function(){
      success: function(response){
      if (response['status_code'] == 200)
      {
+      getNumberOfItemInCart()
       $('#go_to_cart_btn').css('display', '');
       $('#add_to_cart_btn').css('display', 'none');
       $('#buy_now_btn').css('display', '');

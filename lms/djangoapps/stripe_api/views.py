@@ -97,7 +97,7 @@ def custom_basket(request):
             return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
 
 @api_view(['GET'])
-@authentication_classes((BearerAuthentication,))
+@authentication_classes((BearerAuthentication,SessionAuthentication))
 @permission_classes([IsAuthenticated])
 def basket_item_count(request):
 

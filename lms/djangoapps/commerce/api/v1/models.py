@@ -25,6 +25,8 @@ UNDEFINED = object()
 import requests
 import json
 import jwt
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+
 
 class Course(object):
     """ Pseudo-course model used to group CourseMode objects. """
@@ -41,6 +43,9 @@ class Course(object):
         self._deleted_modes = []
         if 'jwt_token' in kwargs:
             self.jwt_token = kwargs['jwt_token']
+        if 'user' in kwargs:
+            self.user = kwargs['user']
+            self.api = ecommerce_api_client(self.user)
 
     @property
     def name(self):
@@ -150,13 +155,12 @@ class Course(object):
     
     @property
     def discount_info(self):
-        course_id = CourseKey.from_string(six.text_type(self.id))
-
         try:
-            url = settings.LMS_ROOT_URL + '/api/discounts/course/' + str(course_id)
-            headers={'Authorization': self.jwt_token}
-            response = json.loads(requests.get(url=url,headers=headers).text)
-            return response
+            if len(self.modes) > 0:
+                discount_info = self.api.course_discount_info(self.modes[0].sku).get()
+                return discount_info
+            course_price = self.get_paid_mode_price()
+            return {'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
             #return CourseEnrollment.objects.enrollment_counts(course_id)['total']
         except CourseEnrollment.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
@@ -220,15 +224,7 @@ class Course(object):
     def discounted_price(self):
         course_mode_price = self.get_paid_mode_price()
         if self.discount_info and self.discount_info['discount_applicable']:
-            jwt_token = self.discount_info['jwt']
-            decoded_jwt = jwt.decode(jwt_token, verify=False)
-            discount_percentage = decoded_jwt['discount_percent']
-            course_mode_price = self.get_paid_mode_price()
-            if course_mode_price:
-                return (discount_percentage/100) * course_mode_price
-            else:
-                return 0.0
-
+            return self.discount_info['discounted_price']
         return course_mode_price
 
 
@@ -236,14 +232,7 @@ class Course(object):
     def discount_percentage(self):
         course_mode_price = self.get_paid_mode_price()
         if self.discount_info and  self.discount_info['discount_applicable']:
-            jwt_token = self.discount_info['jwt']
-            decoded_jwt = jwt.decode(jwt_token, verify=False)
-            discount_percentage = decoded_jwt['discount_percent']
-            course_mode_price = self.get_paid_mode_price()
-            if course_mode_price:
-                return discount_percentage
-            else:
-                return 0.0
+            return self.discount_info['discount_percentage']
         return 0.0
 
 

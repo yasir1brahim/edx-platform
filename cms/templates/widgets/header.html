@@ -17,7 +17,7 @@
                 % if hasattr(user, 'user_extra_info'):
           		% if user.user_extra_info.organization:
 				% if user.user_extra_info.organization.logo:
-                           	 <img class="brand-image" src="http://134.209.96.11/media/${user.user_extra_info.organization.logo}" alt="${settings.STUDIO_NAME}" />
+                           	 <img class="brand-image" src="${settings.LMS_ROOT_URL}/media/${user.user_extra_info.organization.logo}" alt="${settings.STUDIO_NAME}" />
                         	% else:
                             	<img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
                         	% endif

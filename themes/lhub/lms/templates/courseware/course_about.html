@@ -59,7 +59,7 @@ a#enroll_now_btn {border: 1px solid #000663;
         }
       } else if (xhr.status == 403) {
         $('#register_error').text(
-            (xhr.responseText ? xhr.responseText : "${_("An error has occurred. Please ensure that you are logged in to enroll.") | n, js_escaped_string}")
+            (xhr.responseText ? xhr.responseText : "${_("An error has occurred. Please ensure that you are logged in to redeem.") | n, js_escaped_string}")
         ).css("display", "block");
       } else {
         $('#register_error').text(
@@ -191,7 +191,8 @@ margin-right: 10px;
               href_class = "register"
           %>
 
-          <a href="${reg_href}" class="${href_class}" id="enroll_now_btn"> ${_("Enroll Now")} </a>
+          <a href="${reg_href}" class="${href_class}" id="enroll_now_btn"> ${_("Redeem Now")} </a>
+          <br><br><br>
           <div id="register_error"></div>
         %endif
         </div>
@@ -416,6 +417,13 @@ width: 50% !important;
 
 
 }
+
+#register_error{
+color: red !important;
+background: #fff !important;
+border: 1px #fff !important;
+}
+
 </style>
 
 <script>

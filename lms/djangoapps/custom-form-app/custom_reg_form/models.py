@@ -2,17 +2,17 @@ from django.conf import settings
 from django.db import models
 from openedx.core.djangoapps.content.course_overviews.models import Category
 from organizations.models import Organization
-from datetime import datetime 
+from datetime import datetime, date 
 from django.core.exceptions import ValidationError
 
 # Backwards compatible settings.AUTH_USER_MODEL
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 def age_validator(date):
-    dob = date.year
-    year = datetime.today().year
-    age = year - dob
-    if age < 18:
+    dob = date
+    today = date.today()
+    age = ((today - dob).days)/365.25 
+    if age < 18.00:
         raise ValidationError("Age can't be less than 18.")
     else:
         return date

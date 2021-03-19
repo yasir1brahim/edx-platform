@@ -23,8 +23,8 @@ from rest_framework.decorators import api_view
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from django.http import HttpResponseNotFound
-
+from django.http import HttpResponseNotFound, HttpResponseBadRequest
+from course_modes.models import CourseMode
 
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -201,10 +201,14 @@ def add_product_to_basket(request):
         user = request.user
         api = ecommerce_api_client(user)
         try:
+            for product in request.data['products']:
+                course_mode = CourseMode.objects.get(sku=product['sku'])
+                if course_mode.mode_slug == 'audit':
+                    raise Exception("Free Product can not be added to the cart")
             response = api.baskets.post(request.data)
             return Response(response)
         except Exception as e:
-            return Response({'message':e, 'status': True, 'result':{}, 'status_code':200})
+            return HttpResponseBadRequest(str(e))
 
 
 

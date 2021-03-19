@@ -59,7 +59,13 @@ class CourseListView(ListAPIView):
                     request_filters[f] = filter_val.split(',')
 
         courses = list(Course.iterator(self.request.META.get('HTTP_AUTHORIZATION', None)))
-        
+        mobile_only_courses = []
+        for course in courses:
+            platform = course.platform_visibility
+            if platform == None or platform == "Mobile" or platform == "Both":
+                mobile_only_courses.append(course)
+        courses = mobile_only_courses
+
         try:
             mobile_courses_list = []
             user = self.request.user
@@ -140,12 +146,7 @@ class CourseListView(ListAPIView):
                 elif order == "discounted_price":
                     course_list.sort(key=lambda x: (x.discounted_price is None, x.discounted_price))
 
-        for course in course_list:
-            platform = course.platform_visibility
-            if platform == None or platform == "Mobile" or platform == "Both":
-                mobile_courses.append(course)
-
-        return mobile_courses
+        return course_list
 
 
 @view_auth_classes(is_authenticated=True)

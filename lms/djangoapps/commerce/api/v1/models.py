@@ -26,7 +26,8 @@ import requests
 import json
 import jwt
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class Course(object):
     """ Pseudo-course model used to group CourseMode objects. """
@@ -44,8 +45,17 @@ class Course(object):
         if 'jwt_token' in kwargs:
             self.jwt_token = kwargs['jwt_token']
         if 'user' in kwargs:
-            self.user = kwargs['user']
+            if kwargs['user'].id:
+                self.user = kwargs['user']
+            else:
+                self.user = user = User.objects.get(username="ecommerce_worker")
             self.api = ecommerce_api_client(self.user)
+            if len(self.modes) > 0:
+                self.discount_info = self.api.course_discount_info(self.modes[0].sku).get()
+            else:
+                course_price = self.get_paid_mode_price()
+                self.discount_info =  {'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
+
 
     @property
     def name(self):
@@ -153,14 +163,20 @@ class Course(object):
             log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
             return None
     
+
+
+
+
     @property
-    def discount_info(self):
+    def discount_info1(self):
         try:
-            if len(self.modes) > 0:
-                discount_info = self.api.course_discount_info(self.modes[0].sku).get()
-                return discount_info
-            course_price = self.get_paid_mode_price()
-            return {'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
+            if not self.discount_info:
+                if len(self.modes) > 0:
+                    discount_info = self.api.course_discount_info(self.modes[0].sku).get()
+                    return discount_info
+                course_price = self.get_paid_mode_price()
+                return {'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
+            return 
             #return CourseEnrollment.objects.enrollment_counts(course_id)['total']
         except CourseEnrollment.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
@@ -171,42 +187,6 @@ class Course(object):
     @property
     def discount_applicable(self):
         return self.discount_info['discount_applicable'] if self.discount_info else False
-
-    @property
-    def web_discount_applicable(self):
-        course_id = CourseKey.from_string(six.text_type(self.id))
-        configured_percentage = DiscountPercentageConfig.objects.filter(course=course_id).order_by('-id')
-        if len(configured_percentage) and configured_percentage[0].percentage > 0:
-            return True
-        return False
-
-
-    @property
-    def web_discounted_price(self):
-        course_id = CourseKey.from_string(six.text_type(self.id))
-        configured_percentage = DiscountPercentageConfig.objects.filter(course=course_id).order_by('-id')
-        course_mode_price = self.get_paid_mode_price()
-        if len(configured_percentage) and configured_percentage[0].percentage > 0:
-            #course_mode_price = self.get_paid_mode_price()
-            if course_mode_price:
-                return (course_mode_price - ( (configured_percentage[0].percentage/100) * course_mode_price))
-            else:
-                return 0.0
-
-        return course_mode_price
-
-    @property
-    def web_discount_percentage(self):
-        course_id = CourseKey.from_string(six.text_type(self.id))
-        configured_percentage = DiscountPercentageConfig.objects.filter(course=course_id).order_by('-id')
-        course_mode_price = self.get_paid_mode_price()
-        if len(configured_percentage) and configured_percentage[0].percentage > 0:
-            if course_mode_price:
-                return configured_percentage[0].percentage 
-            else:
-                return 0.0
-
-        return 0.0
 
 
     @property

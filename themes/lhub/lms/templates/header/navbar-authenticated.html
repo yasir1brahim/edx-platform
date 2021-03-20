@@ -25,6 +25,12 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
   else:
     help_link = doc_link
 %>
+
+<%
+curl = request.path
+xblock = curl.split('/')[1]
+%>
+
 <style>
 @media (max-width: 991px){
 .cart-item-authenticated {
@@ -172,8 +178,17 @@ font-size: 11px;
 top: -5px;
 }
 
+% if xblock == "xblock":
+header{
+display:none
+}
+.wrapper-footer{
+display: none
+}
+% endif
 
 </style>
+
 <div class="nav-links">
   <div class="main">
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">

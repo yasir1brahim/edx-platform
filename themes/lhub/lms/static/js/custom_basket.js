@@ -227,26 +227,17 @@ setTimeout(
 function() 
 {
 var selected = $(".form-check-input:checked")
-var cart_total = 0;
+var cart_total = 0.00;
 for (var x=0; x<selected.length; x++)
 {
    var x_selected = selected[x]
    var cart_list	 = $(x_selected).parent().next();
-   var price_elements = cart_list.children().find('.price-set').find('p')[1];
-   if (selected.length == 1)
-   {
-    var actual_price_element = cart_list.children().find('.price-set').find('p')[0];
-    if($(actual_price_element).text().length > 0)
-    {
-      price_elements = cart_list.children().find('.price-set').find('p')[0];
-    }
-    
-    }
+   var price_elements = $(cart_list.children().find('.price-set').find('p')[0]).text().length > 0 ? cart_list.children().find('.price-set').find('p')[0] : cart_list.children().find('.price-set').find('p')[1]
 
    var price_text = $(price_elements).text();
    var price  = price_text.substring(2, price_text.length);
-   price = parseInt(price)
-   cart_total += price
+   var float_price = parseFloat(price)
+   cart_total += float_price
 }
 var currency = 'S$'
 $("#cart_total").text(currency + cart_total)
@@ -263,7 +254,7 @@ $('#btn-checkout').attr("disabled", false)
 $('#loader-sec').css('display', 'none')
 }, 1000);
 
-});
+});		
 
 
 }

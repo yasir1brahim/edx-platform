@@ -207,6 +207,8 @@ def add_product_to_basket(request):
                 if course_mode.mode_slug == 'audit':
                     raise Exception("Free Product can not be added to the cart")
             response = api.baskets.post(request.data)
+            if 'status_code' in response and response['status_code'] == 409:
+                return HttpResponseBadRequest(response['message'])
             return Response(response)
         except Exception as e:
             return HttpResponseBadRequest(str(e))

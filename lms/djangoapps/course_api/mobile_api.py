@@ -240,3 +240,270 @@ def get_course_run_url(request, course_id):
     """
     course_run_url = reverse('openedx.course_experience.course_home', args=[course_id])
     return request.build_absolute_uri(course_run_url)
+
+
+
+
+
+
+
+
+
+import logging
+
+from common.djangoapps.course_modes.models import CourseMode
+from django.core.exceptions import ObjectDoesNotExist, ValidationError  # lint-amnesty, pylint: disable=wrong-import-order
+from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
+from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments import api
+from openedx.core.djangoapps.enrollments.errors import (
+    CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError,
+)
+from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
+from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer
+from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.exceptions import CourseNotFoundError
+from openedx.core.lib.log_utils import audit_log
+from openedx.features.enterprise_support.api import (
+    ConsentApiServiceClient,
+    EnterpriseApiException,
+    EnterpriseApiServiceClient,
+    enterprise_enabled
+)
+from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.auth import user_has_role
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from openedx.core.lib.api.authentication import BearerAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+
+log = logging.getLogger(__name__)
+REQUIRED_ATTRIBUTES = {
+    "credit": ["credit:provider_id"],
+}
+
+@api_view(['POST'])
+@authentication_classes((BearerAuthenticationAllowInactiveUser,))
+@permission_classes((IsAuthenticated,))
+def enroll_course_endpoint(request):
+    """
+    Enrolls the current user to a course.
+    Requirments:
+    * Course needs to be unpaid
+    * Valid course id needs to be provided
+    * User needs to be authenticated
+    """
+    username = request.data.get('user', request.user.username)
+    course_id = request.data.get('course_details', {}).get('course_id')
+
+    if not course_id:
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={"message": "Course ID must be specified to create a new enrollment."}
+        )
+
+    try:
+        course_id = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={
+                "message": f"No course '{course_id}' found for enrollment"
+            }
+        )
+
+    mode = request.data.get('mode')
+
+    # Check that the user specified is either the same user, or this is a server-to-server request.
+    if not username:
+        username = request.user.username
+    if username != request.user.username and not GlobalStaff().has_user(request.user):
+        # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
+        # other users, do not let them deduce the existence of an enrollment.
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not GlobalStaff().has_user(request.user):
+        return Response(
+            status=status.HTTP_403_FORBIDDEN,
+            data={
+                "message": "User does not have permission to create enrollment with mode [{mode}].".format(
+                    mode=mode
+                )
+            }
+        )
+
+    try:
+        # Lookup the user, instead of using request.user, since request.user may not match the username POSTed.
+        user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        return Response(
+            status=status.HTTP_406_NOT_ACCEPTABLE,
+            data={
+                'message': f'The user {username} does not exist.'
+            }
+        )
+
+    embargo_response = embargo_api.get_embargo_response(request, course_id, user)
+
+    if embargo_response:
+        return embargo_response
+
+    try:
+        is_active = request.data.get('is_active')
+        # Check if the requested activation status is None or a Boolean
+        if is_active is not None and not isinstance(is_active, bool):
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    'message': ("'{value}' is an invalid enrollment activation status.").format(value=is_active)
+                }
+            )
+
+        explicit_linked_enterprise = request.data.get('linked_enterprise_customer')
+        if explicit_linked_enterprise and ApiKeyHeaderPermission().has_permission(request) and enterprise_enabled():
+            enterprise_api_client = EnterpriseApiServiceClient()
+            consent_client = ConsentApiServiceClient()
+            try:
+                enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id), None)
+            except EnterpriseApiException as error:
+                log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                                "for user [%s] in course run [%s]", username, course_id)
+                raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
+            kwargs = {
+                'username': username,
+                'course_id': str(course_id),
+                'enterprise_customer_uuid': explicit_linked_enterprise,
+            }
+            consent_client.provide_consent(**kwargs)
+
+        enrollment_attributes = request.data.get('enrollment_attributes')
+        enrollment = api.get_enrollment(username, str(course_id))
+        mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
+        active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
+        missing_attrs = []
+        if enrollment_attributes:
+            actual_attrs = [
+                "{namespace}:{name}".format(**attr)
+                for attr in enrollment_attributes
+            ]
+            missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
+        if GlobalStaff().has_user(request.user) and (mode_changed or active_changed):
+            if mode_changed and active_changed and not is_active:
+                # if the requester wanted to deactivate but specified the wrong mode, fail
+                # the request (on the assumption that the requester had outdated information
+                # about the currently active enrollment).
+                msg = "Enrollment mode mismatch: active mode={}, requested mode={}. Won't deactivate.".format(
+                    enrollment["mode"], mode
+                )
+                log.warning(msg)
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
+
+            if missing_attrs:
+                msg = "Missing enrollment attributes: requested mode={} required attributes={}".format(
+                    mode, REQUIRED_ATTRIBUTES.get(mode)
+                )
+                return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
+
+            response = api.update_enrollment(
+                username,
+                str(course_id),
+                mode=mode,
+                is_active=is_active,
+                enrollment_attributes=enrollment_attributes,
+                # If we are updating enrollment by authorized api caller, we should allow expired modes
+            )
+        else:
+            # Will reactivate inactive enrollments.
+            response = api.add_enrollment(
+                username,
+                str(course_id),
+                mode=mode,
+                is_active=is_active,
+                enrollment_attributes=enrollment_attributes
+            )
+
+        cohort_name = request.data.get('cohort')
+        if cohort_name is not None:
+            cohort = get_cohort_by_name(course_id, cohort_name)
+            try:
+                add_user_to_cohort(cohort, user)
+            except ValueError:
+                # user already in cohort, probably because they were un-enrolled and re-enrolled
+                log.exception('Cohort re-addition')
+        email_opt_in = request.data.get('email_opt_in', None)
+        if email_opt_in is not None:
+            org = course_id.org
+            update_email_opt_in(request.user, org, email_opt_in)
+
+        log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
+        return Response(response)
+    except CourseModeNotFoundError as error:
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={
+                "message": (
+                    "The course is not free or has been expired."
+                ).format(mode=mode, course_id=course_id),
+            })
+    except CourseNotFoundError:
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={
+                "message": f"No course '{course_id}' found for enrollment"
+            }
+        )
+    except CourseEnrollmentExistsError as error:
+        log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
+        return Response(data=error.enrollment)
+    except CourseEnrollmentError:
+        log.exception("An error occurred while creating the new course enrollment for user "
+                        "[%s] in course run [%s]", username, course_id)
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={
+                "message": (
+                    "An error occurred while creating the new course enrollment for user "
+                    "'{username}' in course '{course_id}'"
+                ).format(username=username, course_id=course_id)
+            }
+        )
+    except CourseUserGroup.DoesNotExist:
+        log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST,
+            data={
+                "message": "An error occured while adding to cohort [%s]" % cohort_name
+            })
+    finally:
+        # Assumes that the ecommerce service uses an API key to authenticate.
+        current_enrollment = api.get_enrollment(username, str(course_id))
+        audit_log(
+            'enrollment_change_requested',
+            course_id=str(course_id),
+            requested_mode=mode,
+            actual_mode=current_enrollment['mode'] if current_enrollment else None,
+            requested_activation=is_active,
+            actual_activation=current_enrollment['is_active'] if current_enrollment else None,
+            user_id=user.id
+        )
+

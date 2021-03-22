@@ -376,13 +376,12 @@ class Course(object):
         return None
 
     @classmethod
-    def iterator(cls,jwt_token=None,filters=None):
+    def iterator(cls,user=None,filters=None):
         """ Generator that yields all courses. """
         if filters==None:
             course_modes = CourseMode.objects.order_by('course_id')
         else:
             pass
             #course_modes = CourseMode.objects.order_by('ratings')
-        JWT_TOKEN = jwt_token
         for course_id, modes in groupby(course_modes, lambda o: o.course_id):
-            yield cls(course_id, list(modes),jwt_token=jwt_token)
+            yield cls(course_id, list(modes),user=user)

@@ -58,7 +58,7 @@ class CourseListView(ListAPIView):
                 else:
                     request_filters[f] = filter_val.split(',')
 
-        courses = list(Course.iterator(self.request.META.get('HTTP_AUTHORIZATION', None)))
+        courses = list(Course.iterator(user=self.request.user))
         
         try:
             mobile_courses_list = []
@@ -163,7 +163,7 @@ class CourseDetailView(RetrieveAPIView):
             if course_overview.platform_visibility == "Web":
                 response = {"status": False, "message":"Course platform doesn't match the requirments", "result":None, "status_code": 404}
             course.image_urls = course_overview.image_urls
-            course_extra_info = Course(course.id,list(course_modes))
+            course_extra_info = Course(course.id,list(course_modes),user=self.request.user)
             course.enrollments_count = course_extra_info.enrollments_count
             course.ratings = float("{:.2f}".format(course_extra_info.ratings))
             course.comments_count = course_extra_info.comments_count

@@ -719,14 +719,14 @@ def get_courses_with_extra_info(user, org=None, filter_=None):
     )
     for course in courses:
         course_modes = CourseMode.objects.filter(course_id=course.id)
-        course_extra_info = Course(course.id,list(course_modes))
+        course_extra_info = Course(course.id,list(course_modes),user=user)
         course.enrollments_count = course_extra_info.enrollments_count
         course.ratings =  course_extra_info.ratings if course_extra_info.ratings else None
         course.comments_count = course_extra_info.comments_count
         course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
-        course.discount_applicable = course_extra_info.web_discount_applicable
-        course.discount_percentage = course_extra_info.web_discount_percentage
-        course.discounted_price = course_extra_info.web_discounted_price
+        course.discount_applicable = course_extra_info.discount_applicable
+        course.discount_percentage = course_extra_info.discount_percentage
+        course.discounted_price = course_extra_info.discounted_price
         course.currency = course_extra_info.currency
         if len(course_extra_info.modes) == 0:
             course.price = 0
@@ -769,9 +769,9 @@ def get_courses_with_extra_info_json(user, org=None, filter_=None):
         course.ratings =  course_extra_info.ratings if course_extra_info.ratings else None
         course.comments_count = course_extra_info.comments_count
         course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
-        course.discount_applicable = course_extra_info.web_discount_applicable
-        course.discount_percentage = course_extra_info.web_discount_percentage
-        course.discounted_price = course_extra_info.web_discounted_price
+        course.discount_applicable = course_extra_info.discount_applicable
+        course.discount_percentage = course_extra_info.discount_percentage
+        course.discounted_price = course_extra_info.discounted_price
         course.currency = course_extra_info.currency
         if len(course_extra_info.modes) == 0:
             course.price = 0

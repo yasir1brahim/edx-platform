@@ -998,7 +998,7 @@ def course_about(request, course_id):
         allow_anonymous = check_public_access(course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE])
 
         mode = course_modes = CourseMode.objects.filter(course_id=course.id)
-        course_extra_info = Course(course.id,list(course_modes))
+        course_extra_info = Course(course.id,list(course_modes), user=request.user)
         if request.user.id:
             api = ecommerce_api_client(request.user)
             basket_response = api.basket_details.get()

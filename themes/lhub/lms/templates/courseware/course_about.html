@@ -312,13 +312,13 @@ margin-right: 10px;
           <span class="important-dates-item-text prerequisites course-price">${course_price}</span></li>
          % else:
 
-           % if course_extra_info.web_discount_applicable:
+           % if course_extra_info.discount_applicable:
           <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
           <span class="cut_price important-dates-item-text prerequisites"> S${course_price} </span></li>
 
 
           <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Discounted Price")}</p>
-          <span class=" important-dates-item-text prerequisites course-price"> S$${ course_extra_info.web_discounted_price } </span>
+          <span class=" important-dates-item-text prerequisites course-price"> S$${ course_extra_info.discounted_price } </span>
           % else:
            <li class="important-dates-item"><span class="icon fa fa-dollar" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Price")}</p>
           <span class="important-dates-item-text prerequisites course-price"> S${course_price} </span></li>

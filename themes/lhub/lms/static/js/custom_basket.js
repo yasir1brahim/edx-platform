@@ -9,6 +9,12 @@ $(document).ready(function() {
 add_checkout_function();
 });
 
+// converts price to 2 decimal points e.g 2.1 to 2.10
+function append_decimal(price){
+    return (price).toFixed(2);
+}
+
+
 //counts the number of item in the cart.
 function getNumberOfItemInCart(){
     $.ajax({
@@ -55,10 +61,18 @@ return $.ajax({
        for (var j=0; j< response['result']['products'][i].length; j++)
        {
            var course_details = {}
-          
+
            if (response['result']['products'][i][j]['code'] == "course_details")
            {
              course_details = response['result']['products'][i][j]
+             if (course_details['discount_applicable'] == true)
+             {
+                course_details['discounted_price'] = append_decimal(course_details['discounted_price'])
+             }
+             else
+             {
+                 course_details['price'] = append_decimal(course_details['price'])
+             }
            }
            if(response['result']['products'][i][j]['code'] == "course_key")
            {
@@ -251,17 +265,26 @@ setTimeout(
 function() 
 {
 var selected = $(".form-check-input:checked")
-var cart_total = 0.00;
+var cart_total = 0;
 for (var x=0; x<selected.length; x++)
 {
    var x_selected = selected[x]
    var cart_list	 = $(x_selected).parent().next();
-   var price_elements = $(cart_list.children().find('.price-set').find('p')[0]).text().length > 0 ? cart_list.children().find('.price-set').find('p')[0] : cart_list.children().find('.price-set').find('p')[1]
+   var price_elements = cart_list.children().find('.price-set').find('p')[1];
+   if (selected.length == 1)
+   {
+    var actual_price_element = cart_list.children().find('.price-set').find('p')[0];
+    if($(actual_price_element).text().length > 0)
+    {
+      price_elements = cart_list.children().find('.price-set').find('p')[0];
+    }
+    
+    }
 
    var price_text = $(price_elements).text();
    var price  = price_text.substring(2, price_text.length);
-   var float_price = parseFloat(price)
-   cart_total += float_price
+   price = parseInt(price)
+   cart_total += price
 }
 var currency = 'S$'
 $("#cart_total").text(currency + cart_total)
@@ -278,7 +301,7 @@ $('#btn-checkout').attr("disabled", false)
 $('#loader-sec').css('display', 'none')
 }, 1000);
 
-});		
+});
 
 
 }

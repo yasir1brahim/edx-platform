@@ -1017,6 +1017,13 @@ def course_about(request, course_id):
         # Embed the course reviews tool
         reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
 
+
+        check = course_price
+        check_points = check.split('.')
+        last_check = check_points[-1]
+        if not(len(last_check) > 1):
+            course_price = course_price + '0'
+
         context = {
             'course': course,
             'course_extra_info': course_extra_info,

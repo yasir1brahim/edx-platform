@@ -10,7 +10,7 @@ from django.urls import reverse
 from rest_framework.exceptions import PermissionDenied
 import search
 import six
-
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
@@ -266,6 +266,7 @@ from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
     CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError,
 )
+
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer
@@ -295,7 +296,7 @@ from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from openedx.core.lib.api.authentication import BearerAuthentication
 from rest_framework.permissions import IsAuthenticated
-
+from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
@@ -341,6 +342,14 @@ def enroll_course_endpoint(request):
         # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
         # other users, do not let them deduce the existence of an enrollment.
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        #enrollment = CourseEnrollment.objects.get(user__username=username, course_id=course_id)
+        is_enrolled = CourseEnrollment.is_enrolled(request.user, course_id)
+        if is_enrolled:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={ "message": "You are already enrolled." })
+    except:
+        pass
 
     if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not GlobalStaff().has_user(request.user):
         return Response(

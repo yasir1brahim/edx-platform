@@ -224,20 +224,22 @@ alert(response['message']);
 }
 
 function append_decimal_point(price){
-    price = price.toString()
-    split_price = price.split(".")
+    str_price = price.toString()
+    split_price = str_price.split(".")
     if(split_price.length === 2){
         last_decimal_point = split_price[split_price.length-1]
-        if(last_decimal_point.length < 2){
-            price = price.concat("0")
-            return price
+        if(!(last_decimal_point.length >= 2)){
+            str_price = str_price.concat("0")
+            return str_price
+        }
+        else{
+            return price.toFixed(2)
         }
     }
     else{
-        return price
+        return str_price.concat(".00")
     }
 }
-
 function onclick_select()
 
 {
@@ -265,8 +267,10 @@ var float_price = parseFloat(price);
 cart_total += float_price
 }
 var currency = 'S$'
-$("#cart_total").text(currency + append_decimal_point(cart_total))
-$("#sub_total").text(currency + append_decimal_point(cart_total))
+var two_decimal_price = append_decimal_point(cart_total)
+var total = currency.concat(two_decimal_price)
+$("#cart_total").text(total)
+$("#sub_total").text(total)
 if (selected.length == 0)
 {
 $('#btn-checkout').attr("disabled", true)

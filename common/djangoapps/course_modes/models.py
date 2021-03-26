@@ -244,6 +244,10 @@ class CourseMode(models.Model):
         """ Return _expiration_datetime. """
         return self._expiration_datetime
 
+    @property
+    def min_price_str(self):
+        return format(self.min_property, ".2f")
+
     @expiration_datetime.setter
     def expiration_datetime(self, new_datetime):
         """ Saves datetime to _expiration_datetime and sets the explicit flag. """

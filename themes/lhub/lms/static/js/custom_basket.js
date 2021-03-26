@@ -30,6 +30,7 @@ var course_id = '';
 if (response['status_code'] == 200)
 {
 $('.wish-list').empty()
+response['result']['basket_total'] = append_decimal(response['result']['basket_total'])
 for (var i = 0; i < response['result']['products'].length; i++)
 {
 for (var j=0; j< response['result']['products'][i].length; j++)
@@ -222,7 +223,20 @@ alert(response['message']);
 
 }
 
-
+function append_decimal_point(price){
+    price = price.toString()
+    split_price = price.split(".")
+    if(split_price.length === 2){
+        last_decimal_point = split_price[split_price.length-1]
+        if(last_decimal_point.length < 2){
+            price = price.concat("0")
+            return price
+        }
+    }
+    else{
+        return price
+    }
+}
 
 function onclick_select()
 
@@ -247,12 +261,12 @@ var price_elements = $(cart_list.children().find('.price-set').find('p')[0]).tex
 
 var price_text = $(price_elements).text();
 var price = price_text.substring(2, price_text.length);
-var float_price = parseFloat(price)
+var float_price = parseFloat(price);
 cart_total += float_price
 }
 var currency = 'S$'
-$("#cart_total").text(currency + cart_total)
-$("#sub_total").text(currency + cart_total)
+$("#cart_total").text(currency + append_decimal_point(cart_total))
+$("#sub_total").text(currency + append_decimal_point(cart_total))
 if (selected.length == 0)
 {
 $('#btn-checkout').attr("disabled", true)

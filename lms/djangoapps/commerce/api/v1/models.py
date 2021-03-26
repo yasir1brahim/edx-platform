@@ -50,11 +50,11 @@ class Course(object):
             else:
                 self.user = user = User.objects.get(username="ecommerce_worker")
             self.api = ecommerce_api_client(self.user)
-            if len(self.modes) > 0:
+            if len(self.modes) > 0 and not  hasattr(self, 'discount_info'):
                 self.discount_info = self.api.course_discount_info(self.modes[0].sku).get()
             else:
                 course_price = self.get_paid_mode_price()
-                self.discount_info =  {'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
+                self.discount_info =  {'status_code': 200, 'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
 
 
     @property
@@ -166,27 +166,9 @@ class Course(object):
 
 
 
-
-    @property
-    def discount_info1(self):
-        try:
-            if not self.discount_info:
-                if len(self.modes) > 0:
-                    discount_info = self.api.course_discount_info(self.modes[0].sku).get()
-                    return discount_info
-                course_price = self.get_paid_mode_price()
-                return {'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
-            return 
-            #return CourseEnrollment.objects.enrollment_counts(course_id)['total']
-        except CourseEnrollment.DoesNotExist:
-            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
-            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
-            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
-            return None 
-
     @property
     def discount_applicable(self):
-        return self.discount_info['discount_applicable'] if self.discount_info else False
+        return self.discount_info['discount_applicable'] if self.discount_info['status_code'] == 200 else False
 
 
     @property
@@ -203,7 +185,7 @@ class Course(object):
     @property
     def discounted_price(self):
         course_mode_price = self.get_paid_mode_price()
-        if self.discount_info and self.discount_info['discount_applicable']:
+        if self.discount_info['status_code'] == 200 and self.discount_info['discount_applicable']:
             return self.discount_info['discounted_price']
         return course_mode_price
 
@@ -211,7 +193,7 @@ class Course(object):
     @property
     def discount_percentage(self):
         course_mode_price = self.get_paid_mode_price()
-        if self.discount_info and  self.discount_info['discount_applicable']:
+        if self.discount_info['status_code'] == 200 and  self.discount_info['discount_applicable']:
             return self.discount_info['discount_percentage']
         return 0.0
 
@@ -360,6 +342,7 @@ class Course(object):
 
     @classmethod
     def get(cls, course_id):
+
         """ Retrieve a single course. """
         try:
             course_id = CourseKey.from_string(six.text_type(course_id))

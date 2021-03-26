@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^basket-details/$', views.get_basket_content, name='get_basket_detail'),
     url(r'^basket-details/(?P<id>[0-9]+)$', views.get_basket_content, name='get_basket_detail'),
     url(r'^basket_details_mobile/$', views.get_basket_content_mobile, name='get_basket_detail_mobile'),
+    url(r'^update_discount/(?P<sku>[\w\-]+)/$', views.update_discount, name='update_discount'),
 ]

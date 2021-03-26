@@ -209,6 +209,23 @@ def add_product_to_basket(request):
 
 
 
+@api_view(['POST'])
+@authentication_classes((JwtAuthentication,SessionAuthentication,))
+@permission_classes([IsAuthenticated])
+def update_discount(request, sku):
+    if CourseMode.objects.filter(sku=sku).exists():
+        course_mode = CourseMode.objects.get(sku=sku)
+        course_mode.discount_percentage = request.data['discount_percentage']
+        course_mode.save()
+        return Response({"result": "success"})
+
+
+
+
+
+
+
+
 
 @view_auth_classes(is_authenticated=True)
 class CourseCheckoutDetailView(RetrieveAPIView):

@@ -58,7 +58,7 @@ class CourseListView(ListAPIView):
                 else:
                     request_filters[f] = filter_val.split(',')
 
-        courses = list(Course.iterator(user=self.request.user))        
+        courses = list(Course.iterator())        
         mobile_only_courses = []
         for course in courses:
             platform = course.platform_visibility

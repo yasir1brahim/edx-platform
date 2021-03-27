@@ -651,7 +651,7 @@ def get_courses_with_extra_info(user, org=None, filter_=None):
     )
     for course in courses:
         course_modes = CourseMode.objects.filter(course_id=course.id)
-        course_extra_info = Course(course.id,list(course_modes),user=user)
+        course_extra_info = Course(course.id,list(course_modes))
         course.enrollments_count = course_extra_info.enrollments_count
         course.ratings =  course_extra_info.ratings if course_extra_info.ratings else None
         course.comments_count = course_extra_info.comments_count

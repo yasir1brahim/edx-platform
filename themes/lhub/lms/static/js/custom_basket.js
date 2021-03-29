@@ -358,7 +358,7 @@ course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_
 <li>Price: <span class="main_price_cut">S$`+course_price+`</span></li>
 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
 }
-else if (course_discount_applicable == false && course.price > 0 )
+else if (course_discount_applicable == false && course_price > 0 )
 {
 
 course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`

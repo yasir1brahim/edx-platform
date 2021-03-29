@@ -42,19 +42,6 @@ class Course(object):
         if 'verification_deadline' in kwargs:
             self.verification_deadline = kwargs['verification_deadline']
         self._deleted_modes = []
-        if 'jwt_token' in kwargs:
-            self.jwt_token = kwargs['jwt_token']
-        if 'user' in kwargs:
-            if kwargs['user'].id:
-                self.user = kwargs['user']
-            else:
-                self.user = user = User.objects.get(username="ecommerce_worker")
-            self.api = ecommerce_api_client(self.user)
-            if len(self.modes) > 0 and not  hasattr(self, 'discount_info'):
-                self.discount_info = self.api.course_discount_info(self.modes[0].sku).get()
-            else:
-                course_price = self.get_paid_mode_price()
-                self.discount_info =  {'status_code': 200, 'discount_percentage' : 0.00, 'original_price': course_price, 'discount_applicable' : False, 'discounted_price': course_price}
 
 
     @property
@@ -168,8 +155,10 @@ class Course(object):
 
     @property
     def discount_applicable(self):
-        return self.discount_info['discount_applicable'] if self.discount_info['status_code'] == 200 else False
+        if len(self.modes) > 0:
+            return self.modes[0].discount_percentage > 0.00
 
+        return False
 
     @property
     def currency(self):
@@ -184,17 +173,18 @@ class Course(object):
 
     @property
     def discounted_price(self):
+        if len(self.modes) > 0:
+            price = self.modes[0].min_price
+            discounted_price = price -  (self.modes[0].discount_percentage/100) * price
+            return discounted_price
         course_mode_price = self.get_paid_mode_price()
-        if self.discount_info['status_code'] == 200 and self.discount_info['discount_applicable']:
-            return self.discount_info['discounted_price']
         return course_mode_price
 
 
     @property
     def discount_percentage(self):
-        course_mode_price = self.get_paid_mode_price()
-        if self.discount_info['status_code'] == 200 and  self.discount_info['discount_applicable']:
-            return self.discount_info['discount_percentage']
+        if len(self.modes) > 0:
+            return self.modes[0].discount_percentage
         return 0.0
 
 
@@ -359,7 +349,7 @@ class Course(object):
         return None
 
     @classmethod
-    def iterator(cls,user=None,filters=None):
+    def iterator(cls,filters=None):
         """ Generator that yields all courses. """
         if filters==None:
             course_modes = CourseMode.objects.order_by('course_id')
@@ -367,4 +357,4 @@ class Course(object):
             pass
             #course_modes = CourseMode.objects.order_by('ratings')
         for course_id, modes in groupby(course_modes, lambda o: o.course_id):
-            yield cls(course_id, list(modes),user=user)
+            yield cls(course_id, list(modes))

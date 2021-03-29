@@ -58,7 +58,7 @@ class CourseListView(ListAPIView):
                 else:
                     request_filters[f] = filter_val.split(',')
 
-        courses = list(Course.iterator(user=self.request.user))        
+        courses = list(Course.iterator())        
         mobile_only_courses = []
         for course in courses:
             platform = course.platform_visibility
@@ -212,6 +212,23 @@ def add_product_to_basket(request):
             return Response(response)
         except Exception as e:
             return HttpResponseBadRequest(str(e))
+
+
+
+@api_view(['POST'])
+@authentication_classes((JwtAuthentication,SessionAuthentication,))
+@permission_classes([IsAuthenticated])
+def update_discount(request, sku):
+    if CourseMode.objects.filter(sku=sku).exists():
+        course_mode = CourseMode.objects.get(sku=sku)
+        course_mode.discount_percentage = request.data['discount_percentage']
+        course_mode.save()
+        return Response({"result": "success"})
+
+
+
+
+
 
 
 

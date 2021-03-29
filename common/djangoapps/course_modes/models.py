@@ -70,7 +70,8 @@ class CourseMode(models.Model):
     # switched to using a single price.  Although this field is called `min_price`, it is
     # really just the price of the course.
     min_price = models.FloatField(default=0.00, verbose_name=_("Price"))
-
+    
+    discount_percentage = models.FloatField(default=0.00, verbose_name=_("Discount Percentage"))
     # the currency these prices are in, using lower case ISO currency codes
     currency = models.CharField(default=u"SGD", max_length=8)
 

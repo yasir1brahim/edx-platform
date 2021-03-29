@@ -6,7 +6,7 @@ Programmatic integration point for User API Accounts sub-application
 
 
 import datetime
-
+import re
 import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -210,6 +210,7 @@ def update_account_settings(requesting_user, update, username=None):
     #_validate_nric_change(user_extra_info,update, field_errors)
     _validate_dob_change(user_extra_info,update, field_errors)
     _validate_industry_change(user_extra_info,update, field_errors)
+    _validate_phone_number_change(user, update, field_errors)
 
     if field_errors:
         raise errors.AccountValidationError(field_errors)
@@ -287,6 +288,26 @@ def _validate_dob_change(user, data, field_errors):
             "user_message": text_type(err)
         }
         return
+
+def _validate_phone_number_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "phone_number" not in data:
+        return
+    phone_number = data["phone_number"]
+    try:
+        if phone_number == '':
+            raise ValueError('Please enter valid phone number.')
+        else:
+            if not bool(re.match(r"^\+?1?\d{9,15}$", phone_number)):
+                raise ValueError('Phone number must be entered in the format: +999999999. Up to 15 digits allowed.')
+    except ValueError as err:
+        field_errors["phone_number"] = {
+            "developer_message": u"Error thrown from phone number: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
+
 
 def _validate_industry_change(user, data, field_errors):
     # If user has requested to change email, we must call the multi-step process to handle this.

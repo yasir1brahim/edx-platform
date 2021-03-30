@@ -12,7 +12,7 @@ from django.utils import timezone
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
-from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
+from py2neo import Graph, Node, Relationship, NodeSelector
 from py2neo.compat import integer, string
 
 
@@ -389,15 +389,9 @@ def authenticate_and_create_graph(credentials):
     neo4j_user = credentials['user']
     neo4j_password = credentials['password']
 
-    authenticate(
-        "{host}:{port}".format(
-            host=host, port=https_port if secure else http_port
-        ),
-        neo4j_user,
-        neo4j_password,
-    )
-
     graph = Graph(
+        port=https_port if secure else http_port,
+        auth=(neo4j_user, neo4j_password),
         bolt=True,
         password=neo4j_password,
         user=neo4j_user,

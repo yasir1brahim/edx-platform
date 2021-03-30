@@ -298,7 +298,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         relationship_pairs = [
             tuple([node["location"] for node in rel.nodes()])
-            for rel in relationships if rel.type() == relationship_type
+            for rel in relationships if type(rel).__name__ == relationship_type
         ]
         return relationship_pairs
 

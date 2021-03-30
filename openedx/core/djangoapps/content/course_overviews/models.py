@@ -156,8 +156,8 @@ class CourseOverview(TimeStampedModel):
     language = TextField(null=True)
     difficulty_level = TextField(null=True)
     organization = models.ForeignKey(Organization, related_name='course_org', on_delete=models.SET_NULL, null=True)
-    new_category = TextField(null=True)
-    subcategory = TextField(null=True)
+    new_category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
     platform_visibility = TextField(null=True)
     course_sale_type = TextField(null=True)
     premium = BooleanField(default=False)
@@ -167,7 +167,7 @@ class CourseOverview(TimeStampedModel):
     history = HistoricalRecords()
 
     @classmethod
-    def _create_or_update(cls, course):
+    def _create_or_update(cls, course, load_from_modulestore=None):
         """
         Creates or updates a CourseOverview object from a CourseDescriptor.
 
@@ -267,9 +267,30 @@ class CourseOverview(TimeStampedModel):
         course_overview.self_paced = course.self_paced
         if hasattr(course, 'difficulty_level'):
             course_overview.difficulty_level = course.difficulty_level
-        if hasattr(course, 'new_category'):
-            course_overview.new_category = course.new_category
-            course_overview.subcategory = course.subcategory
+        if course.new_category and course.new_category != '-' and not load_from_modulestore:
+            category_object = Category.objects.filter(id=int(course.new_category)).first()
+            course_overview.new_category = category_object
+        
+        elif course.new_category and course.new_category != '-' and load_from_modulestore:
+            category_object = Category.objects.filter(name=course.new_category).first()
+            course_overview.new_category = category_object
+        
+        else:
+            course_overview.new_category = None
+
+        if course.subcategory and course.subcategory != '-' and not load_from_modulestore:
+            subcategory_object = SubCategory.objects.filter(id=int(course.subcategory)).first()
+            course_overview.subcategory = subcategory_object
+
+        elif course.subcategory and course.subcategory != '-' and load_from_modulestore:
+            subcategory_object = SubCategory.objects.filter(name=course.subcategory).first()
+            course_overview.subcategory = subcategory_object
+
+        else:
+            course_overview.subcategory = None
+
+ 
+
         course_overview.course_sale_type = course.course_sale_type
         course_overview.platform_visibility = course.platform_visibility
         course_overview.premium = course.premium
@@ -311,7 +332,7 @@ class CourseOverview(TimeStampedModel):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
                 try:
-                    course_overview = cls._create_or_update(course)
+                    course_overview = cls._create_or_update(course, load_from_modulestore=True)
                     with transaction.atomic():
                         course_overview.org = course.location.org
                         if Organization.objects.filter(short_name=course.location.org).exists():
@@ -319,7 +340,6 @@ class CourseOverview(TimeStampedModel):
                             course_overview.organization_id = organization.id
                             course_overview.organization = organization
                         course_overview.save()
-                        logging.info("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- overview saved: %s", vars(course_overview))
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([

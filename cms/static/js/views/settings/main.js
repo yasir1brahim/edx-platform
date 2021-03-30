@@ -289,9 +289,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                     var subcat_list = subcat_list.concat(subcategories[selectedCategoryValue])
                     console.log(subcat_list)
                     subcat_list.forEach(function(subcategory) {
-
+                         var subcat_id = Object.keys(subcategory)[0]
+                         var subcat_name  = Object.values(subcategory)[0]
                         // you can extract this line into separate function
-                        var $option = $('<option/>').attr('value', subcategory).html(subcategory);
+                        var $option = $('<option/>').attr('value', subcat_id).html(subcat_name);
 
                         $subCategorySelect.append($option);
                     });
@@ -300,6 +301,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 {
                   $('#course-subcategory option[value="'+selectedSubCategoryValue+'"]').attr('selected','selected');    
                  }
+                else
+                  {
+                    $('#course-subcategory option[value="0"]').attr('selected','selected');  
+                  }
                 //$subCategorySelect.value=selectedSubCategoryValue;
               },
               updateSubCategory: function() {
@@ -321,13 +326,15 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                     var subcat_list = subcat_list.concat(subcategories[selectedCategoryValue])
                     console.log(subcat_list)
                     subcat_list.forEach(function(subcategory) {
-
+                         var subcat_id = Object.keys(subcategory)[0]
+                         var subcat_name  = Object.values(subcategory)[0]
                         // you can extract this line into separate function
-                        var $option = $('<option/>').attr('value', subcategory).html(subcategory);
+                        var $option = $('<option/>').attr('value', subcat_id).html(subcat_name);
 
                         $subCategorySelect.append($option);
                     });
                 }
+               $('#course-subcategory option[value="0"]').attr('selected','selected'); 
             },
             disableCoursePrice: function() {
                 if (this.$el.find('#course-course-sale-type').val() === "free") {

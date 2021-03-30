@@ -58,11 +58,11 @@ class CourseListView(ListAPIView):
                 else:
                     request_filters[f] = filter_val.split(',')
 
-        courses = list(Course.iterator())        
+        courses = list(Course.iterator())
         mobile_only_courses = []
         for course in courses:
             platform = course.platform_visibility
-            if platform == None or platform == "Mobile" or platform == "Both":
+            if platform == None or platform == "mobile" or platform == "both":
                 mobile_only_courses.append(course)
         courses = mobile_only_courses
 

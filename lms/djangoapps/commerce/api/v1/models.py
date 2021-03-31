@@ -121,6 +121,22 @@ class Course(object):
             return 0.0
 
 
+    @property
+    def category(self):
+        """ Return course category ID. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        try:
+            category = CourseOverview.get_from_id(course_id).new_category
+            if category:
+                category_id =  category.id
+                return str(category_id)
+            else:
+                return str(0)
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return 0.0
 
 
     @property

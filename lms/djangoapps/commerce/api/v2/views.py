@@ -46,7 +46,7 @@ class CourseListView(ListAPIView):
         filtered_courses = []
         mobile_courses = []
         filter = False
-        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None,'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
+        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None, 'category': None, 'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
         request_filters = {}
         for f,val in filters.items():
             filter_val = self.request.query_params.get(f, None)

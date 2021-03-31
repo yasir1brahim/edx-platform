@@ -125,6 +125,7 @@ class CourseSerializer(serializers.Serializer):
     discounted_price = serializers.FloatField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)
+    category = serializers.CharField(required=False)
     platform_visibility = serializers.CharField(required=False)
     is_premium = serializers.BooleanField(required=False)
     media = _CourseApiMediaCollectionSerializer(source='*',required=False)

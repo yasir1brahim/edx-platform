@@ -461,7 +461,7 @@ width: 70% !important;
               <select id="course-category" name="course-category" required>
                 <option value="" selected> - </option>
                 % for category in categories:
-                  <option value="${category.name}">${category.name}</option>
+                  <option value="${category.id}">${category.name}</option>
                 % endfor
               </select>
               <span class="tip tip-stacked">Please enter Category</span>
@@ -471,7 +471,7 @@ width: 70% !important;
               <select id="course-subcategory">
                 <option value="" selected> - </option>
                 % for subcategory in subcategories:
-                  <option value="${subcategory.name}">${subcategory.name}</option>
+                  <option value="${subcategory.id}">${subcategory.name}</option>
                 % endfor
               </select>
               <span class="tip tip-stacked">Please enter Sub Category</span>

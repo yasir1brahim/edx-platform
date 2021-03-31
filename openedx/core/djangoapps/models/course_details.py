@@ -121,8 +121,6 @@ class CourseDetails(object):
         """
         Returns a fully populated CourseDetails model given the course descriptor
         """
-        log.info("====descriptor====")
-        log.info(type(course_descriptor))
         course_key = course_descriptor.id
         course_details = cls(course_key.org, course_key.course, course_key.run)
         course_details.start_date = course_descriptor.start
@@ -142,7 +140,7 @@ class CourseDetails(object):
         course_details.difficulty_level = course_descriptor.difficulty_level
         course_details.course_org = course_descriptor.course_org
         course_details.new_category = course_descriptor.new_category
-        course_details.subcategory = course_descriptor.subcategory
+        course_details.subcategory = course_descriptor.subcategory 
         course_details.platform_visibility = course_descriptor.platform_visibility
         course_details.premium = course_descriptor.premium
         course_details.course_sale_type = course_descriptor.course_sale_type

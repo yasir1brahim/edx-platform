@@ -109,9 +109,8 @@ class Course(object):
 
         try:
             subcategory = CourseOverview.get_from_id(course_id).subcategory
-            subcategory = SubCategory.objects.filter(name=subcategory)
             if subcategory:
-                subcategory_id =  subcategory.first().id
+                subcategory_id =  subcategory.id
                 return str(subcategory_id)
             else:
                 return str(0)

@@ -136,20 +136,8 @@ class CourseDetails(object):
         course_details.region = course_descriptor.region
         course_details.difficulty_level = course_descriptor.difficulty_level
         course_details.course_org = course_descriptor.course_org
-        Category = apps.get_model('course_overviews', 'Category')
-        if Category.objects.filter(name=course_descriptor.new_category).exists():
-            category_id  = Category.objects.filter(name=course_descriptor.new_category).first().id
-            course_details.new_category = category_id
-        else:
-            course_details.new_category = course_descriptor.new_category
-        
-        SubCategory = apps.get_model('course_overviews', 'SubCategory')
-        if SubCategory.objects.filter(name=course_descriptor.subcategory).exists():
-            subcategory_id  = SubCategory.objects.filter(name=course_descriptor.subcategory).first().id
-            course_details.subcategory = subcategory_id
-        else:
-            course_details.subcategory = course_descriptor.subcategory 
-
+        course_details.new_category = course_descriptor.new_category
+        course_details.subcategory = course_descriptor.subcategory 
         course_details.platform_visibility = course_descriptor.platform_visibility
         course_details.premium = course_descriptor.premium
         course_details.course_sale_type = course_descriptor.course_sale_type
@@ -328,15 +316,11 @@ class CourseDetails(object):
             dirty = True
 
         if 'new_category' in jsondict and jsondict['new_category'] != descriptor.new_category:
-            Category = apps.get_model('course_overviews', 'Category')
-            category_name = Category.objects.get(id=int(jsondict['new_category'])).name
-            descriptor.new_category = category_name
+            descriptor.new_category = jsondict['new_category']
             dirty = True
 
         if 'subcategory' in jsondict and jsondict['subcategory'] != descriptor.subcategory:
-            SubCategory = apps.get_model('course_overviews', 'SubCategory')
-            category_name = SubCategory.objects.get(id=int(jsondict['subcategory'])).name
-            descriptor.subcategory = category_name
+            descriptor.subcategory = jsondict['subcategory']
             dirty = True
 
         if 'platform_visibility' in jsondict and jsondict['platform_visibility'] != descriptor.platform_visibility:

@@ -267,29 +267,21 @@ class CourseOverview(TimeStampedModel):
         course_overview.self_paced = course.self_paced
         if hasattr(course, 'difficulty_level'):
             course_overview.difficulty_level = course.difficulty_level
-        if course.new_category and course.new_category != '-' and not load_from_modulestore:
+        logging.info(course.new_category)
+        logging.info(type(course.new_category))
+        if course.new_category and course.new_category != '-':
             category_object = Category.objects.filter(id=int(course.new_category)).first()
-            course_overview.new_category = category_object
-        
-        elif course.new_category and course.new_category != '-' and load_from_modulestore:
-            category_object = Category.objects.filter(name=course.new_category).first()
             course_overview.new_category = category_object
         
         else:
             course_overview.new_category = None
-
-        if course.subcategory and course.subcategory != '-' and not load_from_modulestore:
+        
+        if course.subcategory and course.subcategory != '-':
             subcategory_object = SubCategory.objects.filter(id=int(course.subcategory)).first()
-            course_overview.subcategory = subcategory_object
-
-        elif course.subcategory and course.subcategory != '-' and load_from_modulestore:
-            subcategory_object = SubCategory.objects.filter(name=course.subcategory).first()
             course_overview.subcategory = subcategory_object
 
         else:
             course_overview.subcategory = None
-
- 
 
         course_overview.course_sale_type = course.course_sale_type
         course_overview.platform_visibility = course.platform_visibility
@@ -332,7 +324,7 @@ class CourseOverview(TimeStampedModel):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
                 try:
-                    course_overview = cls._create_or_update(course, load_from_modulestore=True)
+                    course_overview = cls._create_or_update(course)
                     with transaction.atomic():
                         course_overview.org = course.location.org
                         if Organization.objects.filter(short_name=course.location.org).exists():

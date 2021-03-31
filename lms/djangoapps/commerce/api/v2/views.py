@@ -178,6 +178,7 @@ class CourseDetailView(RetrieveAPIView):
             response = get_blocks(self.request,course_usage_key,self.request.user,requested_fields=['completion'],block_types_filter='vertical')
             course.chapter_count = len(response['blocks'])
             course.name = course_overview.display_name
+            course.allow_review = course_overview.allow_review
 
             if len(course_extra_info.modes) == 0:
                 course.price = 0

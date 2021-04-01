@@ -48,6 +48,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('#course-number').val(this.model.get('course_id'));
                    this.$el.find('#course-name').val(this.model.get('run'));
                    this.$el.find('.set-date').datepicker({dateFormat: 'm/d/yy'});
+                   this.$el.find('#allow-review').val(this.model.get('allow_review'));
 
         // Avoid showing broken image on mistyped/nonexistent image
                    this.$el.find('img').error(function() {
@@ -162,6 +163,9 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                        this.$('.div-grade-requirements').hide();
                    }
                    this.$('#' + this.fieldToSelectorMap.entrance_exam_minimum_score_pct).val(this.model.get('entrance_exam_minimum_score_pct'));
+                   this.$el.find('#' + this.fieldToSelectorMap.allow_review).attr(
+                     'checked', JSON.parse(this.model.get('allow_review'))
+                   );
 
                    var selfPacedButton = this.$('#course-pace-self-paced'),
                        instructorPacedButton = this.$('#course-pace-instructor-paced'),
@@ -231,7 +235,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    course_settings_learning_fields: 'course-settings-learning-fields',
                    add_course_learning_info: 'add-course-learning-info',
                    add_course_instructor_info: 'add-course-instructor-info',
-                   course_learning_info: 'course-learning-info'
+                   course_learning_info: 'course-learning-info',
+                   allow_review: 'allow-review',
                },
 
                addLearningFields: function() {
@@ -299,11 +304,11 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 }
                if (selectedSubCategoryValue)
                 {
-                  $('#course-subcategory option[value="'+selectedSubCategoryValue+'"]').attr('selected','selected');    
+                  $('#course-subcategory option[value="'+selectedSubCategoryValue+'"]').attr('selected','selected');
                  }
                 else
                   {
-                    $('#course-subcategory option[value="0"]').attr('selected','selected');  
+                    $('#course-subcategory option[value="0"]').attr('selected','selected');
                   }
                 //$subCategorySelect.value=selectedSubCategoryValue;
               },
@@ -334,7 +339,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                         $subCategorySelect.append($option);
                     });
                 }
-               $('#course-subcategory option[value="0"]').attr('selected','selected'); 
+               $('#course-subcategory option[value="0"]').attr('selected','selected');
             },
             disableCoursePrice: function() {
                 if (this.$el.find('#course-course-sale-type').val() === "free") {
@@ -439,6 +444,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    case 'course-duration':
                    case 'course-description':
                    case 'course-short-description':
+                   case 'allow-review':
                        this.setField(event);
                        break;
                    default: // Everything else is handled by datepickers and CodeMirror.

@@ -104,6 +104,7 @@ class CourseOverview(TimeStampedModel):
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
+    allow_review = BooleanField(default=True)
 
     # Start/end dates
     # TODO Remove 'start' & 'end' in removing field in column renaming, DE-1822
@@ -272,10 +273,10 @@ class CourseOverview(TimeStampedModel):
         if course.new_category and course.new_category != '-':
             category_object = Category.objects.filter(id=int(course.new_category)).first()
             course_overview.new_category = category_object
-        
+
         else:
             course_overview.new_category = None
-        
+
         if course.subcategory and course.subcategory != '-':
             subcategory_object = SubCategory.objects.filter(id=int(course.subcategory)).first()
             course_overview.subcategory = subcategory_object
@@ -291,7 +292,9 @@ class CourseOverview(TimeStampedModel):
         if  course.course_org and course.course_org != '-':
             course_org_object = Organization.objects.filter(id=int(course.course_org)).first()
         course_overview.organization = course_org_object
-
+        course_overview.allow_review = json.loads(
+            CourseDetails.fetch_about_attribute(course.id, 'allow_review') or 'true'
+        )
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
 

@@ -46,7 +46,7 @@ class CourseListView(ListAPIView):
         filtered_courses = []
         mobile_courses = []
         filter = False
-        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None, 'category': None, 'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
+        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None, 'platform_visibility' : None ,'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
         request_filters = {}
         for f,val in filters.items():
             filter_val = self.request.query_params.get(f, None)
@@ -58,16 +58,21 @@ class CourseListView(ListAPIView):
                 else:
                     request_filters[f] = filter_val.split(',')
 
-        courses = list(Course.iterator())
-        mobile_only_courses = []
+        courses = list(Course.iterator())        
+        platform_only_courses = []
         for course in courses:
             platform = course.platform_visibility
-            if platform == None or platform == "mobile" or platform == "both":
-                mobile_only_courses.append(course)
-        courses = mobile_only_courses
+            if 'platform_visibility' in request_filters.keys():
+                requested_platform = request_filters['platform_visibility'][0].lower()
+                if platform == None or platform == requested_platform or platform == "both":
+                    platform_only_courses.append(course)
+            else:
+                if platform == None or platform == "both":
+                    platform_only_courses.append(course)
+        courses = platform_only_courses
 
         try:
-            mobile_courses_list = []
+            platform_courses_list = []
             user = self.request.user
             user_org = user.user_extra_info.organization
 
@@ -76,29 +81,27 @@ class CourseListView(ListAPIView):
                     course_overview = CourseOverview.get_from_id(course.id)
                     platform = course_overview.platform_visibility
                     organization = course_overview.organization
-                    if not platform == 'Web':
-                        if user.is_staff:
-                            mobile_courses_list.append(course)
-                        elif user_org == organization or organization == None:
-                            mobile_courses_list.append(course)
-                        elif organization == None and user_org == None:
-                            mobile_courses_list.append(course)
+                    if user.is_staff:
+                        platform_courses_list.append(course)
+                    elif user_org == organization or organization == None:
+                        platform_courses_list.append(course)
+                    elif organization == None and user_org == None:
+                        platform_courses_list.append(course)
                 except:
                     pass
-            courses = mobile_courses_list
+            courses = platform_courses_list
         except:
-            mobile_courses_list = []
+            platform_courses_list = []
             for course in courses:
                 try:
                     course_overview = CourseOverview.get_from_id(course.id)
                     platform = course_overview.platform_visibility
                     organization = course_overview.organization
-                    if not platform == 'Web':
-                        if organization == None:
-                            mobile_courses_list.append(course)
+                    if organization == None:
+                        platform_courses_list.append(course)
                 except:
                     pass
-            courses = mobile_courses_list
+            courses = platform_courses_list
 
         ordering_filter=self.request.query_params.get('ordering', None)
         if ordering_filter:

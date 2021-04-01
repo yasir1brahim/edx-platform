@@ -29,7 +29,7 @@ from openedx.core.lib.api.view_utils import LazySequence
 import importlib
 custom_reg_form = importlib.import_module('lms.djangoapps.custom-form-app', 'custom_reg_form')
 from custom_reg_form.models import UserExtraInfo
-from django.db.models import Count, F
+from django.db.models import Count, F, Q
 #from itertools import chain
 #from django.forms.models import model_to_dict
 #from django.db.models import F
@@ -448,16 +448,21 @@ class CategoryListView(DeveloperErrorViewMixin, ListAPIView):
     throttle_classes = (CourseListUserThrottle,)
 
     def get_queryset(self):
+        platform_visibility = self.request.query_params.get('platform_visibility', None)
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
-        categories_count = CourseOverview.objects.filter(new_category__isnull=False).values('new_category','id').order_by().annotate(Count('new_category')).values('new_category__count','new_category').annotate(course_count=F('new_category__count'),category=F('new_category')).values('category','course_count')
+        if platform_visibility:
+            categories_count = CourseOverview.objects.filter( Q(platform_visibility=platform_visibility) | Q(platform_visibility='both'), new_category__isnull=False).values('new_category','id').order_by().annotate(Count('new_category')).values('new_category__count','new_category').annotate(course_count=F('new_category__count'),category=F('new_category')).values('category','course_count')
+        else:
+            categories_count = CourseOverview.objects.filter(platform_visibility='both' , new_category__isnull=False).values('new_category','id').order_by().annotate(Count('new_category')).values('new_category__count','new_category').annotate(course_count=F('new_category__count'),category=F('new_category')).values('category','course_count')    
         categories = []
         for cat in categories_count:
-            if Category.objects.filter(name=cat['category']).exists():
-                cat_id = Category.objects.filter(name=cat['category']).values()[0]
-                cat['id'] =  cat_id['id']
+            if Category.objects.filter(id=cat['category']).exists():
+                cat_id = Category.objects.filter(id=cat['category']).values()[0]
+                cat['category'] =  cat_id['name']
                 cat['category_image'] = cat_id['category_image']
+                cat['id'] = cat_id['id']
                 categories.append(cat)
         return LazySequence(
         (c for c in categories),

@@ -817,6 +817,16 @@ urlpatterns += [
                                        namespace='course_goals_api')),
 ]
 
+# FAQ
+urlpatterns += [
+    url(r'api/faq/', include(('lms.djangoapps.faq.urls', 'lms.djangoapps.faq'), namespace='faq')),
+]
+
+# Note
+urlpatterns += [
+    url(r'api/note/', include(('lms.djangoapps.note.urls', 'lms.djangoapps.note'), namespace='note')),
+]
+
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += [

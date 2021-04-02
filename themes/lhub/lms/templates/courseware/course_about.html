@@ -189,8 +189,10 @@ margin-right: 10px;
 		  });
               </script>
           %else:
+              %if course_price != "Free":
               <a href="/login?next=${ quote(request.path) }"><button type="button">Add to Cart </button></a>
               <a href="/login?next=${ quote(request.path) }"> <button type="button">Buy now</button> </a>
+              %endif
           %endif
           
           <%

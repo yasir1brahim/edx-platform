@@ -175,10 +175,19 @@ margin-right: 10px;
             else:
               href_class = "register"
           %>
-	  %if user.is_authenticated:
+	  %if user.is_authenticated and user.is_active:
               <a><button style="display:none" id="add_to_cart_btn" type="button">Add to Cart </button></a>
               <a href="http://${settings.LMS_BASE}/commerce/basket-view/"><button id="go_to_cart_btn" style="display:none;">Go to cart</button></a>
               <a> <button id="buy_now_btn" data-sku="${course_extra_info.modes[0].sku}" type="button">Buy now</button> </a>
+          %elif user.is_authenticated and not(user.is_active):
+              <script>
+                  $(document).ready(function(){
+                        is_active = "${user.is_active}"
+		        if (is_active != "True"){
+                            window.location.href = '/verify_email/';
+    			}
+		  });
+              </script>
           %else:
               <a href="/login?next=${ quote(request.path) }"><button type="button">Add to Cart </button></a>
               <a href="/login?next=${ quote(request.path) }"> <button type="button">Buy now</button> </a>
@@ -433,11 +442,6 @@ border: 1px #fff !important;
 <script>
 $(document).ready(function() {
     
-    is_active = "${user.is_active}"
-    if (is_active != "True"){
-        window.location.href = '/verify_email/';
-    }
-
     $('#buy_now_btn').click(function(){
         let sku = $(this).attr('data-sku');
         let csrf = $('#web_csrf_token').val();

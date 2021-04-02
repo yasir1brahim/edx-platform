@@ -158,7 +158,7 @@ class CourseOverview(TimeStampedModel):
     organization = models.ForeignKey(Organization, related_name='course_org', on_delete=models.SET_NULL, null=True)
     new_category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
-    platform_visibility = TextField(null=True)
+    platform_visibility = TextField(default='Both', null=True)
     course_sale_type = TextField(null=True)
     premium = BooleanField(default=False)
     indexed_in_discovery = BooleanField(default=False)

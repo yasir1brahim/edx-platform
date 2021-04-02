@@ -46,7 +46,7 @@ class CourseListView(ListAPIView):
         filtered_courses = []
         mobile_courses = []
         filter = False
-        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None, 'platform_visibility' : None ,'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
+        filters = {'difficulty_level': None, 'sale_type': None, 'subcategory_id': None, 'platform_visibility' : None , 'category' : None, 'discount_applicable': 'Boolean', 'is_premium': 'Boolean'}
         request_filters = {}
         for f,val in filters.items():
             filter_val = self.request.query_params.get(f, None)
@@ -63,8 +63,8 @@ class CourseListView(ListAPIView):
         for course in courses:
             platform = course.platform_visibility
             if 'platform_visibility' in request_filters.keys():
-                requested_platform = request_filters['platform_visibility'][0].lower()
-                if platform == None or platform == requested_platform or platform == "both":
+                request_filters['platform_visibility'].append('both')
+                if platform == None or platform in request_filters['platform_visibility']:
                     platform_only_courses.append(course)
             else:
                 if platform == None or platform == "both":

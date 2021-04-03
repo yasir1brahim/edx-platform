@@ -511,8 +511,9 @@ class EnrollmentListViewMobile(DeveloperErrorViewMixin, ListAPIView):
         courses.
         """
         username = self.request.GET.get('user', self.request.user.username)
+        platform_visibility = self.request.query_params.get('platform_visibility', None)
         try:
-            enrollment_data = api.mobile_get_enrollments(username)
+            enrollment_data = api.mobile_get_enrollments(username, platform_visibility=platform_visibility)
         except CourseEnrollmentError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,

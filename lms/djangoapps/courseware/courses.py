@@ -597,12 +597,13 @@ def get_course_syllabus_section(course, section_key):
 
 
 @function_trace('get_courses')
-def get_courses(user, org=None, filter_=None):
+def get_courses(user, org=None, platform=None, filter_=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
     courses = branding.get_visible_courses(
         org=org,
+        platform=platform,
         filter_=filter_,
     ).prefetch_related(
         Prefetch(
@@ -673,12 +674,13 @@ def get_courses_with_extra_info(user, org=None, filter_=None):
 
 
 @function_trace('get_courses')
-def get_courses_with_extra_info_json(user, org=None, filter_=None):
+def get_courses_with_extra_info_json(user, org=None, platform=None, filter_=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
     courses = branding.get_visible_courses(
         org=org,
+        platform=platform,
         filter_=filter_,
     ).prefetch_related(
         Prefetch(

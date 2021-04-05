@@ -29,7 +29,75 @@
 </%block>
 % endif
 
+<style>
+    .selects-wrapper-all {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 5px;
+        padding: 0 20px;
+    }
+
+    .select-wrapper {
+        margin: 0 20px 15px 0;
+    }
+
+    .select-wrapper select {
+        border: 2px solid #5678a9;
+        border-radius: 8px;
+        min-width: 200px;
+    }
+
+    .selects-wrapper-all .select-name {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+</style>
+
 <%block name="pagetitle">${_("Courses")}</%block>
+<div class="selects-wrapper-all">
+    <div class="select-wrapper">
+        <span class="select-name">${_("Sorting")}</span>
+        <select class="js-select-sort">
+            <option value="">---</option>
+            <option value="rating" ${'selected="selected"' if sort == 'rating' else ''}>
+                ${_("Rating from highest to lowest")}
+            </option>
+            <option value="price" ${'selected="selected"' if sort == 'price' else ''}>
+                ${_("Price highest to lowest")}
+            </option>
+            <option value="latest" ${'selected="selected"' if sort == 'latest' else ''}>
+                ${_("Newest to oldest ")}
+            </option>
+        </select>
+    </div>
+    <div class="select-wrapper">
+        <span class="select-name">${_("Level")}</span>
+        <select class="js-select-difficulty-level">
+            <option value="">---</option>
+            % for difficulty_level in difficulty_levels:
+            <option value="${difficulty_level.id}" ${'selected="selected"' if difficulty_level.id == selected_difficulty_level_id else ''}>
+                ${difficulty_level.label}
+            </option>
+            % endfor
+        </select>
+    </div>
+    <div class="select-wrapper">
+        <span class="select-name">${_("Payment type")}</span>
+        <select class="js-select-mode">
+            <option value="">---</option>
+            <option value="free" ${'selected="selected"' if selected_mode == 'free' else ''}>
+                ${_("Free")}
+            </option>
+            <option value="paid" ${'selected="selected"' if selected_mode == 'paid' else ''}>
+                ${_("Paid")}
+            </option>
+            <option value="discounted" ${'selected="selected"' if selected_mode == 'discounted' else ''}>
+                ${_("Discounted")}
+            </option>
+        </select>
+    </div>
+</div>
 
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="find-courses">

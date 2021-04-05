@@ -22,29 +22,35 @@ background-color: #1a345c;
 color: white;
 }
 
-#footer-openedx .wrapper-logo img {
-width: 195px;
-}
 
-#footer-openedx .wrapper-logo {
+footer .wrapper-logo {
 margin: 40px 0px !important;
 }
 
-#footer-openedx {
+footer {
 padding-left: 38px;
 }
 
-#footer-openedx nav.nav-colophon ol li a {
+#footer-openedx nav.nav-colophon ol li a, .wrapper-footer footer .site-nav .nav-item .nav-link {
 color: #ffffff!important;
 font-weight: 600;
 }
+
 .wrapper-footer p.copyright {
     color: #bdbdbd !important;
+    font-size: 11px !important;
 }
 
-.wrapper-footer nav.nav-legal li a {
+.wrapper-footer nav.nav-legal li a, footer .legal-nav .nav-item .nav-link {
     color: #bdbdbd !important;
+        font-size: 11px !important;
+    margin-right: 10px !important;
 }
+
+img.footer-logo {
+width: 195px;
+}
+
 </style>
 
 % if uses_bootstrap:
@@ -72,7 +78,7 @@ font-weight: 600;
                 ## can be included in the footer on other sites
                 ## (e.g. a blog or marketing front-end) to provide a consistent
                 ## user experience.  See the branding app for details.
-                <img alt="${_('organization logo')}" src="${footer['logo_image']}">
+                <img alt="${_('organization logo')}" src="${footer['logo_image']}" class="footer-logo">
               </a>
             </p>
           </div>

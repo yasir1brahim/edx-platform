@@ -29,6 +29,9 @@ from course_modes.models import CourseMode
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from django.apps import apps
+
+CourseEnrollment = apps.get_model('student', 'CourseEnrollment')
 
 class CourseListView(ListAPIView):
     """ List courses and modes. """
@@ -182,6 +185,7 @@ class CourseDetailView(RetrieveAPIView):
             course.chapter_count = len(response['blocks'])
             course.name = course_overview.display_name
             course.allow_review = course_overview.allow_review
+            course.is_enrolled = CourseEnrollment.is_enrolled(self.request.user, course_id)
 
             if len(course_extra_info.modes) == 0:
                 course.price = 0

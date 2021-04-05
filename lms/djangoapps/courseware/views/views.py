@@ -72,7 +72,10 @@ from lms.djangoapps.courseware.courses import (
     get_permission_for_course_about,
     get_studio_url,
     sort_by_announcement,
-    sort_by_start_date
+    sort_by_start_date,
+    sort_by_rating,
+    sort_by_price,
+
 )
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
@@ -94,7 +97,9 @@ from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import (
+    Category, CourseOverview, SubCategory, DifficultyLevel
+)
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
     is_credit_course,
@@ -252,11 +257,17 @@ def user_groups(user):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous()
 def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
+    sort = request.GET.get('sort', '')
+    category_id = request.GET.get('category')
+    subcategory_id = request.GET.get('subcategory')
+    difficulty_level_id = request.GET.get('difficulty_level')
+    mode = request.GET.get('mode', '')
+    category = sub_category = difficulty_level = None
+
     courses_list = []
     filter_ = None
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
@@ -274,30 +285,73 @@ def courses(request):
             filter_ = {'organization': None}
         courses_list = get_courses_with_extra_info(request.user,filter_=filter_)
 
-        if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
-                                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
+        if sort == 'latest':
             courses_list = sort_by_start_date(courses_list)
+        elif sort == 'rating':
+            courses_list = sort_by_rating(courses_list)
+        elif sort == 'price':
+            courses_list = sort_by_price(courses_list)
         else:
             courses_list = sort_by_announcement(courses_list)
 
-    # Add marketable programs to the context.
-    web_couses = []
-
-    for course in courses_list:
-        platform = course.platform_visibility
-        if platform == None or platform == "Web" or platform == "Both":
-            web_couses.append(course)
-
     programs_list = get_programs_with_type(request.site, include_hidden=False)
+
+    if category_id:
+        category = Category.objects.filter(id=category_id).first()
+
+    if subcategory_id:
+        sub_category = SubCategory.objects.filter(id=subcategory_id).first()
+
+    if difficulty_level_id:
+        difficulty_level = DifficultyLevel.objects.filter(id=difficulty_level_id).first()
+
+    def filter_courses(course):
+        if course.platform_visibility not in ["Web", "Both", None]:
+            return False
+
+        if category and course.new_category_id != category.id:
+            return False
+
+        if sub_category and course.subcategory_id != sub_category.id:
+            return False
+
+        if difficulty_level and course.difficulty_level != difficulty_level.level.capitalize():
+            return False
+
+        if mode == 'free' and course.price:
+            return False
+        elif mode == 'paid' and not course.price:
+            return False
+        elif mode == 'discounted' and not course.discount_applicable:
+            return False
+
+        return True
+
+    courses_list = filter(filter_courses, courses_list)
+    categories = Category.objects.prefetch_related('subcategories')
+    difficulty_levels = DifficultyLevel.objects.all()
+    selected_category_name = ''
+
+    if category:
+        selected_category_name = category.name
+    elif sub_category:
+        selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
 
     return render_to_response(
         "courseware/courses.html",
         {
-            'courses': web_couses,
+            'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
+            'categories': categories,
+            'selected_category_name': selected_category_name,
+            'difficulty_levels': difficulty_levels,
+            'selected_difficulty_level_id': difficulty_level.id if difficulty_level else '',
+            'selected_mode': mode,
+            'sort': sort,
         }
     )
+
 
 def _get_course_creator_status(user):
     """

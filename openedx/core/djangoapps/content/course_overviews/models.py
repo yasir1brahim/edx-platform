@@ -690,7 +690,7 @@ class CourseOverview(TimeStampedModel):
         log.info('Finished generating course overviews.')
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None):
+    def get_all_courses(cls, orgs=None, platform=None,filter_=None):
         """
         Return a queryset containing all CourseOverview objects in the database.
 
@@ -712,6 +712,9 @@ class CourseOverview(TimeStampedModel):
             for org in orgs:
                 org_filter |= Q(org__iexact=org)
             course_overviews = course_overviews.filter(org_filter)
+       
+        if platform: 
+            course_overviews = course_overviews.filter(Q(platform_visibility=platform) | Q(platform_visibility='Both'), platform_visibility__isnull=False)       
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)

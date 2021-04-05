@@ -22,7 +22,7 @@ DEFAULT_DATA_API = 'openedx.core.djangoapps.enrollments.data'
 
 
 
-def mobile_get_enrollments(username, include_inactive=False):
+def mobile_get_enrollments(username,platform_visibility=None ,include_inactive=False):
     """Retrieves all the courses a user is enrolled in.
 
     Takes a user and retrieves all relative enrollments. Includes information regarding how the user is enrolled
@@ -97,7 +97,7 @@ def mobile_get_enrollments(username, include_inactive=False):
         ]
 
     """
-    return _data_api().get_mobile_course_enrollments(username, include_inactive)
+    return _data_api().get_mobile_course_enrollments(username, platform_visibility=platform_visibility, include_inactive=include_inactive)
 
 
 

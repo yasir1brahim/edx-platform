@@ -297,71 +297,6 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
 #@view_auth_classes(is_authenticated=True)
 class CourseListView(DeveloperErrorViewMixin, ListAPIView):
-    """
-    **Use Cases**
-
-        Request information on all courses visible to the specified user.
-
-    **Example Requests**
-
-        GET /api/courses/v1/courses/
-
-    **Response Values**
-
-        Body comprises a list of objects as returned by `CourseDetailView`.
-
-    **Parameters**
-
-        search_term (optional):
-            Search term to filter courses (used by ElasticSearch).
-
-        username (optional):
-            The username of the specified user whose visible courses we
-            want to see. The username is not required only if the API is
-            requested by an Anonymous user.
-
-        org (optional):
-            If specified, visible `CourseOverview` objects are filtered
-            such that only those belonging to the organization with the
-            provided org code (e.g., "HarvardX") are returned.
-            Case-insensitive.
-
-    **Returns**
-
-        * 200 on success, with a list of course discovery objects as returned
-          by `CourseDetailView`.
-        * 400 if an invalid parameter was sent or the username was not provided
-          for an authenticated request.
-        * 403 if a user who does not have permission to masquerade as
-          another user specifies a username other than their own.
-        * 404 if the specified user does not exist, or the requesting user does
-          not have permission to view their courses.
-
-        Example response:
-
-            [
-              {
-                "blocks_url": "/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall",
-                "media": {
-                  "course_image": {
-                    "uri": "/c4x/edX/example/asset/just_a_test.jpg",
-                    "name": "Course Image"
-                  }
-                },
-                "description": "An example course.",
-                "end": "2015-09-19T18:00:00Z",
-                "enrollment_end": "2015-07-15T00:00:00Z",
-                "enrollment_start": "2015-06-15T00:00:00Z",
-                "course_id": "edX/example/2012_Fall",
-                "name": "Example Course",
-                "number": "example",
-                "org": "edX",
-                "start": "2015-07-17T12:00:00Z",
-                "start_display": "July 17, 2015",
-                "start_type": "timestamp"
-              }
-            ]
-    """
     authentication_classes = (BearerAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -385,11 +320,12 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             if form.cleaned_data['filter_'] is not None:
                 form.cleaned_data['filter_'].update({'new_category':user_category.name})
             else:
-                form.cleaned_data['filter_'] = {'new_category':user_category.name}
+                form.cleaned_data['filter_'] = {'new_category':user_category.id}
         result= list_courses(
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
+            platform='Mobile',
             filter_=form.cleaned_data['filter_'],
             search_term=form.cleaned_data['search_term']
         )
@@ -605,12 +541,13 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
 @permission_classes([IsAuthenticated])
 def get_recommended_courses_for_web(request,id=None):
 
+    filter_ = {}
     user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
     if hasattr(user_extra_info, 'industry_id'):
         user_category = Category.objects.filter(id=user_extra_info.industry_id).first()
-        filter_ = {'new_category':user_category.name}
+        filter_.update({'new_category':user_category.id})
 
-    courses = get_courses_with_extra_info_json(request.user, filter_=filter_)
+    courses = get_courses_with_extra_info_json(request.user, platform='Web', filter_=filter_)
     course_list = []
     for course in courses:
         if course.advertised_start:

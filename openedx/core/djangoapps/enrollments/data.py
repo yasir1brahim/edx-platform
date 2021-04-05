@@ -34,7 +34,7 @@ from common.djangoapps.student.roles import RoleCache
 log = logging.getLogger(__name__)
 
 
-def get_mobile_course_enrollments(username, include_inactive=False):
+def get_mobile_course_enrollments(username, platform_visibility=None,include_inactive=False):
     """Retrieve a list representing all aggregated data for a user's course enrollments.
 
     Construct a representation of all course enrollment data for a specific user.
@@ -60,8 +60,9 @@ def get_mobile_course_enrollments(username, include_inactive=False):
     # Find deleted courses and filter them out of the results
     deleted = []
     valid = []
+    requested_platform_visibility = ['both'] if not platform_visibility else [platform_visibility, 'both']
     for enrollment in qset:
-        if enrollment.course_overview is not None:
+        if enrollment.course_overview is not None and enrollment.course_overview.platform_visibility.lower() in requested_platform_visibility:
             valid.append(enrollment.id)
         else:
             deleted.append(enrollment)

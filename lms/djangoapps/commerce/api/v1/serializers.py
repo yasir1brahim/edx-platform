@@ -219,6 +219,7 @@ class CourseDetailSerializer(serializers.Serializer):
     chapter_count = serializers.IntegerField(required=False)
     description = serializers.CharField(required=False)
     allow_review = serializers.BooleanField()
+    is_enrolled = serializers.BooleanField(required=False)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema

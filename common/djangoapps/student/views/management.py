@@ -44,6 +44,7 @@ from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_respon
 from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.content.course_overviews.models import Category, SubCategory
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -118,7 +119,36 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if extra_context is None:
         extra_context = {}
 
+    category_id = request.GET.get('category')
+    subcategory_id = request.GET.get('subcategory')
+    category = sub_category = None
+
+    if category_id:
+        category = Category.objects.filter(id=category_id).first()
+
+    if subcategory_id:
+        sub_category = SubCategory.objects.filter(id=subcategory_id).first()
+
     courses = get_courses_with_extra_info(user,filter_={'organization': None})
+
+    def filter_courses(course):
+        if category and course.new_category_id != category.id:
+            return False
+
+        if sub_category and course.subcategory_id != sub_category.id:
+            return False
+
+        return True
+
+    courses = filter(filter_courses, courses)
+    categories = Category.objects.prefetch_related('subcategories')
+    selected_category_name = ''
+
+    if category:
+        selected_category_name = category.name
+    elif sub_category:
+        selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
+
     if configuration_helpers.get_value(
         "ENABLE_COURSE_SORTING_BY_START_DATE",
         settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
@@ -127,7 +157,11 @@ def index(request, extra_context=None, user=AnonymousUser()):
     else:
         courses = sort_by_announcement(courses)
 
-    context = {'courses': courses}
+    context = {
+        'courses': courses,
+        'categories': categories,
+        'selected_category_name': selected_category_name,
+    }
 
     context['homepage_overlay_html'] = configuration_helpers.get_value('homepage_overlay_html')
 

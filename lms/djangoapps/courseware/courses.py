@@ -812,14 +812,32 @@ def sort_by_announcement(courses):
 
 def sort_by_start_date(courses):
     """
-    Returns a list of courses sorted by their start date, latest first.
+    Returns a list of courses sorted by their start date.
     """
     courses = sorted(
         courses,
         key=lambda course: (course.has_ended(), course.start is None, course.start),
-        reverse=False
+        reverse=True
     )
 
+    return courses
+
+
+def sort_by_rating(courses):
+    courses = sorted(
+        courses,
+        key=lambda course: course.ratings or 0,
+        reverse=True
+    )
+    return courses
+
+
+def sort_by_price(courses):
+    courses = sorted(
+        courses,
+        key=lambda course: course.price,
+        reverse=True
+    )
     return courses
 
 

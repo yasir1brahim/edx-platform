@@ -93,7 +93,7 @@ class CourseDetails(object):
         self.self_paced = None
         self.learning_info = []
         self.instructor_info = []
-        self.allow_review = True
+        self.allow_review = "true"
 
     @classmethod
     def fetch_about_attribute(cls, course_key, attribute):

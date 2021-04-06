@@ -1,0 +1,280 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%!
+import arrow
+import json
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+
+%>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0 auto; /* Center website */
+    }
+
+    .heading {
+        font-size: 25px;
+        margin-right: 25px;
+    }
+
+    .fa {
+        font-size: 25px;
+    }
+
+    .checked {
+        color: orange;
+    }
+
+    /* Three column layout */
+
+    .row .rateit {
+        justify-content: center;
+    }
+
+    .arrows-holder {
+        width: 400px;
+        display: flex;
+        align-items: center;
+    }
+
+    .arrows-holder .fa {
+        margin: 0 3px;
+    }
+
+    .arrows-holder .percent-counter {
+        margin-left: 10px;
+    }
+
+    .middle {
+        width: calc(100% - 400px);
+        box-sizing: border-box;
+        padding-right: 40px;
+    }
+
+    /* Place text to the right */
+    .right {
+        text-align: right;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    /* The bar container */
+    .bar-container {
+        width: 100%;
+        background-color: #f1f1f1;
+        text-align: center;
+        color: white;
+        height: 25px;
+        position: relative;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    /* Individual bars */
+    .bar-line {
+        background: orange;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 25px;
+        border-radius: 5px;
+    }
+
+    /* Responsive layout - make the columns stack on top of each other instead of next to each other */
+    @media (max-width: 400px) {
+        .side, .middle {
+            width: 100%;
+        }
+        /* Hide the right column on small screens */
+        .right {
+            display: none;
+        }
+    }
+
+    .average-rating {
+        font-size: 40px;
+        font-weight: 700;
+    }
+
+    .single-bar-wrapper {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+    }
+
+    .rateit-wrapper {
+        margin-bottom: 10px;
+    }
+
+    .username-wrapper {
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .review-item {
+        display: flex;
+    }
+
+    .reviews-user-avatar {
+        width: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 30px;
+        border: 2px solid #1a345c;
+    }
+
+    .reviews-user-avatar img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .reviews-user-name {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .reviews-rating-and-date {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .reviews-rating {
+        display: flex;
+        align-items: center;
+        margin-right: 15px;
+    }
+
+    .reviews-rating .fa {
+        margin-right: 5px;
+        font-size: 20px;
+    }
+
+    .reviews-date {
+        position: relative;
+        padding-left: 20px;
+        font-weight: 700;
+        font-size: 15px;
+    }
+    .reviews-date:before {
+        content: "";
+        width: 1px;
+        height: 20px;
+        background: #ccc;
+        position: absolute;
+        left: 0;
+        top: 50%;
+        margin-top: -10px;
+    }
+    .static-tab-wrapper {
+        margin-bottom: 30px;
+    }
+</style>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+        <section class="static-tab-wrapper">
+
+            <span class="heading">${_("Student Feedback")}</span>
+
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <div class="text-center">
+                        <h1 class="average-rating">${average_rating}</h1>
+                        <div class="rateit" data-rateit-value="${average_rating}" data-rateit-mode="font" data-rateit-ispreset="true" data-rateit-readonly="true"></div>
+                        <div>${_("Overall Course Rating")}</div>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="bars-wrapper">
+                        % for key, value in reversed(rating_percent_dict.items()):
+                            <div class="single-bar-wrapper">
+                                <div class="middle">
+                                    <div class="bar-container">
+                                        <div class="bar-line" style="width: ${value}%"></div>
+                                    </div>
+                                </div>
+                                <div class="arrows-holder">
+                                    % for point in range(5):
+                                        % if point >= key:
+                                            <span class="fa fa-star"></span>
+                                        % else:
+                                            <span class="fa fa-star checked"></span>
+                                        % endif
+                                    % endfor
+                                    <span class="percent-counter">${value}%</span>
+                                </div>
+                            </div>
+                        % endfor
+                    </div>
+                </div>
+            </div>
+            % if not is_commented:
+                <h3 class="font-weight-bold">${_("Leave your review")}</h3>
+                <div>
+                    <div class="username-wrapper">${user.username}</div>
+                    <div class="rateit-wrapper">
+                        ${_("Rate your experience: ")}
+                    </div>
+                    <div>
+                        <select id="backing3c">
+                            <option value="1">★</option>
+                            <option value="2">★</option>
+                            <option value="3">★</option>
+                            <option value="4">★</option>
+                            <option value="5">★</option>
+                        </select>
+                        <div class="rateit" data-rateit-backingfld="#backing3c" data-rateit-mode="font" data-rateit-min="0"></div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-group">
+                            <textarea class="form-control" id="feedbackTextarea" rows="3"
+                                      placeholder="${_('Share your feedback here.')}"></textarea>
+                        </div>
+                        <button type="submit" id="submitRating" class="btn btn-primary" data-url="${create_review_url}">Submit</button>
+                    </div>
+                </div>
+            % endif
+            <h3 class="font-weight-bold mb-4">${_("Reviews")}</h3>
+            % for review in reviews:
+                <div class="review-item">
+                    <div class="reviews-user-avatar">
+                        <img src="https://www.vettedpetcare.com/vetted-blog/wp-content/uploads/2018/08/How-To-Travel-With-a-Super-Anxious-Cat-square.jpeg" alt="">
+                    </div>
+                    <div>
+                        <div class="reviews-user-name">${review.user_id.username}</div>
+                        <div class="reviews-rating-and-date">
+                            <div class="reviews-rating">
+                                % for point in range(5):
+                                    % if point >= review.rating:
+                                        <span class="fa fa-star"></span>
+                                    % else:
+                                        <span class="fa fa-star checked"></span>
+                                    % endif
+                                % endfor
+                            </div>
+                            <div class="reviews-date">${arrow.get(review.created_at).humanize()}</div>
+                        </div>
+                        <div class="reviews-text">${review.review}</div>
+                    </div>
+                </div>
+                <hr/>
+            % endfor
+        </section>
+    </div>
+</main>

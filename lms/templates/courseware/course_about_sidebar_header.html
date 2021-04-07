@@ -2,6 +2,7 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
 import six
+import urllib
 
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -35,7 +36,27 @@ from six import text_type
         ).replace(u" ", u"+")
         tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=six.moves.urllib.parse.quote_plus(tweet_text.encode('UTF-8')))
 
-        facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
+        facebook_text = _("I just enrolled in {number} {title}: {url}").format(
+            number=course.number,
+            title=course.display_name_with_default_escaped,
+            url=u"{protocol}://{domain}{path}".format(
+                protocol=site_protocol,
+                domain=site_domain,
+                path=urllib.parse.quote_plus(
+                    reverse('about_course', args=[text_type(course.id)]),
+                )
+            )
+        ).replace(u" ", u"%20")
+        course_url=u"{protocol}://{domain}{path}".format(
+            protocol=site_protocol,
+            domain=site_domain,
+            path=urllib.parse.quote_plus(
+                    reverse('about_course', args=[text_type(course.id)]),
+                ),
+        )
+        facebook_action = u"https://www.facebook.com/sharer/sharer.php?u={course_url}&quote={facebook_text}".format(
+            course_url=course_url, facebook_text=facebook_text
+        )
 
         email_body = _("I just enrolled in {number} {title} through {platform} {url}").format(
                 number=course.number,
@@ -57,7 +78,7 @@ from six import text_type
       <a href="${tweet_action}" class="share">
         <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
       </a>
-      <a href="${facebook_link}" class="share">
+      <a href="${facebook_action}" class="share">
         <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
       <a href="${email_link}" class="share">

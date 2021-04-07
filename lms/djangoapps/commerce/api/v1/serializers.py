@@ -130,7 +130,7 @@ class CourseSerializer(serializers.Serializer):
     is_premium = serializers.BooleanField(required=False)
     media = _CourseApiMediaCollectionSerializer(source='*',required=False)
     discount_percentage = serializers.FloatField(required=False)
-    allow_review = serializers.BooleanField()
+    allow_review = serializers.BooleanField(required=False)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema

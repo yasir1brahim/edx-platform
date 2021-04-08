@@ -1201,7 +1201,7 @@ def settings_handler(request, course_key_string):
 
             subcat_dict = {}
             for obj in subcategories:
-                if obj.category.name in subcat_dict.keys():
+                if obj.category.id in subcat_dict.keys():
                     subcat_dict[obj.category.id].append({obj.id: obj.name})
                 else:
                     subcat_dict[obj.category.id]=[{obj.id:obj.name}]

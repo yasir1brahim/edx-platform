@@ -53,6 +53,9 @@ urlpatterns = [
     url(r'^user_api/v1/account/login_session/$', login.LoginSessionView.as_view(),
         name="user_api_login_session"),
 
+    url(r'^user_api/v2/account/login_session/$', login.LoginSessionCustomView.as_view(),
+        name="user_api_login_session_custom"),
+
     # Login Refresh of JWT Cookies
     url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
 

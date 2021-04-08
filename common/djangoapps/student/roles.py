@@ -11,6 +11,7 @@ from collections import defaultdict
 import six
 from django.contrib.auth.models import User
 from opaque_keys.edx.django.models import CourseKeyField
+from django.db.models import Q
 
 from openedx.core.lib.cache_utils import get_cache
 from common.djangoapps.student.models import CourseAccessRole
@@ -449,5 +450,13 @@ class UserBasedRole(object):
         * course_id
         * role (will be self.role--thus uninteresting)
         """
-        return CourseAccessRole.objects.filter(role=self.role,org=user_org,course_id__contains='course-v1')
+        
+
+        
+        if CourseAccessRole.objects.filter(user=self.user).exists():
+            return CourseAccessRole.objects.filter(Q(user=self.user) | Q(org=user_org), role=self.role )
+        
+         
+        else:
+            return CourseAccessRole.objects.filter(role=self.role,org=user_org,course_id__contains='course-v1')
 

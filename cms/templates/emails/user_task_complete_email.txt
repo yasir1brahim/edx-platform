@@ -19,9 +19,11 @@ ${_("Errors:")}
   * ${error}
 % endfor
 
+% if olx_validation_errors.get('warnings'):
 ${_("Warnings:")}
 % for warning in olx_validation_errors.get('warnings'):
   * ${warning}
 % endfor
 
+% endif
 % endif

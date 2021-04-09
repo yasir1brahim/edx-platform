@@ -557,6 +557,8 @@ class LoginSessionView(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
+        for key in list(request.session.keys()):
+            del request.session[key]
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")
 
     @method_decorator(require_post_params(["email", "password"]))

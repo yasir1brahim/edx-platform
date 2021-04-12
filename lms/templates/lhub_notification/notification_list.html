@@ -1,0 +1,184 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="pagetitle">${_("Notifications")}</%block>
+<%block name="bodyclass">view-notification</%block>
+
+<%block name="js_extra">
+<script type="text/javascript" src="${static.url('js/lhub/notification_page.js')}"></script>
+</%block>
+
+<style>
+.lhub-notifications {
+  padding: 20px 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.lhub-notifications-page-title {
+  font: 700 20px/25px "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.lhub-notifications p + p {
+  margin-top: 10px;
+}
+
+.notification-list-item-title {
+  display: inline-block;
+  vertical-align: top;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.notification-list-item-date {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.lhub-notifications-list {
+  list-style: none;
+  margin: 0 0 40px;
+  padding: 0;
+}
+
+.lhub-notifications-list li {
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  padding: 25px 0;
+  position: relative;
+}
+
+.lhub-img-holder {
+  min-width: 70px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  text-align: center;
+  margin-right: 30px;
+  font-size: 35px;
+  line-height: 70px;
+}
+
+.lhub-notifications-list li .notification-list-item {
+  position: relative;
+}
+
+.lhub-notifications-list li.new-notification .notification-list-item:before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2b78e4;
+  position: absolute;
+  left: -17px;
+  top: 4px;
+}
+
+.notification-list-actions {
+  margin-left: auto;
+  text-align: right;
+  width: 200px;
+  min-width: 200px;
+}
+
+.notification-list-actions a {
+  display: block;
+  padding-bottom: 15px;
+}
+
+.lhub-pagination {
+  list-style: none;
+  margin: 0 auto 30px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.lhub-pagination li {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  line-height: 30px;
+  margin: 0 5px;
+}
+
+.lhub-pagination li  a,
+.lhub-pagination li  span {
+  display: block;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ccc;
+}
+
+.lhub-pagination li  a:hover,
+.lhub-pagination li  a:focus,
+.lhub-pagination li  a:active {
+  background: #1a345c;
+  color: #fff !important;
+  border: 1px solid #1a345c;
+  text-decoration: none;
+}
+</style>
+
+<main id="main" aria-label="Content" tabindex="-1">
+  <div class="lhub-notifications">
+    <div class="main-container">
+      <h2 class="lhub-notifications-page-title">${_("Notifications")}</h2>
+      <ul class="lhub-notifications-list">
+        % for notification in notification_list:
+          <li class="${'new-notification' if not notification.is_read else ''} js-item-notification">
+            <div class="lhub-img-holder">
+              <i class="fa fa-book" aria-hidden="true"></i>
+            </div>
+            <div class="notification-list-item">
+              <a class="notification-list-item-title" href="${reverse('lhub-notification-detail', kwargs={'pk': notification.id})}" >
+                ${notification.title}
+              </a>
+              <div class="notification-list-item-date">${notification.created.strftime('%d/%m/%Y')}</div>
+            </div>
+            <div class="notification-list-actions">
+              % if not notification.is_read:
+                <a href="#" class="js-mark-as-read"
+                   data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}">
+                  ${_("Mark as read")}
+                </a>
+              % endif
+              <a href="#" class="js-delete-notification"
+                 data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}">
+                ${_("Delete")}
+              </a>
+            </div>
+          </li>
+        % endfor
+      </ul>
+    </div>
+    % if is_paginated:
+      <ul class="lhub-pagination">
+        % if page_obj.has_previous():
+          <li><a href="?page=${page_obj.previous_page_number()}">&laquo;</a></li>
+        % else:
+          <li class="disabled"><span>&laquo;</span></li>
+        % endif
+        % for i in page_obj.paginator.page_range:
+          % if page_obj.number == i:
+            <li class="active"><span>${i}<span class="sr-only">(current)</span></span></li>
+          % else:
+            <li><a href="?page=${i}">${i}</a></li>
+          % endif
+        % endfor
+        % if page_obj.has_next():
+          <li><a href="?page=${page_obj.next_page_number()}">&raquo;</a></li>
+        % else:
+          <li class="disabled"><span>&raquo;</span></li>
+        % endif
+      </ul>
+    % endif
+  </div>
+</main>

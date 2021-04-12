@@ -1,0 +1,13 @@
+<% _.each(notifications, function(notification) { %>
+    <div class="js-notifications-item <% if (!notification.is_read) { %>new-notification<% } %>">
+        <p class="notification-title"><%= notification.title %></p>
+        <div>
+            <a href="<%- notification.course_url %>" class="<% if (!notification.is_read) { %>js-mark-read<% } %>" data-id=<%- notification.id %>>
+                <%- gettext('Go to course') %>
+            </a>
+        </div>
+        <p class="notification-date">
+            <%- gettext('Sent') %> <%- notification.created %>
+        </p>
+    </div>
+<% }) %>

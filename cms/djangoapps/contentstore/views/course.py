@@ -1270,16 +1270,19 @@ def settings_handler(request, course_key_string):
                             'show_min_grade_warning': show_min_grade_warning,
                         }
                     )
-
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
                 course_details = CourseDetails.fetch(course_key)
-                return JsonResponse(
+
+                response = JsonResponse(
                     course_details,
                     # encoder serializes dates, old locations, and instances
                     encoder=CourseSettingsEncoder
                 )
+                    # to control cache for back button work correctly
+                response['Cache-Control'] = "private, no-cache, no-store"
+                return response
             # For every other possible method type submitted by the caller...
             else:
                 # if pre-requisite course feature is enabled set pre-requisite course

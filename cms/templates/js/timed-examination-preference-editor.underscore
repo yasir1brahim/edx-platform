@@ -18,28 +18,37 @@
                     </p>
                 </div>
             <% } %>
+            <% if (isOnboardingMissing) { %>
+                <div class="summary-message summary-message-warning">
+                    <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+                    <p class="copy">
+                        <%- gettext("No Onboarding Exam has been configured for this course. You may not set up a Proctored Exam until an Onboarding Exam has been configured.") %>
+                    </p>
+                </div>
+            <% } %>
             <label class="label no-descriptive-text">
                 <input type="radio" name="exam_type" class="input input-radio no_special_exam" checked="checked"/>
                 <%- gettext('None') %>
             </label>
             <label class="label">
                 <input type="radio" name="exam_type" class="input input-radio timed_exam"
-                    aria-describedby="timed-exam-description" 
+                    aria-describedby="timed-exam-description"
                     <%- specialExamLockedIn && !isTimedExam ? 'disabled' : '' %>
                 />
                 <%- gettext('Timed') %>
             </label>
             <p class='field-message' id='timed-exam-description'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time for individual learners through the Instructor Dashboard.') %> </p>
             <% if (enableProctoredExams) { %>
-                <label class="label">
-                    <input type="radio" name="exam_type" class="input input-radio proctored_exam"
-                        aria-describedby="proctored-exam-description"
-                        <%- specialExamLockedIn && (!isProctoredExam || isOnboardingExam) ? 'disabled' : '' %>
-                    />
-                    <%- gettext('Proctored') %>
-                </label>
-                <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.') %> </p>
-
+                <% if (!isOnboardingMissing) { %>
+                    <label class="label">
+                        <input type="radio" name="exam_type" class="input input-radio proctored_exam"
+                            aria-describedby="proctored-exam-description"
+                            <%- specialExamLockedIn && (!isProctoredExam || isOnboardingExam) ? 'disabled' : '' %>
+                        />
+                        <%- gettext('Proctored') %>
+                    </label>
+                    <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.') %> </p>
+                <% } %>
                 <% var supports_onboarding = xblockInfo.get('supports_onboarding'); %>
                 <% if (supports_onboarding) { %>
                     <label class="label">

@@ -17,7 +17,8 @@ from django.views.decorators.http import require_http_methods
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
-    get_exam_configuration_dashboard_url
+    get_exam_configuration_dashboard_url,
+    get_course_has_onboarding_exam
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
@@ -1282,6 +1283,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 else:
                     show_review_rules = True
 
+                is_onboarding_missing = supports_onboarding and not get_course_has_onboarding_exam(course.id)
+
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
                     'was_ever_special_exam': _was_xblock_ever_special_exam(
@@ -1295,7 +1298,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'default_time_limit_minutes': xblock.default_time_limit_minutes,
                     'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
                     'supports_onboarding': supports_onboarding,
-                    'show_review_rules': show_review_rules
+                    'show_review_rules': show_review_rules,
+                    'is_onboarding_missing': is_onboarding_missing
                 })
 
         # Update with gating info

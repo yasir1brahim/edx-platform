@@ -85,6 +85,7 @@ if (xblockInfo.get('graded')) {
 var is_proctored_exam = xblockInfo.get('is_proctored_exam');
 var is_practice_exam = xblockInfo.get('is_practice_exam');
 var is_onboarding_exam = xblockInfo.get('is_onboarding_exam');
+var is_onboarding_missing = xblockInfo.get('is_onboarding_missing');
 var exam_value;
 if (is_proctored_exam) {
     if (is_onboarding_exam) {
@@ -147,10 +148,17 @@ if (is_proctored_exam) {
                 <% } %>
                 <% if (xblockInfo.isEditableOnCourseOutline()) { %>
                     <li class="action-item action-configure">
-                        <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
-                            <span class="icon fa fa-gear" aria-hidden="true"></span>
-                            <span class="sr action-button-text"><%- gettext('Configure') %></span>
-                        </a>
+                        <% if (is_proctored_exam && is_onboarding_missing) { %>
+                            <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
+                                <span class="icon fa fa-warning" aria-hidden="true"></span>
+                                <span class="sr action-button-text"><%- gettext('Configure') %></span>
+                            </a>
+                        <% } else { %>
+                            <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
+                                <span class="icon fa fa-gear" aria-hidden="true"></span>
+                                <span class="sr action-button-text"><%- gettext('Configure') %></span>
+                            </a>
+                        <% }%>
                     </li>
                 <% } %>
                 <% if (xblockInfo.isDuplicable()) { %>

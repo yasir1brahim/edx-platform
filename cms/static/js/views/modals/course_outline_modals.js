@@ -312,6 +312,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var isProctoredExam = xblockInfo.get('is_proctored_exam');
             var isPracticeExam = xblockInfo.get('is_practice_exam');
             var isOnboardingExam = xblockInfo.get('is_onboarding_exam');
+            var isOnboardingMissing = xblockInfo.get('is_onboarding_missing');
             var html = this.template($.extend({}, {
                 xblockInfo: xblockInfo,
                 xblockType: this.options.xblockType,
@@ -321,6 +322,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 isProctoredExam: isProctoredExam,
                 isPracticeExam: isPracticeExam,
                 isOnboardingExam: isOnboardingExam,
+                isOnboardingMissing: isOnboardingMissing,
                 isTimedExam: isTimeLimited && !(
                     isProctoredExam || isPracticeExam || isOnboardingExam
                 ),

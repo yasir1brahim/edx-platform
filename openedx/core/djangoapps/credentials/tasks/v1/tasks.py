@@ -213,6 +213,7 @@ def paged_query(queryset, delay, page_size):
                 logger.warning('OperationalError Exception caught, it is possible some results were missed')
             continue
 
+
 def print_dry_run(certs, grades):
     """Give a preview of what certs/grades we will handle."""
     print("DRY-RUN: This command would have handled changes for...")

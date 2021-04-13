@@ -97,7 +97,7 @@ def handle_notify_credentials(self, options, course_keys):
     ))
 
     if options['dry_run']:
-        print_dry_run(certs, grades)
+        log_dry_run(certs, grades)
     else:
         send_notifications(
             certs,
@@ -215,26 +215,26 @@ def paged_query(queryset, delay, page_size):
             continue
 
 
-def print_dry_run(certs, grades):
+def log_dry_run(certs, grades):
     """Give a preview of what certs/grades we will handle."""
-    print("DRY-RUN: This command would have handled changes for...")
+    logger.info("DRY-RUN: This command would have handled changes for...")
     ITEMS_TO_SHOW = 10
 
-    print(certs.count(), "Certificates:")
+    logger.info(f"{certs.count()} Certificates:")
     for cert in certs[:ITEMS_TO_SHOW]:
-        print("   ", certstr(cert))
+        logger.info(f"   {certstr(cert)}")
     if certs.count() > ITEMS_TO_SHOW:
-        print("    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
+        logger.info(f"    (+ {certs.count() - ITEMS_TO_SHOW} more)")
 
-    print(grades.count(), "Grades:")
+    logger.info(f"{grades.count()} Grades:")
     for grade in grades[:ITEMS_TO_SHOW]:
-        print("   ", gradestr(grade))
+        logger.info(f"   {gradestr(grade)}")
     if grades.count() > ITEMS_TO_SHOW:
-        print("    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))
+        logger.info(f"    (+ {grades.count() - ITEMS_TO_SHOW} more)")
 
 
 def certstr(cert):
-    return f'{cert.course_id} for user {cert.user.username}'
+    return f'{cert.course_id} for user {cert.user.id}'
 
 
 def gradestr(grade):

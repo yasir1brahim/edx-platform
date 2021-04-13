@@ -5,6 +5,7 @@ This file contains celery tasks for contentstore views
 import base64
 import json
 import os
+import pkg_resources
 import shutil
 import tarfile
 from datetime import datetime
@@ -58,18 +59,21 @@ from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, InvalidProctoringProvider
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
 from .outlines import update_outline_from_modulestore
-from .toggles import course_import_olx_validation_is_enabled
+from .utils import course_import_olx_validation_is_enabled
 
 User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
 FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
+ALL_ALLOWED_XBLOCKS = frozenset(
+    [entry_point.name for entry_point in pkg_resources.iter_entry_points("xblock.v1")]
+)
 
 
 def clone_instance(instance, field_values):
@@ -612,9 +616,12 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         set_custom_attribute('course_import_completed', True)
     except Exception as exception:  # pylint: disable=broad-except
         msg = str(exception)
-        LOGGER.exception(f'{log_prefix}: Unknown error while importing course {msg}')
+        status_msg = _('Unknown error while importing course.')
+        if isinstance(exception, InvalidProctoringProvider):
+            status_msg = msg
+        LOGGER.exception(f'{log_prefix}: Unknown error while importing course {str(exception)}')
         if self.status.state != UserTaskStatus.FAILED:
-            self.status.fail(_('Unknown error while importing course.'))
+            self.status.fail(status_msg)
         monitor_import_failure(courselike_key, current_step, exception=exception)
     finally:
         if course_dir.isdir():
@@ -681,7 +688,12 @@ def validate_course_olx(courselike_key, course_dir, status):
     if not course_import_olx_validation_is_enabled():
         return olx_is_valid
     try:
-        __, errorstore, __ = olxcleaner.validate(course_dir, steps=8)
+        __, errorstore, __ = olxcleaner.validate(
+            filename=course_dir,
+            steps=settings.COURSE_OLX_VALIDATION_STAGE,
+            ignore=settings.COURSE_OLX_VALIDATION_IGNORE_LIST,
+            allowed_xblocks=ALL_ALLOWED_XBLOCKS
+        )
     except Exception:  # pylint: disable=broad-except
         LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
         return olx_is_valid
@@ -703,6 +715,7 @@ def validate_course_olx(courselike_key, course_dir, status):
 
 def log_errors_to_artifact(errorstore, status):
     """Log errors as a task artifact."""
+
     def get_error_by_type(error_type):
         return [error for error in error_report if error.startswith(error_type)]
 

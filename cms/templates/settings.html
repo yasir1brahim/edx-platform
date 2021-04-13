@@ -91,47 +91,68 @@ width: 70% !important;
           </header>
 
           <ol class="list-input">
+            <div>
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">${_("Organization")}</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-organization" readonly />
-            </li>
+            </li><br><br>
+            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
+              <label for="course-name">${_("Course Name")}</label>
+              <textarea class="input-crs-name" >${display_name}</textarea>
+            </li> 
+            </div>
 
+            <div>
             <li class="field text is-not-editable" id="field-course-number">
               <label for="course-number">${_("Course Number")}</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="short" id="course-number" readonly>
+            </li><br><br>
+            <li class="field text is-not-editable" id="field-course-id" stye="width:50% !important;">
+              <label for="course-id">${_("Course ID")}</label>
+              <textarea id="course-id" class="input-crs-name" >${course_id}</textarea>
             </li>
+            </div>
 
-            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
-              <label for="course-name">${_("Course Run")}</label>
+            <div>
+            <li class="field text is-not-editable" id="field-course-run" style="width:auto">
+              <label for="course-run">${_("Course Run")}</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
-                class="long" id="course-name" readonly />
+                class="long" id="course-run" readonly />
             </li>
+            </div>
 
-
+            <div>
             <li class="field text is-not-editable" id="field-course-indexed-in-discovery">
               <input type="checkbox" class="field-radio" disabled="disabled"  name="Indexed in Discovery" id="course-indexed-in-discovery" value="true" aria-labelledby="course-pace-indexed-in-discovery-label"/>
               <label id="course-indexed-in-discovery-label" class="course-label" for="course-indexed-in-discovery">${_("Indexed in Discovery")}</label>
               <span class="tip">${_("Indexed in Discovery")}</span>
+              <div id="field-course-published-in-ecommerce" class="yes_no" style="display:none;">
+             
+              <span class="tip">${_("Published in Ecommerce: ")}  <input type="text" disabled="disabled" name="Published in Ecommerce" id="course-published-in-ecommerce" aria-labelledby="course-pace-published-in-ecommerce-label"/></span> 
+              <span><button type="button" id="published-in-ecommerce-retry"><i class="fa fa-refresh"></i>Retry</button></span>
+              <span class="tip"><p id="retry-text" style="color: red">Failed creating ecommerce</p></span>
+            </div>
             </li>
-            <br>
+          </div>
+            
 
-            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
-              <label for="course-name">${_("Course Name")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
-                class="long" id="course-name" value="${display_name}" readonly />
-            </li>
-
-
-            <li class="field text is-not-editable" id="field-course-name" style="width:auto">
-              <label for="course-name">${_("Course ID")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
-                class="long" id="course-name" value="${course_id}" readonly />
-            </li>
+            
 
           </ol>
+<style>
 
+.view-settings .group-settings.basic .list-input .field {
+    width: 22% !important;
+    display: inline-block !important;
+    margin: 0px !important;
+    vertical-align: top;
+}
+.group-settings.basic .field.text.is-not-editable:nth-child(6) {
+  width: 50% !important;
+}
+</style>
           % if not marketing_enabled:
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
@@ -459,7 +480,6 @@ width: 70% !important;
                <input type="number" placeholder="0.00" step="any" id="course-course-price" class="short" />
               <span class="tip tip-stacked">Please enter price</span>
             </li>
-
 
             <li class="field" id="field-course-category">
               <label for="course-category">${_("Category")}</label>
@@ -824,5 +844,78 @@ width: 70% !important;
     </div>
   </div>
 </div>
-</%block>
 
+<style>
+  ol.list-input>div .field.text.is-not-editable {
+display: block !important;
+min-width: 100% !important;
+padding-bottom: 25px !important;
+}
+
+ol.list-input>div {
+width: 24% !important;
+display: inline-block;
+vertical-align: top;
+}
+
+.yes_no span.tip {
+display: flex !important;
+justify-content: space-between;
+}
+
+.yes_no span.tip *, .yes_no span.tip {
+font-size: 12px !important;
+}
+button#published-in-ecommerce-retry {
+    background: #0075b4;
+    width: 100%;
+    color: #ffffff;
+    font-size: 15px !important;
+    border: none;
+    padding: 6px 0px;
+    margin: 10px auto 3px auto;
+    font-weight: 600 !important;
+}
+ol.list-input li:nth-child(5) {
+    padding-right: 4% !important;
+}
+span.icon.fa.fas.fa-redo.icon-inline {
+display: block;
+color: #ffffff;
+font-size: 12px;
+}
+button#published-in-ecommerce-retry i {
+    margin-right: 6px;
+}
+
+input#course-published-in-ecommerce {
+width: 20%;
+font-weight: 400;
+color: #666;
+}
+
+p#retry-text {
+width: 100%;
+text-align: center;
+}
+
+li#field-course-indexed-in-discovery span.tip label {
+    margin-bottom: 0px;
+}
+textarea.input-crs-name {
+resize: none;
+color: #4c4c4c;
+overflow: hidden;
+}
+
+#course-id {
+    min-width: 410px !important;
+    width: 100% !important;
+}
+
+.view-settings .group-settings.basic .note-promotion-courseURL{
+  margin-top: 0px !important;
+}
+
+</style>
+</%block>

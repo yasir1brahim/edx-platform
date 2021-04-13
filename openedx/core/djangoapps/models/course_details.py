@@ -8,7 +8,6 @@ import re
 
 import six
 from django.conf import settings
-
 from openedx.core.djangoapps.models.config.waffle import enable_course_detail_update_certificate_date
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from openedx.core.djangolib.markup import HTML
@@ -62,6 +61,7 @@ class CourseDetails(object):
         self.course_sale_type = None
         self.course_price = None
         self.indexed_in_discovery = None
+        self.published_in_ecommerce = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -149,6 +149,7 @@ class CourseDetails(object):
         course_details.course_price = course_descriptor.course_price
         CourseOverview = apps.get_model('course_overviews', 'CourseOverview')
         course_details.indexed_in_discovery = CourseOverview.get_from_id(course_key).indexed_in_discovery
+        course_details.published_in_ecommerce = CourseOverview.get_from_id(course_key).published_in_ecommerce
         course_details.self_paced = course_descriptor.self_paced
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info

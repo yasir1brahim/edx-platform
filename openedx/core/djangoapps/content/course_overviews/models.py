@@ -163,6 +163,7 @@ class CourseOverview(TimeStampedModel):
     course_sale_type = TextField(null=True)
     premium = BooleanField(default=False)
     indexed_in_discovery = BooleanField(default=False)
+    published_in_ecommerce = BooleanField(null=True)
     course_price = FloatField(default=0.0)
 
     history = HistoricalRecords()

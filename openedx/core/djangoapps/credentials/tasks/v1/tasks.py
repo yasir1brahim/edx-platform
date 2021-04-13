@@ -226,7 +226,7 @@ def paged_query(queryset, delay, page_size):
 
 def log_dry_run(certs, grades):
     """Give a preview of what certs/grades we will handle."""
-    logger.info("DRY-RUN: This command would have handled changes for...")
+    logger.info("DRY-RUN: This task would have handled changes for...")
     ITEMS_TO_SHOW = 10
 
     logger.info(f"{certs.count()} Certificates:")

@@ -1296,7 +1296,10 @@ def settings_handler(request, course_key_string):
                     course_name = course.display_name_with_default
                     #course_id = CourseLocator.from_string(course_key)
                     course_id = six.text_type(course_key)
-                    publish_course_ecommerce(course_id, course_name, course_sale_type, course_price)
+                    publish_course_output = publish_course_ecommerce(course_id, course_name, course_sale_type, course_price)
+                    update_published_in_ecommerce = CourseOverview.objects.get(id=course_id)
+                    update_published_in_ecommerce.published_in_ecommerce = publish_course_output
+                    update_published_in_ecommerce.save()
                 if is_prerequisite_courses_enabled():
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
                     if prerequisite_course_keys:
@@ -1375,8 +1378,6 @@ def publish_course_ecommerce(course_key, display_name, course_type='audit', cour
     product_list.append(product)
     data = {'id': course_key, 'name': display_name, 'verification_deadline': None,
         'products': product_list}
-    # print(data)
-
     user = User.objects.get(username="ecommerce_worker")
     api_user = user
     api = ecommerce_api_client(api_user)

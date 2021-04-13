@@ -15,9 +15,9 @@ from lms.djangoapps.certificates.api import (
     can_generate_certificate_task,
     generate_certificate_task,
     generate_user_certificates,
-    get_allowlisted_users
+    get_allowlisted_users,
+    is_using_v2_course_certificates,
 )
-from lms.djangoapps.certificates.generation_handler import is_using_v2_course_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
 

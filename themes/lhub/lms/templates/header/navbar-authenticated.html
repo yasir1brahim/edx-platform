@@ -31,6 +31,12 @@ curl = request.path
 xblock = curl.split('/')[1]
 %>
 
+%if user.is_authenticated:
+    <%static:require_module module_name="js/lhub/notifications" class_name="LhubNotifications">
+    LhubNotifications({url: "${reverse('notification-list')}"});
+    </%static:require_module>
+% endif
+
 <style>
 @media (max-width: 991px){
 .cart-item-authenticated {
@@ -187,6 +193,102 @@ display: none
 }
 % endif
 
+/* lhub notifications */
+
+.notifications-holder {
+  position: relative;
+  padding: 0 !important;
+  margin-right: 20px !important;
+  position: relative;
+  top: 7px;
+}
+
+.js-user-notifications {
+  color: #fff !important;
+  display: block;
+  position: relative;
+  padding: 0 !important;
+}
+
+.js-block-notifications .loading {
+  padding: 5px;
+  text-align: center;
+}
+
+.js-user-notifications .fa {
+  font-size: 25px;
+}
+
+.js-new-notifications-count {
+  display: block;
+  position: absolute;
+  top: 3px;
+  right: -9px;
+  background: red;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.js-notifications {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, .5);
+  color: #000;
+  width: 250px;
+  z-index: 100;
+}
+
+.js-block-notifications {
+  overflow: auto;
+  max-height: 270px;
+}
+
+.js-notifications-item {
+  padding: 8px 22px;
+  text-align: left !important;
+  font-size: 14px;
+  border-top: 1px solid #ccc;
+  position: relative;
+}
+
+.js-notifications-item.new-notification:before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2b78e4;
+  position: absolute;
+  left: 8px;
+  top: 15px;
+}
+
+.js-notifications a {
+  display: block;
+  height: auto !important;
+  text-align: left !important;
+}
+
+.js-notifications a:hover {
+  opacity: .8;
+}
+
+.global-header .nav-links .secondary .nav-item .js-notifications-item a {
+  padding: 5px 0 !important;
+}
+
+.js-notifications .all-notifications {
+  display: block;
+  text-align: center !important;
+  padding: 5px;
+  border-top: 1px solid #ccc;
+}
 </style>
 
 <div class="nav-links">
@@ -223,6 +325,16 @@ display: none
     % endif
   </div>
   <div class="secondary">
+    <div class="nav-item notifications-holder">
+      <a href="#" class="user-menu_item item-notifications js-user-notifications">
+        <i class="fa fa-bell-o" aria-hidden="true"></i>
+        <span class="js-new-notifications-count hidden"></span>
+      </a>
+      <div class="js-notifications" style="display: none;">
+        <div class="js-block-notifications"></div>
+        <a class="all-notifications" href="${reverse('lhub-notification-list')}">${_("See all notifications")}</a>
+      </div>
+    </div>
       <div class="cart-item-authenticated">
 	<a href="/commerce/basket-view/">
         <span class="notification_counter" id="cart_badge" style="display:none"></span>

@@ -2721,7 +2721,7 @@ INSTALLED_APPS = [
 
     # FAQ
     'lms.djangoapps.faq.apps.FaqApiConfig',
-    
+
     # Note
     'lms.djangoapps.note.apps.NoteApiConfig',
 
@@ -2772,6 +2772,8 @@ INSTALLED_APPS = [
 
     #LHUB Mobile APIs
     'lms.djangoapps.lhub_mobile.apps.LhubMobileConfig',
+
+    'lms.djangoapps.lhub_notification.apps.NotificationConfig',
 ]
 
 ######################### CSRF #########################################

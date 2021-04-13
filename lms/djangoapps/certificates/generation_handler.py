@@ -106,11 +106,17 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate an allowlist certificate for this user in this course run.
     """
-    if not _can_generate_allowlist_certificate(user, course_key):
-        log.info(f'Cannot generate an allowlist certificate for {user.id} : {course_key}')
-        return False
+    if _can_generate_allowlist_certificate(user, course_key):
+        return _generate_certificate_task(user, course_key, CertificateStatuses.downloadable, generation_mode)
 
-    return _generate_certificate_task(user, course_key, generation_mode)
+    status = _get_allowlist_cert_status(user, course_key)
+    if status is not None:
+        log.info(f'Cannot generate a {CertificateStatuses.downloadable} allowlist course certificate for {user.id} : '
+                 f'{course_key}. However a {status} certificate will be generated.')
+        return _generate_certificate_task(user, course_key, status, generation_mode)
+
+    log.info(f'Cannot generate an allowlist certificate for {user.id} : {course_key}')
+    return False
 
 
 def generate_regular_certificate_task(user, course_key, generation_mode=None):
@@ -118,14 +124,20 @@ def generate_regular_certificate_task(user, course_key, generation_mode=None):
     Create a task to generate a regular (non-allowlist) certificate for this user in this course run, if the user is
     eligible and a certificate can be generated.
     """
-    if not _can_generate_v2_certificate(user, course_key):
-        log.info(f'Cannot generate a v2 course certificate for {user.id} : {course_key}')
-        return False
+    if _can_generate_v2_certificate(user, course_key):
+        return _generate_certificate_task(user, course_key, CertificateStatuses.downloadable, generation_mode)
 
-    return _generate_certificate_task(user, course_key, generation_mode)
+    status = _get_v2_cert_status(user, course_key)
+    if status is not None:
+        log.info(f'Cannot generate a {CertificateStatuses.downloadable} course certificate for {user.id} : '
+                 f'{course_key}. However a {status} certificate will be generated.')
+        return _generate_certificate_task(user, course_key, status, generation_mode)
+
+    log.info(f'Cannot generate a v2 course certificate for {user.id} : {course_key}')
+    return False
 
 
-def _generate_certificate_task(user, course_key, generation_mode=None):
+def _generate_certificate_task(user, course_key, status, generation_mode=None):
     """
     Create a task to generate a certificate
     """
@@ -134,7 +146,8 @@ def _generate_certificate_task(user, course_key, generation_mode=None):
     kwargs = {
         'student': str(user.id),
         'course_key': str(course_key),
-        'v2_certificate': True
+        'v2_certificate': True,
+        'status': status
     }
     if generation_mode is not None:
         kwargs['generation_mode'] = generation_mode
@@ -237,6 +250,73 @@ def _can_generate_certificate_common(user, course_key):
         return False
 
     return True
+
+
+def _get_allowlist_cert_status(user, course_key):
+    """
+    Determine the allowlist certificate status for this user, in this course run.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if not is_using_certificate_allowlist(course_key):
+        return None
+
+    if not _is_on_certificate_allowlist(user, course_key):
+        return None
+
+    return _get_cert_status_common(user, course_key)
+
+
+def _get_v2_cert_status(user, course_key):
+    """
+    Determine the V2 certificate status for this user, in this course run.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if not _is_using_v2_course_certificates(course_key):
+        return None
+
+    return _get_cert_status_common(user, course_key)
+
+
+def _get_cert_status_common(user, course_key):
+    """
+    Determine the certificate status for this user, in this course run.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+    if enrollment_mode is None:
+        return None
+
+    if not modes_api.is_eligible_for_certificate(enrollment_mode):
+        return None
+
+    course = _get_course(course_key)
+    if not has_html_certificates_enabled(course):
+        return None
+
+    if CertificateInvalidation.has_certificate_invalidation(user, course_key):
+        # The invalidation list prevents certificate generation
+        status = CertificateStatuses.unavailable
+        log.info(f'{user.id} : {course_key} is on the certificate invalidation list. Certificate status will be '
+                 f'{status}.')
+        return status
+
+    if not _has_passing_grade(user, course):
+        status = CertificateStatuses.notpassing
+        log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate status will be {status}.')
+        return status
+
+    if not IDVerificationService.user_is_verified(user):
+        status = CertificateStatuses.unverified
+        log.info(f'{user.id} does not have a verified id. Certificate status for {course_key} will be {status}.')
+        return status
+
+    return None
 
 
 def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):

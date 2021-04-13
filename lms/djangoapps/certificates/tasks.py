@@ -14,6 +14,7 @@ from lms.djangoapps.certificates.generation import (
     generate_course_certificate,
     generate_user_certificates
 )
+from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.verify_student.services import IDVerificationService
 
 log = getLogger(__name__)
@@ -37,6 +38,7 @@ def generate_certificate(self, **kwargs):
             generating a certificate, in the off chance that the database
             has not yet updated with the user's new verification status.
         - v2_certificate: A flag indicating whether to generate a v2 course certificate
+        - status: CertificateStatuses value for the certificate, ex. CertificateStatuses.downloadable
         - generation_mode: Only used when emitting an event for V2 certificates. Options are "self" (implying the user
             generated the cert themself) and "batch" for everything else.
     """
@@ -46,9 +48,10 @@ def generate_certificate(self, **kwargs):
     expected_verification_status = kwargs.pop('expected_verification_status', None)
     v2_certificate = kwargs.pop('v2_certificate', False)
     generation_mode = kwargs.pop('generation_mode', 'batch')
+    status = kwargs.pop('status', CertificateStatuses.downloadable)
 
     if v2_certificate:
-        generate_course_certificate(user=student, course_key=course_key, generation_mode=generation_mode)
+        generate_course_certificate(user=student, course_key=course_key, status=status, generation_mode=generation_mode)
         return
 
     if expected_verification_status:

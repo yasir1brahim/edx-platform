@@ -33,6 +33,7 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
             mode='verified',
         )
         self.gen_mode = 'batch'
+        self.cert_status = CertificateStatuses.downloadable
 
     def test_generation(self):
         """
@@ -41,8 +42,8 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         certs = GeneratedCertificate.objects.filter(user=self.u, course_id=self.key)
         assert len(certs) == 0
 
-        generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
-        assert generated_cert.status, CertificateStatuses.downloadable
+        generated_cert = generate_course_certificate(self.u, self.key, self.cert_status, self.gen_mode)
+        assert generated_cert.status, self.cert_status
 
         certs = GeneratedCertificate.objects.filter(user=self.u, course_id=self.key)
         assert len(certs) == 1
@@ -73,8 +74,8 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         cert = GeneratedCertificate.objects.get(user=self.u, course_id=self.key)
         assert cert.error_reason == error_reason
 
-        generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
-        assert generated_cert.status, CertificateStatuses.downloadable
+        generated_cert = generate_course_certificate(self.u, self.key, self.cert_status, self.gen_mode)
+        assert generated_cert.status, self.cert_status
 
         cert = GeneratedCertificate.objects.get(user=self.u, course_id=self.key)
         assert cert.error_reason == ''
@@ -84,8 +85,8 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         Test that the `verify_uuid` value of a certificate does not change when it is revoked and re-awarded.
         """
         # Create user, a course run, and an enrollment
-        generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
-        assert generated_cert.status, CertificateStatuses.downloadable
+        generated_cert = generate_course_certificate(self.u, self.key, CertificateStatuses.unverified, self.gen_mode)
+        assert generated_cert.status, CertificateStatuses.unverified
 
         verify_uuid = generated_cert.verify_uuid
 
@@ -93,7 +94,7 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         assert generated_cert.status, CertificateStatuses.unavailable
         assert generated_cert.verify_uuid, verify_uuid
 
-        generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
+        generated_cert = generate_course_certificate(self.u, self.key, CertificateStatuses.downloadable, self.gen_mode)
         assert generated_cert.status, CertificateStatuses.downloadable
         assert generated_cert.verify_uuid, verify_uuid
 
@@ -101,6 +102,6 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         assert generated_cert.status, CertificateStatuses.notpassing
         assert generated_cert.verify_uuid, verify_uuid
 
-        generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
+        generated_cert = generate_course_certificate(self.u, self.key, CertificateStatuses.downloadable, self.gen_mode)
         assert generated_cert.status, CertificateStatuses.downloadable
         assert generated_cert.verify_uuid, verify_uuid

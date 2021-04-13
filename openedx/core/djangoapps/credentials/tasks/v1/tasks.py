@@ -76,7 +76,8 @@ def handle_notify_credentials(self, options, course_keys):
     try:
         site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
     except SiteConfiguration.DoesNotExist:
-        logger.error('No site configuration found for site %s', options['site'])
+        logger.exception('No site configuration found for site %s', options['site'])
+        return
 
     certs = get_recently_modified_certificates(
         course_keys, options['start_date'], options['end_date'], options['user_ids']

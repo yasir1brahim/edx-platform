@@ -122,11 +122,32 @@ class ProgressTabView(RetrieveAPIView):
 
         enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
 
-        course_grade = CourseGradeFactory().read(request.user, course)\
+        from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
+        # The block structure is used for both the grades and course_grade and has_scheduled content fields
+        # So call it upfront and pass it in for optimization purposes
+        collected_block_structure = get_block_structure_manager(course_key).get_collected()
+        course_grade = CourseGradeFactory().read(request.user, collected_block_structure=collected_block_structure)
+        from lms.djangoapps.course_blocks.transformers import start_date
+
+        from lms.djangoapps.course_blocks.api import get_course_blocks
+        from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+        transformers = BlockStructureTransformers()
+        transformers += [start_date.StartDateTransformer()]
+        course_blocks = get_course_blocks(
+            request.user,
+            collected_block_structure.root_block_usage_key,
+            transformers=transformers,
+            collected_block_structure=collected_block_structure,
+            include_has_scheduled_content=True
+        )
+        has_scheduled_content = collected_block_structure.get_transformer_block_field(
+            collected_block_structure.root_block_usage_key,
+            start_date.StartDateTransformer,
+            'has_scheduled_content',
+        )
 
         descriptor = modulestore().get_course(course_key)
         grading_policy = descriptor.grading_policy
-
         verification_status = IDVerificationService.user_status(request.user)
         verification_link = None
         if verification_status['status'] is None or verification_status['status'] == 'expired':
@@ -143,6 +164,7 @@ class ProgressTabView(RetrieveAPIView):
             'certificate_data': get_cert_data(request.user, course, enrollment_mode, course_grade),
             'completion_summary': get_course_blocks_completion_summary(course_key, request.user),
             'course_grade': course_grade,
+            'has_scheduled_content': has_scheduled_content,
             'section_scores': course_grade.chapter_grades.values(),
             'enrollment_mode': enrollment_mode,
             'grading_policy': grading_policy,

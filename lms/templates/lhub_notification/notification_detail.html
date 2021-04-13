@@ -1,0 +1,95 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="pagetitle">${_("Notification")}</%block>
+<%block name="bodyclass">view-notification</%block>
+
+<style>
+.lhub-notifications {
+  padding: 20px 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.lhub-notifications-page-title {
+  font: 700 20px/25px "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.lhub-notifications .back-link,
+.lhub-notifications .go-new-course {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.lhub-notifications .back-link {
+  margin-bottom: 15px;
+}
+
+.lhub-notifications .go-new-course {
+  margin-top: 15px;
+}
+
+.lhub-notifications p + p {
+  margin-top: 10px;
+}
+
+.notification-title {
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.notification-created-date {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.notification-item {
+  display: flex;
+}
+
+.notification-item + .notification-item {
+  border-top: 1px solid #ccc;
+}
+
+.lhub-img-holder {
+  min-width: 70px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  text-align: center;
+  margin-right: 30px;
+  font-size: 35px;
+  line-height: 70px;
+}
+</style>
+
+<main id="main" aria-label="Content" tabindex="-1">
+  <div class="lhub-notifications">
+    <div class="main-container">
+      <h2 class="lhub-notifications-page-title">${_("Notification")}</h2>
+      <a class="back-link" href="${reverse('lhub-notification-list')}">&laquo;${_("Go back")}</a>
+      <div class="notification-item">
+        <div class="lhub-img-holder">
+          <i class="fa fa-book" aria-hidden="true"></i>
+        </div>
+        <div class="notification-single-item-content">
+          <div class="notification-title">${notification.title}</div>
+          <div class="notification-created-date">${notification.created.strftime('%d/%m/%Y')}</div>
+          <div class="notification-message">${notification.message | n}</div>
+          % if notification.course:
+            <a class="go-new-course" href="${reverse('course_root', kwargs={'course_id': notification.course_id})}">
+              ${_("Click here to go your new course!")}
+            </a>
+          % endif
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

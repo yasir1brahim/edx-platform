@@ -208,6 +208,7 @@ urlpatterns = [
                                     namespace='api_discounts')),
     # LHUB MOBILE API
     url(r'^api/lhub_mobile/', include('lms.djangoapps.lhub_mobile.urls')),
+    url(r'^lhub/', include('lms.djangoapps.lhub_notification.urls')),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):

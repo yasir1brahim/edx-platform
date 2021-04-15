@@ -2774,6 +2774,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.lhub_mobile.apps.LhubMobileConfig',
 
     'lms.djangoapps.lhub_notification.apps.NotificationConfig',
+    'lms.djangoapps.lhub_extended_api.apps.LhubExtendedApiConfig',
 ]
 
 ######################### CSRF #########################################

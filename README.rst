@@ -44,12 +44,14 @@ components.
 Testing
 -------
 
-Official how-to documentation is located here: _docs. Following is a shortcut for getting started running tests in your local environment. 
+Following is a shortcut for getting started running tests in your local environment. 
 
 .. code-block:: bash
 
   # run python tests without compiling assets, but running migrations
   paver test_system -s lms --fasttest --enable-migrations --verbose --disable_capture
+
+Official Testing how-to documentation is located here: _docs. 
 
 .. _docs: https://github.com/edx/edx-platform/blob/master/docs/guides/testing/testing.rst
 

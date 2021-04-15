@@ -5,14 +5,6 @@ Grid Synergy edx-platform fork
      :target: https://lawrencemcdaniel.com
      :alt: Hack.d Lawrence McDaniel
 
-Technical contact:
-
-    Lawrence McDaniel
-
-    lpm0073@gmail.com
-
-    https://lawrencemcdaniel.com
-
 
 Developers
 ----------

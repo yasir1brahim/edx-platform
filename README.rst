@@ -51,9 +51,9 @@ Following is a shortcut for getting started running tests in your local environm
   # run python tests without compiling assets, but running migrations
   paver test_system -s lms --fasttest --enable-migrations --verbose --disable_capture
 
-Official Testing how-to documentation is located here: _docs. 
+Official Testing how-to documentation is located _here. 
 
-.. _docs: https://github.com/edx/edx-platform/blob/master/docs/guides/testing/testing.rst
+.. _here: https://github.com/edx/edx-platform/blob/master/docs/guides/testing/testing.rst
 
 
 Installation

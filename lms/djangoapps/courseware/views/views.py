@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Q, prefetch_related_objects
+from django.db.models import Q, prefetch_related_objects, Prefetch
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
@@ -328,7 +328,9 @@ def courses(request):
         return True
 
     courses_list = filter(filter_courses, courses_list)
-    categories = Category.objects.prefetch_related('subcategories')
+    categories = Category.objects\
+        .prefetch_related(Prefetch('subcategories', queryset=SubCategory.objects.order_by('name')))\
+                          .order_by('name')
     difficulty_levels = DifficultyLevel.objects.all()
     selected_category_name = ''
 

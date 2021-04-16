@@ -194,6 +194,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 }
                 else if (this.model.get('published_in_ecommerce') == true) {
                     this.$("#field-course-published-in-ecommerce").show();
+                    this.$("#field-link-of-ecommerce").show();
                     this.$("#published-in-ecommerce-retry").hide();
                     this.$("#retry-text").hide();
                     this.$('#' + this.fieldToSelectorMap.published_in_ecommerce).val("Yes");
@@ -296,6 +297,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                         $("#published-in-ecommerce-retry i.fa.fa-refresh").removeClass("fa-spin")
                         if (response['status'] == 'Success') {
                             $("#field-course-published-in-ecommerce").show();
+                            $("#field-link-of-ecommerce").show();
                             $("#published-in-ecommerce-retry").hide();
                             $("#retry-text").hide();
                             $('#' + self.fieldToSelectorMap.published_in_ecommerce).val("Yes");

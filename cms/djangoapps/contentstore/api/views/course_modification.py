@@ -47,12 +47,9 @@ def course_modification(request, course_id):
         update_published_in_ecommerce.published_in_ecommerce = True
         update_published_in_ecommerce.save()
        
-        # return True
-        # return Response(data)
         return Response({'status': 'Success'}, status=status.HTTP_200_OK)
+
     except (ConnectionError, SlumberBaseException, Timeout):
         log.exception('Failed to publish the course: %s',course_key)
-        # return False
-        # return Response(data)
-        return Response({'status': 'Failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'status': 'Failed'}, status=status.HTTP_200_OK)
 

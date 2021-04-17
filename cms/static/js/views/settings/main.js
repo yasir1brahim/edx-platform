@@ -284,12 +284,19 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 var course_id = $('#course-id').val();
                 var course_price = $("#course-course-price").val();
                 var course_name = $('#course-name').val();
+                var course_type = $('#course-course-sale-type').val();
+                if(course_type == 'Paid'){
+                    course_type = 'professional';
+                }else{
+                    course_type = 'audit';
+                }
+                console.log(">>>>>>>>>>>>>>>>>>>>",course_type)
                 var host = window.location.protocol + "//" + window.location.host;
                 $.ajax({
                     type: "POST",
                     url: host + "/api/courses/v2/modification/" + course_id + "/",
                     data: JSON.stringify({
-                        "course_type": 'Professional',
+                        "course_type": course_type,
                         "course_price": course_price,
                         "display_name": course_name
                     }),

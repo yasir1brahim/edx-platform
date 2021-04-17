@@ -285,12 +285,11 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 var course_price = $("#course-course-price").val();
                 var course_name = $('#course-name').val();
                 var course_type = $('#course-course-sale-type').val();
-                if(course_type == 'Paid'){
+                if(course_type == 'paid'){
                     course_type = 'professional';
                 }else{
                     course_type = 'audit';
                 }
-                console.log(">>>>>>>>>>>>>>>>>>>>",course_type)
                 var host = window.location.protocol + "//" + window.location.host;
                 $.ajax({
                     type: "POST",

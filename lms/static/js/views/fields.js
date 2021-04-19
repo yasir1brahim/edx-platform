@@ -297,7 +297,7 @@
             },
 
             render: function() {
-                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
+		 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
@@ -313,7 +313,19 @@
             },
 
             updateValueInField: function() {
-                this.$('.u-field-value ').text(this.modelValue());
+                var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? 'Unverified' : this.modelValue();
+                this.$('.u-field-value ').text(value);
+		this.$('.u-field-value ').css('font-size', '15px');
+		if (this.options.title == 'NRIC') {
+		    if (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) {
+			HtmlUtils.setHtml(this.$('.u-field-message-help'), "NRIC Not Available. Please click the link to retrieve NRIC:");
+		    }
+		    else {
+			HtmlUtils.setHtml(this.$('.u-field-message-help'), "Problems with NRIC Number? Please click the link below:");
+		    }
+		    HtmlUtils.append(this.$('.u-field-message'), HtmlUtils.HTML('<span class="u-field-message-help-nric-singpass"> <a href="#"> Singpass</a> </span>'));
+		    this.$('.u-field-message-help-nric-singpass ').css('display', 'block').css('text-decoration', 'underline').css('color', '#0075b4');
+                }
             }
         });
 
@@ -349,6 +361,7 @@
             }
         });
 
+
         FieldViews.TextFieldView = FieldViews.EditableFieldView.extend({
 
             fieldType: 'text',
@@ -374,6 +387,7 @@
                     placeholder: this.options.placeholder || ''
                 }));
                 this.delegateEvents();
+                this.updateValueInField();
                 return this;
             },
 
@@ -384,6 +398,12 @@
             updateValueInField: function() {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
                 this.$('.u-field-value input').val(value);
+                if (this.options.valueAttribute=="date_of_birth"){
+                  var attributes = {};
+                  var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
+                  attributes[this.options.valueAttribute] = value
+                  this.saveAttributes(attributes);
+                }
             },
 
             saveValue: function() {
@@ -486,6 +506,13 @@
                     value = this.options.placeholderValue || '';
                 }
                 this.$('.u-field-value-readonly').text(value);
+
+                if (this.options.valueAttribute==="industry"){
+                  var attributes = {};
+                  var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
+                  attributes[this.options.valueAttribute] = value
+                  this.saveAttributes(attributes);
+                }
 
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();

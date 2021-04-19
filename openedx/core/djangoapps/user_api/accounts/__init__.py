@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 BIO_MAX_LENGTH = 300
 
 # The minimum and maximum length for the name ("full name") account field
-NAME_MIN_LENGTH = 1
+NAME_MIN_LENGTH = 0
 NAME_MAX_LENGTH = 255
 
 # The minimum and maximum length for the username account field
@@ -94,3 +94,4 @@ REQUIRED_FIELD_CITY_MSG = _(u"Enter your city.")
 REQUIRED_FIELD_GOALS_MSG = _(u"Tell us your goals.")
 REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG = _(u"Select the highest level of education you have completed.")
 REQUIRED_FIELD_MAILING_ADDRESS_MSG = _(u"Enter your mailing address.")
+REQUIRED_FIELD_NRIC_MSG = "Enter your NRIC (required)"

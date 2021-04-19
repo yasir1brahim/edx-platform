@@ -732,7 +732,7 @@ def get_module_system_for_user(
 
     block_wrappers.append(partial(display_access_messages, user))
     block_wrappers.append(partial(course_expiration_wrapper, user))
-    block_wrappers.append(partial(offer_banner_wrapper, user))
+    #block_wrappers.append(partial(offer_banner_wrapper, user))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if is_masquerading_as_specific_student(user, course_id):

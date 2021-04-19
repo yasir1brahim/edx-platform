@@ -5,7 +5,7 @@ such as the site footer.
 
 This information exposed to:
 1) Templates in the LMS.
-2) Consumers of the branding API.
+2) Consumers of the branding API.	
 
 This ensures that branded UI elements such as the footer
 are consistent across the LMS and other sites (such as
@@ -27,6 +27,7 @@ from lms.djangoapps.branding.models import BrandingApiConfig
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from .toggles import app_logs_enabled
+from django.contrib.auth.models import User
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -575,6 +576,23 @@ def get_base_url(is_secure):
         is_secure (bool): If true, use HTTPS as the protocol.
     """
     return _absolute_url(is_secure=is_secure, url_path="")
+
+def get_organization_logo_url(username):
+    """
+    Return the url for the organization logo image that the user belongs to
+    Arguments:
+        username the login username
+    """
+    try:
+        user = User.objects.get(username=username)
+        organization = user.user_extra_info.organization
+        if organization:
+            return organization.logo
+        else:
+            return get_logo_url(is_secure)
+    except:
+        return get_logo_url()
+
 
 
 def get_logo_url(is_secure=True):

@@ -76,6 +76,9 @@ from django.utils.encoding import python_2_unicode_compatible
 from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from lms.djangoapps.lhub_mobile.models import MobileUserSessionCookie
+from django.contrib.auth.models import User
+from django.db.utils import IntegrityError
 
 log = getLogger(__name__)
 
@@ -129,6 +132,8 @@ class SafeCookieData(object):
 
         Raises SafeCookieError if session_id is None.
         """
+        log.info("******* USER ID **********")
+        log.info(user_id)
         cls._validate_cookie_params(session_id, user_id)
         safe_cookie_data = SafeCookieData(
             cls.CURRENT_VERSION,
@@ -137,6 +142,13 @@ class SafeCookieData(object):
             signature=None,
         )
         safe_cookie_data.sign(user_id)
+        if user_id:
+            user = User.objects.get(id=user_id)
+            try:
+                MobileUserSessionCookie.objects.filter(user=user).delete()
+                MobileUserSessionCookie.objects.create(user=user, session_cookie=safe_cookie_data)
+            except IntegrityError:
+                pass
         return safe_cookie_data
 
     @classmethod

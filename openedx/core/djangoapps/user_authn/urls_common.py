@@ -15,7 +15,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib.auth.views import PasswordResetCompleteView
 
-from .views import auto_auth, login, logout, password_reset, register
+from .views import auto_auth, login, logout, password_reset, mobile_password_reset, register, mobile_register
 from .views.password_reset import PasswordResetConfirmWrapper
 
 urlpatterns = [
@@ -26,9 +26,11 @@ urlpatterns = [
     # `user_api` prefix is preserved for backwards compatibility.
     url(r'^user_api/v1/account/registration/$', register.RegistrationView.as_view(),
         name="user_api_registration"),
+    url(r'^user_api/v2/account/registration/$', mobile_register.RegistrationView.as_view(),
+        name="user_api_registration_v2"),
 
     # V2 is created to avoid backward compatibility issue with confirm_email
-    url(r'^user_api/v2/account/registration/$', register.RegistrationView.as_view(),
+    url(r'^user_api/v3/account/registration/$', register.RegistrationView.as_view(),
         name="user_api_registration_v2"),
 
     # Moved from user_api/urls.py
@@ -38,6 +40,11 @@ urlpatterns = [
         register.RegistrationValidationView.as_view(),
         name='registration_validation'
     ),
+    url(
+        r'^api/user/v2/validation/registration$',
+        mobile_register.RegistrationValidationView.as_view(),
+        name='registration_validation_v2'
+    ),
 
     url(r'^login_ajax$', login.login_user, name="login_api"),
 
@@ -45,6 +52,9 @@ urlpatterns = [
     # `user_api` prefix is preserved for backwards compatibility.
     url(r'^user_api/v1/account/login_session/$', login.LoginSessionView.as_view(),
         name="user_api_login_session"),
+
+    url(r'^user_api/v2/account/login_session/$', login.LoginSessionCustomView.as_view(),
+        name="user_api_login_session_custom"),
 
     # Login Refresh of JWT Cookies
     url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
@@ -74,6 +84,8 @@ urlpatterns = [
         password_reset.password_reset_logistration,
         name='logistration_password_reset',
     ),
+    url(r'^user_api/v2/account/password_reset$', mobile_password_reset.password_change_request_handler, name='password_change_request_v2'),
+    url(r'^user_api/v1/account/migrate$', register.MigrateUserView.as_view(), name='migrate_user'),
 ]
 
 # password reset django views (see above for password reset views)

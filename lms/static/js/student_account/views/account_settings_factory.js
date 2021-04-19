@@ -28,6 +28,7 @@
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
             extendedProfileFields,
+	    courseOverviewCategory,
             displayAccountDeletion,
             isSecondaryEmailFeatureEnabled,
             betaLanguage
@@ -225,15 +226,6 @@
                             })
                         },
                         {
-                            view: new AccountSettingsFieldViews.DropdownFieldView({
-                                model: userAccountModel,
-                                title: gettext('Year of Birth'),
-                                valueAttribute: 'year_of_birth',
-                                options: fieldsData.year_of_birth.options,
-                                persistChanges: true
-                            })
-                        },
-                        {
                             view: new AccountSettingsFieldViews.LanguageProficienciesFieldView({
                                 model: userAccountModel,
                                 title: gettext('Preferred Language'),
@@ -241,7 +233,36 @@
                                 options: fieldsData.preferred_language.options,
                                 persistChanges: true
                             })
+                        },
+                        {
+                            view: new AccountSettingsFieldViews.ReadonlyFieldView({
+                                model: userAccountModel,
+                                title: gettext('NRIC'),
+                                valueAttribute: 'nric',
+                                persistChanges: true
+                            })
+                        },
+                        {
+                            view: new AccountSettingsFieldViews.TextFieldView({
+                                model: userAccountModel,
+                                title: gettext('Date of birth'),
+                                valueAttribute: 'date_of_birth',
+                                placeholder: 'YYYY-MM-DD',
+                                required: true,
+                                persistChanges: true
+                            })
+                        },
+                        {
+                            view: new AccountSettingsFieldViews.DropdownFieldView({
+                                model: userAccountModel,
+                                title: gettext('Industry'),
+                                valueAttribute: 'industry',
+                                options: courseOverviewCategory,
+                                persistChanges: true
+                            })
                         }
+
+
                     ]
                 }
             ];

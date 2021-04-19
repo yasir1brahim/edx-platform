@@ -8,6 +8,7 @@ DiscountRestrictionConfig Models
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 
@@ -47,7 +48,10 @@ class DiscountPercentageConfig(StackedConfigurationModel):
     A ConfigurationModel to configure the discount percentage for the first purchase discount
     """
     STACKABLE_FIELDS = ('percentage',)
-    percentage = models.PositiveIntegerField()
+    percentage = models.PositiveIntegerField(validators=[
+            MaxValueValidator(100),
+            MinValueValidator(1)
+        ])
 
     def __str__(self):
         return "DiscountPercentageConfig(enabled={!r},percentage={!r})".format(

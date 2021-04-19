@@ -5,7 +5,7 @@ authorization has authorization to do so, which infers authorization via role hi
 to decide whether to check course creator role, and other such functions.
 """
 
-
+import logging
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -23,6 +23,7 @@ from common.djangoapps.student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole
 )
+from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 
 # Studio permissions:
 STUDIO_EDIT_ROLES = 8
@@ -31,7 +32,6 @@ STUDIO_EDIT_CONTENT = 2
 STUDIO_VIEW_CONTENT = 1
 STUDIO_NO_PERMISSIONS = 0
 # In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself
-
 
 def is_ccx_course(course_key):
     """
@@ -86,17 +86,19 @@ def get_user_permissions(user, course_key, org=None):
         return STUDIO_NO_PERMISSIONS
     all_perms = STUDIO_EDIT_ROLES | STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # global staff, org instructors, and course instructors have all permissions:
-    if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
+    if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user) or (_get_course_creator_status(user) == 'granted' and OrgInstructorRole(org=org).has_same_organization(user)):
         return all_perms
     if course_key and user_has_role(user, CourseInstructorRole(course_key)):
         return all_perms
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
+
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
     if course_key and isinstance(course_key, LibraryLocator):
         if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
+
     return STUDIO_NO_PERMISSIONS
 
 
@@ -177,3 +179,30 @@ def _check_caller_authority(caller, role):
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
         if not user_has_role(caller, CourseInstructorRole(role.course_key)):
             raise PermissionDenied
+
+
+def _get_course_creator_status(user):
+    """
+    Helper method for returning the course creator status for a particular user,
+    taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
+
+    If the user passed in has not previously visited the index page, it will be
+    added with status 'unrequested' if the course creator group is in use.
+    """
+
+    if user.is_staff:
+        course_creator_status = 'granted'
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
+        course_creator_status = 'disallowed_for_this_site'
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        course_creator_status = get_course_creator_status(user)
+        if course_creator_status is None:
+            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
+            # Add the user to the course creator admin table with status 'unrequested'.
+            add_user_with_status_unrequested(user)
+            course_creator_status = get_course_creator_status(user)
+    else:
+        course_creator_status = 'granted'
+
+    return course_creator_status
+

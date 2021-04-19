@@ -48,10 +48,14 @@ from common.djangoapps import third_party_auth
 from common.djangoapps.track import segment
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password
+from openedx.core.lib.api.authentication import BearerAuthentication
+from rest_framework import permissions
+from django.contrib.sessions.models import Session
+from django.contrib.auth import logout
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
-
+permission_classes = (permissions.IsAuthenticated,)
 
 def _do_third_party_auth(request):
     """
@@ -553,6 +557,8 @@ class LoginSessionView(APIView):
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
+        for key in list(request.session.keys()):
+            del request.session[key]
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")
 
     @method_decorator(require_post_params(["email", "password"]))
@@ -575,6 +581,22 @@ class LoginSessionView(APIView):
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
         return super(LoginSessionView, self).dispatch(request, *args, **kwargs)
+
+
+class LoginSessionCustomView(APIView):
+
+    authentication_classes = (BearerAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request):
+        logout(request)
+        return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")
+
+    @method_decorator(require_post_params(["email", "password"]))
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        return login_user(request)
 
 
 def _parse_analytics_param_for_course_id(request):

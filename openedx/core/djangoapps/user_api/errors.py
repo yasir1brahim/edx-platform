@@ -62,6 +62,13 @@ class AccountCountryInvalid(AccountRequestError):
     """The requested country does not exist. """
     pass
 
+class AccountNricInvalid(AccountRequestError):
+    """The requested country does not exist. """
+    pass
+
+class AccountPhoneNumberInvalid(AccountRequestError):
+    """The requested phone number is invalid. """
+    pass
 
 class AccountDataBadLength(AccountRequestError):
     """The requested account data is either too short or too long. """

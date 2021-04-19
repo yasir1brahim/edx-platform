@@ -11,6 +11,8 @@ from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
+USE_BOOTSTRAP_FLAG=True
+
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 

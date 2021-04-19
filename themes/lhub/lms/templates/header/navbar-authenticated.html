@@ -1,0 +1,376 @@
+## mako
+
+<%page expression_filter="h" args="online_help_token"/>
+
+<%namespace name='static' file='../static_content.html'/>
+<%namespace file='../main.html' import="login_query"/>
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+%>
+
+<%
+  show_explore_courses = settings.FEATURES.get('COURSES_ARE_BROWSABLE')
+  show_sysadmin_dashboard = settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff
+  self.real_user = getattr(user, 'real_user', user)
+
+  support_link = configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
+  doc_link = get_online_help_info(online_help_token)['doc_url']
+
+  if online_help_token == "instructor":
+    help_link = doc_link
+  elif support_link:
+    help_link = support_link
+  else:
+    help_link = doc_link
+%>
+
+<%
+curl = request.path
+xblock = curl.split('/')[1]
+%>
+
+%if user.is_authenticated:
+    <%static:require_module module_name="js/lhub/notifications" class_name="LhubNotifications">
+    LhubNotifications({url: "${reverse('notification-list')}"});
+    </%static:require_module>
+% endif
+
+<style>
+@media (max-width: 991px){
+.cart-item-authenticated {
+position: absolute;
+right: 3%;
+top: 12%;
+}
+}
+@media (min-width: 992px){
+.global-header .nav-links .secondary .cart-item-authenticated {
+        display: inline-block;
+        margin-right: 18px;
+        position: relative;
+}
+
+.global-header .nav-links .secondary .cart-item-authenticated img {
+        width: 32px;
+}
+header.global-header .main-header .main .nav-item.nav-tab .tab-nav-link {
+padding: 10px;
+margin-right: 15px !important;
+font-size: 14px;
+padding-right: 0px;
+padding-left: 0px;
+}
+}
+@media only screen and (min-device-width : 992px) and (max-device-width : 1320px) {
+
+.global-header .header-logo a .logo {
+height: 45px !important;
+margin: 20px 0px 20px 20px;
+}
+.global-header form {
+margin-left: 4%;
+width: 30%;
+}
+.global-header .category-block a.category-item {
+font-size: 12px;
+margin-top: 20px;
+}
+
+.global-header form.search-foam button.search-btn {
+padding: 7px 20px;
+font-size: 14px;
+}
+
+header.global-header .main-header .main .nav-item.nav-tab .tab-nav-link {
+font-size: 14px;
+margin-right: 10px;
+padding: 10px 0px;
+}
+
+
+.global-header .header-logo a {
+margin: 15px 0 0 20px;
+
+}
+header.global-header .main-header .main {
+margin-top: 40px;
+margin-left: 3%;
+}
+.global-header .nav-links .secondary .user-image-frame {
+width: 35px;
+
+}
+
+.global-header .nav-links .secondary .nav-item a.help-link {
+font-size: 14px;
+}
+
+.global-header .nav-links .secondary {
+margin: 35px 0px 0 0;
+}
+.global-header .nav-links .secondary .mobile-nav-item, .global-header .nav-links .secondary .nav-item {
+margin: 0px;
+}
+}
+@media (min-width: 992px) {
+.global-header .nav-links .secondary .nav-item a.help-link {
+    color: #ffffff !important;
+}
+#user-menu .dropdown-item a {
+    color: #1a345c !important;
+    font-weight: 600 !important;
+}
+.global-header .nav-links .secondary .nav-item a {
+color: #ffffff;
+font-weight: 600;
+padding: 0px;
+}
+.global-header .nav-links .secondary span.username {
+display: none;
+}
+.global-header .nav-links .secondary .user-image-frame {
+border-radius: 50px;
+width: 50px;
+border: 3px solid #ffffff;
+margin: -10px 0px;
+}
+.global-header .nav-links .secondary {
+margin: 35px 40px 0 0;
+}
+.global-header .nav-links .secondary .dropdown-user-menu {
+box-shadow: 0px 0px 6px 2px #6d6d6d91;
+border: none;
+border-radius: 6px;
+right: 45px;
+top: 105px;
+max-width: 200px !important;
+width: 100% !important;
+}
+
+.global-header .nav-links .secondary .nav-item a {
+width: 100% !important;
+color: #18355e;
+text-align: center;
+border-radius: 0px;
+font-size: 14px;
+font-weight: 600 !important;
+padding: 12px 0px !important;
+}
+
+
+#user-menu .dropdown-item a:hover {
+background: #18355e !important;
+color: white !important;
+}
+
+.global-header .nav-links .secondary .nav-item a:hover .global-header .nav-links .secondary .dropdown-user-menu .dropdown-item:after {
+background: transparent;
+}
+}
+
+.notification_counter {
+position: absolute;
+left: 23px;
+background: red;
+color: #fff;
+border-radius: 50%;
+line-height: 1.6;
+width: 18px;
+height: 18px;
+text-align: center;
+font-size: 11px;
+top: -5px;
+}
+
+% if xblock == "xblock":
+header{
+display:none
+}
+.wrapper-footer{
+display: none
+}
+% endif
+
+/* lhub notifications */
+
+.notifications-holder {
+  position: relative;
+  padding: 0 !important;
+  margin-right: 20px !important;
+  position: relative;
+  top: 7px;
+}
+
+.js-user-notifications {
+  color: #fff !important;
+  display: block;
+  position: relative;
+  padding: 0 !important;
+}
+
+.js-block-notifications .loading {
+  padding: 5px;
+  text-align: center;
+}
+
+.js-user-notifications .fa {
+  font-size: 25px;
+}
+
+.js-new-notifications-count {
+  display: block;
+  position: absolute;
+  top: 3px;
+  right: -9px;
+  background: red;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.js-notifications {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, .5);
+  color: #000;
+  width: 250px;
+  z-index: 100;
+}
+
+.js-block-notifications {
+  overflow: auto;
+  max-height: 270px;
+}
+
+.js-notifications-item {
+  padding: 8px 22px;
+  text-align: left !important;
+  font-size: 14px;
+  border-top: 1px solid #ccc;
+  position: relative;
+}
+
+.js-notifications-item.new-notification:before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2b78e4;
+  position: absolute;
+  left: 8px;
+  top: 15px;
+}
+
+.js-notifications a {
+  display: block;
+  height: auto !important;
+  text-align: left !important;
+}
+
+.js-notifications a:hover {
+  opacity: .8;
+}
+
+.global-header .nav-links .secondary .nav-item .js-notifications-item a {
+  padding: 5px 0 !important;
+}
+
+.js-notifications .all-notifications {
+  display: block;
+  text-align: center !important;
+  padding: 5px;
+  border-top: 1px solid #ccc;
+}
+</style>
+
+<div class="nav-links">
+  <div class="main">
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
+             aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
+             ${_("Courses")}
+        </a>
+      </div>
+     % if show_dashboard_tabs:
+      % if show_program_listing:
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}"
+             aria-current="${'page' if reverse('program_listing_view') == request.path else 'false'}">
+             ${_("Programs")}
+          </a>
+        </div>
+      % endif
+    % endif
+    % if show_explore_courses:
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active ' if "/courses" in request.path else ''} tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
+             aria-current="${'page' if '/courses' in request.path else 'false'}">
+             ${_('Discover New')}
+          </a>
+      </div>
+    % endif
+    % if show_sysadmin_dashboard:
+      <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+        ## Translators: This is short for "System administration".
+        <a class="tab-nav-link" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
+      </div>
+    % endif
+  </div>
+  <div class="secondary">
+    <div class="nav-item notifications-holder">
+      <a href="#" class="user-menu_item item-notifications js-user-notifications">
+        <i class="fa fa-bell-o" aria-hidden="true"></i>
+        <span class="js-new-notifications-count hidden"></span>
+      </a>
+      <div class="js-notifications" style="display: none;">
+        <div class="js-block-notifications"></div>
+        <a class="all-notifications" href="${reverse('lhub-notification-list')}">${_("See all notifications")}</a>
+      </div>
+    </div>
+      <div class="cart-item-authenticated">
+	<a href="/commerce/basket-view/">
+        <span class="notification_counter" id="cart_badge" style="display:none"></span>
+        <img class="cart-icon-img" src="${static.url('/static/lhub/images/cart.png')}" alt="cart_icon"/>
+	</a>
+      </div>
+    <div class="mobile-nav-item hidden-mobile nav-item">
+      <a class="help-link" href="${help_link}" rel="noopener" target="_blank">${_("Help")}</a>
+    </div>
+    <%include file="user_dropdown.html"/>
+  </div>
+</div>
+
+
+
+
+<script>
+
+function getNumberOfItemInCart(){
+    $.ajax({
+        url: '/api/stripe/basket/count_item/',
+        success: function(data){
+            number_of_item = data['result']['number_of_item']
+            if(number_of_item > 0){
+                cart_badge = $('#cart_badge').show()
+                cart_badge.text(number_of_item)
+            }
+            else{
+                $('#cart_badge').css('display','none');
+            }
+        }
+    });
+    setTimeout(getNumberOfItemInCart, 4000);
+}
+
+$(document).ready(function(){
+    setTimeout(getNumberOfItemInCart, 4000);
+});
+</script>

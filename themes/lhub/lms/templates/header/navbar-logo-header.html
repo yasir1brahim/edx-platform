@@ -1,0 +1,447 @@
+## mako
+
+<%page expression_filter="h" args="online_help_token"/>
+
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from lms.djangoapps.ccx.overrides import get_current_ccx
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+# App that handles subdomain specific branding
+from branding import api as branding_api
+%>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+@media only screen and (min-device-width : 992px) and (max-device-width : 1200px) {
+
+.global-header .header-logo a .logo {
+height: 45px !important;
+margin: 20px 0px 20px 20px;
+}
+.global-header .header-logo a .logo {
+height: 45px !important;
+margin: 20px 0px 20px 20px;
+}
+.global-header form {
+margin-left: 4%;
+width: 30%;
+}
+.global-header .category-block a.category-item {
+font-size: 14px;
+margin-top: 20px;
+}
+
+.global-header form.search-foam button.search-btn {
+padding: 7px 20px;
+font-size: 14px;
+}
+
+.global-header .nav-links .secondary .nav-item a {
+font-size: 14px;
+padding: 12px 15px;
+}
+.global-header .nav-links .secondary .cart-item {
+margin-right: 0%;
+}
+}
+@media (min-width: 992px){
+header.global-header .main-header .main {
+    margin-top: 40px;
+    margin-left: 35px;
+}
+header.global-header .main-header .main .nav-item.nav-tab .tab-nav-link {
+padding: 10px;
+margin-right: 20px;
+}
+header.global-header .main-header .main .nav-item.nav-tab a.active.tab-nav-link, header.global-header .main-header .main .nav-item.nav-tab .tab-nav-link:hover {
+border-bottom: 2px solid #ffffff;
+}
+.global-header .header-logo .course-header {
+    display: none;
+}
+.global-header {
+    background-color: #1a345c;
+}
+.global-header .nav-links .secondary {
+    color: white !important;
+}
+.global-header .nav-links .main .nav-tab a {
+    color: white !important;
+}
+.global-header .header-logo a .logo {
+    height: 50px !important;
+    margin: 20px;
+}
+
+.global-header .nav-links .secondary .nav-item .register-btn {
+	background: #ffffff;
+	color: #1a345c;
+	border: none;
+}
+
+.global-header .nav-links .secondary .nav-item a {
+	border-radius: 12px;
+	padding: 10px 25px;
+}
+
+.global-header .nav-links .secondary .nav-item a:hover {
+	transition: 0.5s;
+}
+
+.global-header .nav-links .secondary a.sign-in-btn {
+	background: none !important;
+	border: 2px solid #ffffff;
+}
+
+.global-header .nav-links .secondary {
+	margin: 38px 40px 0 0;
+}
+header.global-header .main-header .main .nav-item:last-child a  {
+    margin: 0px !important;
+}
+.global-header .nav-links .secondary .nav-item .register-btn:hover {
+	background: #ffffff;
+	color: #1a345c;
+}
+
+.global-header .nav-links .secondary a.sign-in-btn:hover {
+	background: #ffffff !important;
+	border: 2px solid #ffffff;
+	color: #1a345c;
+}
+
+.global-header .nav-links .secondary .cart-item {
+	display: inline-block;
+	margin-right: 18px;
+}
+
+.global-header .nav-links .secondary .cart-item img {
+	width: 32px;
+}
+.global-header .category-block, .global-header form.search-foam {
+    display: inline;
+    float: left;
+    margin-top: 35px;
+}
+.global-header .category-block a.category-item {
+    color: #ffffff;
+    margin-left: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 15px;
+    display: block;
+}
+.global-header form {
+    margin-left: 5%;
+    width: 30%;
+    position: relative !important;
+}
+.global-header form.search-foam input {
+    outline: none !important;
+    border: none !important;
+    font-family: 'Poppins';
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%;
+    padding-left: 40px;
+    height: 48px;
+    border-radius: 25px;
+}
+.global-header form.search-foam img {
+    position: absolute;
+    width: 18px;
+    top: 16px;
+    left: 15px;
+}
+.global-header form.search-foam input::placeholder {
+color: #c0c0c0;
+font-style: normal;
+}
+
+.global-header form.search-foam input button {
+position: absolute;
+}
+
+.global-header form.search-foam input button {
+position: absolute;
+float: left;
+display: block;
+top: 0px;
+}
+
+.global-header form.search-foam button.search-btn {
+background: #5678a9;
+position: absolute;
+top: 5px;
+right: 7px;
+padding: 7px 40px;
+font-weight: 600;
+border: none;
+border-radius: 25px;
+}
+}
+@media (max-width: 991px){
+header.global-header {
+background: #18355e;
+border: none;
+}
+.global-header .hamburger-menu .line {
+color: #ffffff !important;
+background: #ffffff !important;
+outline: none !important;
+border: none !important;
+}
+.global-header .main-header {
+/*height: 165px;*/
+display: flex;
+align-items: center;
+position: relative;
+width: 100%;
+}
+.global-header .category-block, .global-header form.search-foam {
+display: block;
+float: left;
+}
+
+.global-header .category-block {
+width: 100%;
+text-align: center;
+padding: 12px 0px;
+}
+
+.global-header form.search-foam {
+width: 96%;
+position: relative;
+margin: 0px auto !important;
+margin-left: 2% !important;
+}
+.global-header .category-block a {
+color: #ffffff !important;
+text-decoration: none;
+font-weight: 500;
+}
+.global-header .cart-item {
+position: absolute;
+right: 20px;
+top: 20px;
+}
+
+.global-header .cart-item img {
+width: 30px;
+}
+
+.global-header .mobile-menu .mobile-nav-link a {
+color: #18355e !important;
+text-decoration: none;
+font-weight: 600 !important;
+}
+.mobile-menu .mobile-nav-link a:hover, .mobile-menu .mobile-nav-link a:focus {
+background: #18355e !important;
+color: #ffffff !important;
+}
+.global-header form.search-foam input {
+outline: none !important;
+border: none !important;
+font-family: 'Poppins';
+font-size: 14px;
+font-weight: 600;
+width: 100%;
+padding-left: 40px;
+height: 48px;
+border-radius: 25px;
+}
+
+.global-header form.search-foam img {
+position: absolute;
+width: 18px;
+top: 16px;
+left: 15px;
+}
+.global-header form.search-foam button.search-btn {
+background: #5678a9;
+position: absolute;
+top: 5px;
+right: 7px;
+padding: 7px 40px;
+font-weight: 600;
+border: none;
+border-radius: 25px;
+}
+}
+
+.global-header {
+    overflow: visible !important;
+}
+
+.global-header:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.category-block {
+    position: relative;
+    width: 300px;
+}
+
+.category-block .category-item span {
+    display: block;
+    font-size: 12px;
+}
+
+.category-block .nav-categories {
+    list-style:none;
+    position: absolute;
+    left: 20px;
+    top: 100%;
+    width: 300px;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    z-index: 100;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: opacity 0.1s linear, transform 0.15s linear, visibility 0s linear 0.25s;
+}
+
+.category-block:hover .nav-categories {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.25s linear, transform 0.15s linear, visibility 0s linear 0s;
+}
+
+.category-block .nav-categories li {
+    color: #000;
+    position: relative;
+    padding: 7px 15px;
+    cursor: pointer;
+}
+
+.category-block .nav-categories li.has-child:before {
+    content: "\f054";
+    font-family: FontAwesome;
+    color: #000;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+}
+
+.category-block .nav-categories li:hover {
+    background: rgba(26, 52, 92, .1);
+}
+
+.category-block .nav-categories li ul {
+    list-style: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    width: 300px;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: opacity 0.1s linear, transform 0.15s linear, visibility 0s linear 0.25s;
+}
+
+.category-block .nav-categories li ul li {
+    cursor: pointer;
+}
+
+.category-block .nav-categories li ul li:hover {
+    background: rgba(26, 52, 92, .1);
+}
+
+.category-block .nav-categories li:hover > ul {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+    transition: opacity 0.25s linear, transform 0.15s linear, visibility 0s linear 0s;
+}
+</style>
+
+<h1 class="header-logo">
+  <a href="${branding_api.get_home_url()}">
+    <%block name="navigation_logo">
+   <!-- <img  class="logo" src="${branding_api.get_logo_url(user.username)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/> -->
+    % if branding_api.get_organization_logo_url(user.username):
+    <img  class="logo" src="${branding_api.get_organization_logo_url(user.username)}" alt=""/>
+    % else:
+     <img  class="logo" src="${branding_api.get_logo_url(user.username)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+    % endif
+    </%block>
+  </a>
+  % if course:
+    <div class="course-header">
+      <span class="provider">${course.display_org_with_default}:</span>
+      <span class="course-number">${course.display_number_with_default}</span>
+      <%
+      display_name = course.display_name_with_default
+      if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+        ccx = get_current_ccx(course.id)
+        if ccx:
+          display_name = ccx.display_name
+      %>
+      <span class="course-name">${display_name}</span>
+    </div>
+  % endif
+</h1>
+
+% if request.path in ["/", "/courses", "/courses/"]:
+<div class="category-block">
+    <a class="category-item" href="">${_("Categories")} <span>${selected_category_name}</span></a>
+    <ul class="nav-categories">
+        % for category in categories:
+        <li data-category-id="${category.id}" class="js-select-category ${'has-child' if category.subcategories.all() else ''}">
+            ${category.name}
+            <ul>
+                % for subcategory in category.subcategories.all():
+                <li data-subcategory-id="${subcategory.id}" class="js-select-subcategory">
+                    ${subcategory.name}
+                </li>
+                % endfor
+            </ul>
+        </li>
+        % endfor
+        <li class="js-reset-category">${_("All")}</li>
+    </ul>
+</div>
+
+<form class="search-foam">
+  <img src="${static.url('/static/lhub/images/search-icon.png')}" alt="search-icon" border="0">
+  <input type="text" placeholder="Search.." name="search">
+  <button class="search-btn" type="">GO</button>
+</form>
+%endif
+
+% if "/about" in request.path:
+ % if request.user.is_anonymous:
+<form class="search-foam">
+  <img src="${static.url('/static/lhub/images/search-icon.png')}" alt="search-icon" border="0">
+  <input type="text" placeholder="Search.." name="search">
+  <button class="search-btn" type="">GO</button>
+</form>
+ %endif
+%endif
+
+
+
+% if enable_enterprise_sidebar:
+  <div class="enterprise-tagline">
+    <% tagline = configuration_helpers.get_value('ENTERPRISE_TAGLINE', settings.ENTERPRISE_TAGLINE) %>
+    % if tagline:
+      ${tagline}
+    % endif
+  </div>
+% endif

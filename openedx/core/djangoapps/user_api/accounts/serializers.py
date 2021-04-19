@@ -22,6 +22,10 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from common.djangoapps.student.models import LanguageProficiency, SocialLink, UserProfile
+import importlib
+custom_reg_form = importlib.import_module('lms.djangoapps.custom-form-app', 'custom_reg_form')
+from custom_reg_form.models import UserExtraInfo
+from openedx.core.djangoapps.content.course_overviews.models import Category
 
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY,
@@ -113,8 +117,10 @@ class UserReadOnlySerializer(serializers.Serializer):
         """
         try:
             user_profile = user.profile
+            user_extra_info = user.user_extra_info
         except ObjectDoesNotExist:
             user_profile = None
+            user_extra_info = None
             LOGGER.warning(u"user profile for the user [%s] does not exist", user.username)
 
         try:
@@ -185,6 +191,15 @@ class UserReadOnlySerializer(serializers.Serializer):
                 }
             )
 
+        if user_extra_info:
+            data.update(
+                {
+                    "nric": user_extra_info.nric,
+                    "industry": getattr(user_extra_info.industry, 'id', None),
+                    "date_of_birth": user_extra_info.date_of_birth,
+                }
+            )
+
         if is_secondary_email_feature_enabled():
             data.update(
                 {
@@ -243,6 +258,18 @@ class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFiel
         read_only_fields = fields
         explicit_read_only_fields = ()
 
+
+class AccountUserExtraInfoSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):
+    """
+    Class that serializes the portion of User model needed for account information.
+    """
+    industry = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), required=False)
+
+    class Meta(object):
+        model = UserExtraInfo
+        fields = ("nric","industry","date_of_birth")
+        # read_only_fields = ("nric","industry")
+        explicit_read_only_fields = ()
 
 class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):
     """
@@ -580,3 +607,141 @@ def _visible_fields_from_custom_preferences(user, configuration):
         if preferences.get('{}{}'.format(VISIBILITY_PREFIX, field_name)) == 'all_users'
     ]
     return set(fields_shared_with_all_users + configuration.get('public_fields'))
+
+
+class UserExtraFieldReadOnlySerializer(serializers.Serializer):
+    """
+    Class that serializes the User model and UserProfile model together.
+    """
+    def __init__(self, *args, **kwargs):
+        # Don't pass the 'configuration' arg up to the superclass
+        self.configuration = kwargs.pop('configuration', None)
+        if not self.configuration:
+            self.configuration = settings.ACCOUNT_VISIBILITY_CONFIGURATION
+
+        # Don't pass the 'custom_fields' arg up to the superclass
+        self.custom_fields = kwargs.pop('custom_fields', [])
+
+        super(UserExtraFieldReadOnlySerializer, self).__init__(*args, **kwargs)
+
+    def to_representation(self, user):
+        """
+        Overwrite to_native to handle custom logic since we are serializing three models as one here
+        :param user: User object
+        :return: Dict serialized account
+        """
+        user_extra_info = None
+        try:
+            user_profile = user.profile
+            user_extra_info = user.user_extra_info
+        except ObjectDoesNotExist:
+            user_profile = None
+            LOGGER.warning(u"user profile for the user [%s] does not exist", user.username)
+
+        try:
+            account_recovery = user.account_recovery
+        except ObjectDoesNotExist:
+            account_recovery = None
+
+        accomplishments_shared = badges_enabled()
+
+        data = {
+            "username": user.username,
+            "url": self.context.get('request').build_absolute_uri(
+                reverse('accounts_api', kwargs={'username': user.username})
+            ),
+            "email": user.email,
+            # For backwards compatibility: Tables created after the upgrade to Django 1.8 will save microseconds.
+            # However, mobile apps are not expecting microsecond in the serialized value. If we set it to zero the
+            # DRF JSONEncoder will not include it in the serialized value.
+            # https://docs.djangoproject.com/en/1.8/ref/databases/#fractional-seconds-support-for-time-and-datetime-fields
+            "date_joined": user.date_joined.replace(microsecond=0),
+            "is_active": user.is_active,
+            "bio": None,
+            "country": None,
+            "state": None,
+            "profile_image": None,
+            "language_proficiencies": None,
+            "name": None,
+            "gender": None,
+            "goals": None,
+            "year_of_birth": None,
+            "level_of_education": None,
+            "mailing_address": None,
+            "requires_parental_consent": None,
+            "accomplishments_shared": accomplishments_shared,
+            "account_privacy": self.configuration.get('default_visibility'),
+            "social_links": None,
+            "extended_profile_fields": None,
+            "phone_number": None,
+        }
+
+        if user_profile:
+            data.update(
+                {
+                    "bio": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.bio),
+                    "country": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.country.code),
+                    "state": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.state),
+                    "profile_image": AccountLegacyProfileSerializer.get_profile_image(
+                        user_profile, user, self.context.get('request')
+                    ),
+                    "language_proficiencies": LanguageProficiencySerializer(
+                        user_profile.language_proficiencies.all().order_by('code'), many=True
+                    ).data,
+                    "name": user_profile.name,
+                    "gender": AccountLegacyProfileSerializer.convert_empty_to_None(user_profile.gender),
+                    "goals": user_profile.goals,
+                    "year_of_birth": user_profile.year_of_birth,
+                    "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(
+                        user_profile.level_of_education
+                    ),
+                    "mailing_address": user_profile.mailing_address,
+                    "requires_parental_consent": user_profile.requires_parental_consent(),
+                    "account_privacy": get_profile_visibility(user_profile, user, self.configuration),
+                    "social_links": SocialLinkSerializer(
+                        user_profile.social_links.all().order_by('platform'), many=True
+                    ).data,
+                    "extended_profile": get_extended_profile(user_profile),
+                    "phone_number": user_profile.phone_number,
+                }
+            )
+
+        if user_extra_info:
+            data.update(
+                {
+                    "nric": user_extra_info.nric,
+                    "industry": getattr(user_extra_info.industry, 'name', None),
+                    "date_of_birth": user_extra_info.date_of_birth,
+                }
+            )
+
+        if is_secondary_email_feature_enabled():
+            data.update(
+                {
+                    "secondary_email": account_recovery.secondary_email if account_recovery else None,
+                    "secondary_email_enabled": True,
+                }
+            )
+
+        if self.custom_fields:
+            fields = self.custom_fields
+        elif user_profile:
+            fields = _visible_fields(user_profile, user, self.configuration)
+        else:
+            fields = self.configuration.get('public_fields')
+
+        return self._filter_fields(
+            fields,
+            data
+        )
+
+    def _filter_fields(self, field_whitelist, serialized_account):
+        """
+        Filter serialized account Dict to only include whitelisted keys
+        """
+        visible_serialized_account = {}
+
+        for field_name in field_whitelist:
+            visible_serialized_account[field_name] = serialized_account.get(field_name, None)
+
+        return visible_serialized_account

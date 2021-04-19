@@ -144,6 +144,59 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
             });
         };
 
+
+        var filterCourses = function(){
+        var p_visibility = $('#new-platform-visibility').find(":selected").text(); //check platform visibility
+        var is_premium = $('#premium_check').is(":checked");    //check premium
+
+        //hide all courses
+        $('.list-courses').children().filter(function(){return true;}).hide();
+
+        // show courses depending on conditions
+        $('.list-courses').children().filter(function(){
+
+            // platform visibility is selected and also premium is checked
+            if(p_visibility !== "-" && is_premium){
+                // check if both attributes are available
+                if($(this)[0].attributes[2] && $(this)[0].attributes[3]){
+                    console.log($(this)[0].attributes[2].value === p_visibility && $(this)[0].attributes[3].value === is_premium.toString())
+                    return $(this)[0].attributes[2].value === p_visibility && $(this)[0].attributes[3].value === is_premium.toString()
+                }
+                else{
+                    return true
+                }
+            }
+
+            // no platform is premium
+            else if(p_visibility == "-" && is_premium){
+                // check if premium attribute is available
+                if($(this)[0].attributes[3]){
+                    return $(this)[0].attributes[3].value === is_premium.toString()
+                }
+                else{
+                    return true
+                }
+            }
+
+            // platform visibility is selected and also premium is checked
+            else if(p_visibility !== "-" && is_premium == false){
+                // check if platform attribute is available
+                if($(this)[0].attributes[2]){
+                    return $(this)[0].attributes[2].value === p_visibility
+                }
+                else{
+                    return true
+                }
+            }
+
+            // no filter applied
+            else{
+                return true
+            }
+
+        }).show();
+        };
+
         var addNewLibrary = function(e) {
             e.preventDefault();
             $('.new-library-button').addClass('is-disabled').attr('aria-disabled', true);
@@ -175,6 +228,8 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
             $('.new-course-button').bind('click', addNewCourse);
             $('.new-library-button').bind('click', addNewLibrary);
 
+            $('#new-platform-visibility').bind('change', filterCourses);
+            $('#premium_check').bind('click', filterCourses);
             $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function() {
                 ViewUtils.reload();
             }));

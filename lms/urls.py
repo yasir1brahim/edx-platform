@@ -2,6 +2,7 @@
 URLs for LMS
 """
 
+from django.views.decorators.csrf import csrf_exempt
 from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.conf.urls import include, url
@@ -53,6 +54,9 @@ from openedx.core.djangoapps.verified_track_content import views as verified_tra
 from openedx.features.enterprise_support.api import enterprise_enabled
 from common.djangoapps.student import views as student_views
 from common.djangoapps.util import views as util_views
+
+#custom token authentication
+from lms.djangoapps.gsauthentication.views import CustomObtainAuthToken
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -112,6 +116,8 @@ urlpatterns = [
 
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
+    # Enrollment API For Mobile
+    url(r'^api/enrollment/', include('openedx.core.djangoapps.enrollments.api_v2.urls')),
 
     # Entitlement API RESTful endpoints
     url(
@@ -151,6 +157,8 @@ urlpatterns = [
             namespace='commerce_api',
         ),
     ),
+    url(r'^commerce/', include(('lms.djangoapps.commerce.urls', 'lms.djangoapps.commerce'), namespace='commerce')),
+    url(r'^api/stripe/', include('lms.djangoapps.stripe_api.urls')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
     url(r'^api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),
     url(r'^rss_proxy/', include('lms.djangoapps.rss_proxy.urls')),
@@ -198,6 +206,13 @@ urlpatterns = [
     ),
     url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                     namespace='api_discounts')),
+    # LHUB MOBILE API
+    url(r'^api/lhub_mobile/', include('lms.djangoapps.lhub_mobile.urls')),
+    url(r'^lhub/', include('lms.djangoapps.lhub_notification.urls')),
+]
+
+urlpatterns += [
+    url(r'^lhub_extended_api/', include('lms.djangoapps.lhub_extended_api.urls')),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
@@ -647,6 +662,15 @@ urlpatterns += [
         include('openedx.features.course_experience.urls'),
     ),
 
+    # Course experience api
+    #url(
+        #r'^api/v1/courses/{}/'.format(
+            #settings.COURSE_ID_PATTERN,
+        #),
+        #include('common.djangoapps.feedback.urls'),
+    #),
+    url(r'^api/course_reviews/', include('common.djangoapps.feedback.urls')),
+
     # Course bookmarks UI in LMS
     url(
         r'^courses/{}/bookmarks/'.format(
@@ -798,6 +822,16 @@ urlpatterns += [
                                        namespace='course_goals_api')),
 ]
 
+# FAQ
+urlpatterns += [
+    url(r'api/faq/', include(('lms.djangoapps.faq.urls', 'lms.djangoapps.faq'), namespace='faq')),
+]
+
+# Note
+urlpatterns += [
+    url(r'api/note/', include(('lms.djangoapps.note.urls', 'lms.djangoapps.note'), namespace='note')),
+]
+
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += [
@@ -821,6 +855,7 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
         # views directly, but should rather use the wrapped views at /oauth2/
         url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+        url(r'^gs-auth/', include('lms.djangoapps.gsauthentication.urls', namespace='gsauthentication')),
     ]
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
@@ -985,6 +1020,7 @@ urlpatterns.extend(get_plugin_url_patterns(ProjectType.LMS))
 # Course Home API urls
 urlpatterns += [
     url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
+    url("terms-conditions", include('lms.djangoapps.terms_conditions.urls')),
 ]
 
 # Course Experience API urls

@@ -18,7 +18,24 @@ from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
 from common.djangoapps.student.models import CourseEnrollment
+from .. import USE_BOOTSTRAP_FLAG
+from django.core.exceptions import ValidationError
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
+@view_auth_classes(is_authenticated=False)
+class CourseReviewRatingView(DeveloperErrorViewMixin, RetrieveAPIView):
+    def get_object(self):
+        """
+        Return the requested course object, if the user has appropriate
+        permissions.
+        """
+        requested_params = self.request.query_params.copy()
+        print(self.kwargs)
+        print("--------------------------------------")
+        requested_params.update({'course_key': self.kwargs['course_id']})
+        print("============+++++++++=============")
+        print(requested_params.update({'course_key': self.kwargs['course_id']}))
 
 class CourseReviewsView(CourseTabView):
     """

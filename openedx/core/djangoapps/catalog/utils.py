@@ -322,7 +322,7 @@ def get_currency_data():
         return []
 
 
-def format_price(price, symbol='$', code='USD'):
+def format_price(price, symbol='S$', code='SGD'):
     """
     Format the price to have the appropriate currency and digits..
 

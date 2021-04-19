@@ -69,10 +69,11 @@ class CourseMode(models.Model):
     # Historical note: We used to allow users to choose from several prices, but later
     # switched to using a single price.  Although this field is called `min_price`, it is
     # really just the price of the course.
-    min_price = models.IntegerField(default=0, verbose_name=_("Price"))
-
+    min_price = models.FloatField(default=0.00, verbose_name=_("Price"))
+    
+    discount_percentage = models.FloatField(default=0.00, verbose_name=_("Discount Percentage"))
     # the currency these prices are in, using lower case ISO currency codes
-    currency = models.CharField(default=u"usd", max_length=8)
+    currency = models.CharField(default=u"SGD", max_length=8)
 
     # The datetime at which the course mode will expire.
     # This is used to implement "upgrade" deadlines.
@@ -189,6 +190,8 @@ class CourseMode(models.Model):
 
     CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
+    readonly_fields = ('currency',)
+
     class Meta(object):
         app_label = "course_modes"
         unique_together = ('course', 'mode_slug', 'currency')
@@ -241,6 +244,10 @@ class CourseMode(models.Model):
     def expiration_datetime(self):
         """ Return _expiration_datetime. """
         return self._expiration_datetime
+
+    @property
+    def min_price_str(self):
+        return format(self.min_property, ".2f")
 
     @expiration_datetime.setter
     def expiration_datetime(self, new_datetime):
@@ -912,7 +919,7 @@ class CourseModesArchive(models.Model):
                                         validators=[validate_comma_separated_integer_list])
 
     # the currency these prices are in, using lower case ISO currency codes
-    currency = models.CharField(default=u"usd", max_length=8)
+    currency = models.CharField(default=u"SGD", max_length=8)
 
     # turn this mode off after the given expiration date
     expiration_date = models.DateField(default=None, null=True, blank=True)

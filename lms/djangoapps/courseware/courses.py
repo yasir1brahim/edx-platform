@@ -12,6 +12,7 @@ import six
 from crum import get_current_request
 from dateutil.parser import parse as parse_date
 from django.conf import settings
+from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -65,6 +66,9 @@ from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import STUDENT_VIEW
+from commerce.api.v1.models import Course
+from course_modes.models import CourseMode
+
 
 log = logging.getLogger(__name__)
 
@@ -665,12 +669,13 @@ def get_course_syllabus_section(course, section_key):
 
 
 @function_trace('get_courses')
-def get_courses(user, org=None, filter_=None):
+def get_courses(user, org=None, platform=None, filter_=None):
     """
     Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
     """
     courses = branding.get_visible_courses(
         org=org,
+        platform=platform,
         filter_=filter_,
     ).prefetch_related(
         'modes',
@@ -687,6 +692,99 @@ def get_courses(user, org=None, filter_=None):
         (c for c in courses if has_access(user, permission_name, c)),
         est_len=courses.count()
     )
+
+
+
+
+@function_trace('get_courses')
+def get_courses_with_extra_info(user, org=None, filter_=None):
+    """
+    Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
+    """
+    courses = branding.get_visible_courses(
+        org=org,
+        filter_=filter_,
+    ).prefetch_related(
+        Prefetch(
+            'modes',
+            queryset=CourseMode.objects.exclude(mode_slug__in=CourseMode.CREDIT_MODES),
+            to_attr='selectable_modes',
+        ),
+    ).select_related(
+        'image_set'
+    )
+
+    permission_name = configuration_helpers.get_value(
+        'COURSE_CATALOG_VISIBILITY_PERMISSION',
+        settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+    )
+    for course in courses:
+        course_modes = CourseMode.objects.filter(course_id=course.id)
+        course_extra_info = Course(course.id,list(course_modes))
+        course.enrollments_count = course_extra_info.enrollments_count
+        course.ratings =  course_extra_info.ratings if course_extra_info.ratings else None
+        course.comments_count = course_extra_info.comments_count
+        course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
+        course.discount_applicable = course_extra_info.discount_applicable
+        course.discount_percentage = course_extra_info.discount_percentage
+        course.discounted_price = course_extra_info.discounted_price
+        course.currency = course_extra_info.currency
+        if len(course_extra_info.modes) == 0:
+            course.price = 0
+        else:
+            course.price = course_extra_info.modes[0].min_price
+
+    return LazySequence(
+        (c for c in courses if has_access(user, permission_name, c)),
+        est_len=courses.count()
+    )
+
+
+
+@function_trace('get_courses')
+def get_courses_with_extra_info_json(user, org=None, platform=None, filter_=None):
+    """
+    Return a LazySequence of courses available, optionally filtered by org code (case-insensitive).
+    """
+    courses = branding.get_visible_courses(
+        org=org,
+        platform=platform,
+        filter_=filter_,
+    ).prefetch_related(
+        Prefetch(
+            'modes',
+            queryset=CourseMode.objects.exclude(mode_slug__in=CourseMode.CREDIT_MODES),
+            to_attr='selectable_modes',
+        ),
+    ).select_related(
+        'image_set'
+    )
+
+    permission_name = configuration_helpers.get_value(
+        'COURSE_CATALOG_VISIBILITY_PERMISSION',
+        settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+    )
+    for course in courses:
+        course_modes = CourseMode.objects.filter(course_id=course.id)
+        course_extra_info = Course(course.id,list(course_modes))
+        course.enrollments_count = course_extra_info.enrollments_count
+        course.ratings =  course_extra_info.ratings if course_extra_info.ratings else None
+        course.comments_count = course_extra_info.comments_count
+        course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
+        course.discount_applicable = course_extra_info.discount_applicable
+        course.discount_percentage = course_extra_info.discount_percentage
+        course.discounted_price = course_extra_info.discounted_price
+        course.currency = course_extra_info.currency
+        if len(course_extra_info.modes) == 0:
+            course.price = 0
+        else:
+            course.price = course_extra_info.modes[0].min_price
+    return courses
+
+
+
+
+
 
 
 def get_permission_for_course_about():
@@ -714,14 +812,32 @@ def sort_by_announcement(courses):
 
 def sort_by_start_date(courses):
     """
-    Returns a list of courses sorted by their start date, latest first.
+    Returns a list of courses sorted by their start date.
     """
     courses = sorted(
         courses,
         key=lambda course: (course.has_ended(), course.start is None, course.start),
-        reverse=False
+        reverse=True
     )
 
+    return courses
+
+
+def sort_by_rating(courses):
+    courses = sorted(
+        courses,
+        key=lambda course: course.ratings or 0,
+        reverse=True
+    )
+    return courses
+
+
+def sort_by_price(courses):
+    courses = sorted(
+        courses,
+        key=lambda course: course.price,
+        reverse=True
+    )
     return courses
 
 
@@ -860,3 +976,4 @@ def get_course_chapter_ids(course_key):
         log.exception('Failed to retrieve course from modulestore.')
         return []
     return [six.text_type(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+

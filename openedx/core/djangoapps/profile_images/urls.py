@@ -13,6 +13,7 @@ from django.conf import settings
 from django.conf.urls import url
 
 from .views import ProfileImageRemoveView, ProfileImageUploadView
+from .views import ProfileImageRemoveView, Base64ImageUpload
 
 urlpatterns = [
     url(
@@ -24,5 +25,11 @@ urlpatterns = [
         r'^v1/' + settings.USERNAME_PATTERN + '/remove$',
         ProfileImageRemoveView.as_view(),
         name="profile_image_remove"
+    ),
+
+    url(
+        r'^v1/'+ settings.USERNAME_PATTERN + '/base64/upload$',
+        Base64ImageUpload.as_view(),
+        name="profile_image_base64_upload"
     ),
 ]

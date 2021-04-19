@@ -8,6 +8,12 @@ import itertools
 import logging
 from contextlib import closing
 
+import base64
+from django.core.files.base import ContentFile
+import requests
+from django.conf import settings
+
+
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -17,7 +23,6 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
-
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -26,12 +31,19 @@ from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 from .exceptions import ImageValidationError
-from .images import IMAGE_TYPES, create_profile_images, remove_profile_images, validate_uploaded_image
+from .images import IMAGE_TYPES, create_profile_images, remove_profile_images, validate_uploaded_image, create_base64_profile_images
 
 log = logging.getLogger(__name__)
 
 LOG_MESSAGE_CREATE = u'Generated and uploaded images %(image_names)s for user %(user_id)s'
 LOG_MESSAGE_DELETE = u'Deleted images %(image_names)s for user %(user_id)s'
+
+from oauth2_provider.models import AccessToken as Token
+from rest_framework.response import Response
+import logging
+from rest_framework.views import APIView
+import requests
+import json
 
 
 def _make_upload_dt():
@@ -168,7 +180,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
             )
 
         # send client response.
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, username):
         """
@@ -193,6 +205,26 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
         # send client response.
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def post64(self, request, username):
+        if 'image' not in request.POST:
+            return Response(
+                {
+                    "message": "No file provided for profile image",
+                    "status": False,
+                    "result": {},
+                    "status_code": 400
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # process the upload.
+        uploaded_file = request.POST['image']
+        # generate profile pic and thumbnails and store them
+        create_base64_profile_images(uploaded_file, username)
+        # update the user account to reflect that a profile image is available.
+        set_has_profile_image(username, True, _make_upload_dt())
+        # send client response.
+        return Response({"message": "Profile uploaded successfully.","status": True,"result": {},"status_code": 200 })
 
 class ProfileImageUploadView(APIView):
     """
@@ -231,3 +263,13 @@ class ProfileImageRemoveView(APIView):
         POST /api/profile_images/v1/{username}/remove
         """
         return ProfileImageView().delete(request, username)
+
+
+class Base64ImageUpload(APIView):
+
+    authentication_classes = ProfileImageView.authentication_classes
+    permission_classes = ProfileImageView.permission_classes
+
+    def post(self, request, username):
+        return ProfileImageView().post64(request, username)
+

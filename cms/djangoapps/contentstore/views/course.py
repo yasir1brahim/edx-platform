@@ -9,6 +9,7 @@ import logging
 import random
 import re
 import string
+import slumber
 from collections import defaultdict
 
 import django.utils
@@ -30,6 +31,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 from six.moves import filter
+from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -101,6 +103,17 @@ from ..utils import (
     reverse_url,
     reverse_usage_url
 )
+from openedx.core.djangoapps.content.course_overviews.models import DifficultyLevel, Category, SubCategory, CourseOverview
+from organizations.models import Organization
+
+from django.contrib.auth import get_user_model
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from opaque_keys.edx.locator import CourseLocator
+import json
+import requests
+from requests.exceptions import ConnectionError, Timeout
+from edx_rest_api_client.exceptions import SlumberBaseException
+
 from .component import ADVANCED_COMPONENT_TYPES
 from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
 from .item import create_xblock_info
@@ -110,6 +123,7 @@ from .library import (
     get_library_creator_status,
     should_redirect_to_library_authoring_mfe
 )
+from django_countries.data import COUNTRIES
 
 log = logging.getLogger(__name__)
 
@@ -126,6 +140,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
 
 WAFFLE_NAMESPACE = 'studio_home'
 
+User = get_user_model()
 
 class AccessListFallback(Exception):
     """
@@ -461,6 +476,32 @@ def _accessible_courses_iter_for_tests(request):
     return courses, in_process_course_actions
 
 
+def _get_course_creator_status(user):
+    """
+    Helper method for returning the course creator status for a particular user,
+    taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
+
+    If the user passed in has not previously visited the index page, it will be
+    added with status 'unrequested' if the course creator group is in use.
+    """
+
+    if user.is_staff:
+        course_creator_status = 'granted'
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
+        course_creator_status = 'disallowed_for_this_site'
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        course_creator_status = get_course_creator_status(user)
+        if course_creator_status is None:
+            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
+            # Add the user to the course creator admin table with status 'unrequested'.
+            add_user_with_status_unrequested(user)
+            course_creator_status = get_course_creator_status(user)
+    else:
+        course_creator_status = 'granted'
+
+    return course_creator_status
+
+
 def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
@@ -468,9 +509,14 @@ def _accessible_courses_list_from_groups(request):
     def filter_ccx(course_access):
         """ CCXs cannot be edited in Studio and should not be shown in this dashboard """
         return not isinstance(course_access.course_id, CCXLocator)
+    if _get_course_creator_status(request.user) != 'granted' and not request.user.is_staff:
+        return [],[]
 
-    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
-    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
+    user_org = None
+    if request.user.user_extra_info.organization:
+        user_org = request.user.user_extra_info.organization.short_name
+    instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role_and_org(user_org)
+    staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role_and_org(user_org)
     all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
     courses_list = []
     course_keys = {}
@@ -496,6 +542,9 @@ def _accessible_libraries_iter(user, org=None):
         string will result in no libraries, and otherwise only libraries with the
         specified org will be returned. The default value is None.
     """
+    if hasattr(user, 'user_extra_info'):
+        if user.user_extra_info.organization and not user.is_staff:
+            org = user.user_extra_info.organization.short_name
     if org is not None:
         libraries = [] if org == '' else modulestore().get_libraries(org=org)
     else:
@@ -510,10 +559,8 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-
     optimization_enabled = GlobalStaff().has_user(request.user) and \
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
-
     org = request.GET.get('org', '') if optimization_enabled else None
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
@@ -557,6 +604,11 @@ def course_listing(request):
     split_archived = settings.FEATURES.get(u'ENABLE_SEPARATE_ARCHIVED_COURSES', False)
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+    organization_short_name = ""
+    try:
+        organization_short_name = user.user_extra_info.organization.short_name
+    except:
+        organization_short_name = ""
 
     return render_to_response(u'index.html', {
         u'courses': active_courses,
@@ -568,6 +620,7 @@ def course_listing(request):
         u'libraries': [format_library_for_view(lib) for lib in libraries],
         u'show_new_library_button': get_library_creator_status(user) and not should_redirect_to_library_authoring_mfe(),
         u'user': user,
+        u'organization_short_name': organization_short_name,
         u'request_course_creator_url': reverse('request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),
         u'rerun_creator_status': GlobalStaff().has_user(user),
@@ -744,7 +797,9 @@ def _process_courses_list(courses_iter, in_process_course_actions, split_archive
             'rerun_link': _get_rerun_link_for_item(course.id),
             'org': course.display_org_with_default,
             'number': course.display_number_with_default,
-            'run': course.location.run
+            'run': course.location.run,
+            'platform_visibility': course.platform_visibility,
+            'premium': course.premium
         }
 
     in_process_action_course_keys = {uca.course_key for uca in in_process_course_actions}
@@ -805,6 +860,25 @@ def course_outline_initial_state(locator_to_show, course_structure):
     }
 
 
+
+def refresh_course_metadata(request,course_id):
+    data = {'client_id': 'discovery-backend-service-key', 'client_secret': 'discovery-backend-service-secret', 'grant_type': 'client_credentials', 'token_type': 'jwt'}
+    response = requests.post(url = settings.LMS_ROOT_URL + '/oauth2/access_token', data=data)
+    json_response = json.loads(response.text)
+    if "access_token" in json_response.keys():
+        jwt_token = json_response['access_token']
+        param_dict = {'course_id':course_id}
+        headers = {'Authorization' : 'JWT ' + jwt_token}
+        URL = settings.DISCOVERY_ROOT_URL + '/api/v1/refresh_course_metadata'
+        response = requests.get(url = URL, headers = headers, params = param_dict)
+        json_response = json.loads(response.text)
+        result = json_response['is_successful']
+        if result == True:
+            CourseOverview.objects.filter(id=course_id).update(indexed_in_discovery=True)
+    return result
+
+
+
 @expect_json
 def _create_or_rerun_course(request):
     """
@@ -831,7 +905,7 @@ def _create_or_rerun_course(request):
                     status=400
                 )
 
-        fields = {'start': start}
+        fields = {'start': start, 'platform_visibility': 'Both'}
         if display_name is not None:
             fields['display_name'] = display_name
 
@@ -847,6 +921,7 @@ def _create_or_rerun_course(request):
         if source_course_key:
             source_course_key = CourseKey.from_string(source_course_key)
             destination_course_key = rerun_course(request.user, source_course_key, org, course, run, fields)
+            response = refresh_course_metadata(six.text_type(request,destination_course_key))
             return JsonResponse({
                 'url': reverse_url('course_handler'),
                 'destination_course_key': six.text_type(destination_course_key)
@@ -854,6 +929,7 @@ def _create_or_rerun_course(request):
         else:
             try:
                 new_course = create_new_course(request.user, org, course, run, fields)
+                response = refresh_course_metadata(request,six.text_type(new_course.id))
                 return JsonResponse({
                     'url': reverse_course_url('course_handler', new_course.id),
                     'course_key': six.text_type(new_course.id),
@@ -1104,8 +1180,37 @@ def settings_handler(request, course_key_string):
                                 verified_mode.expiration_datetime.isoformat())
 
             course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
+            # Difficulty Level Options
+            # difficulty_level_options = [('beginner', 'Beginner'), ('intermediate','Intermediate'), ('advanced','Advanced')]
+            course_sale_type_options = [('free', 'Free'), ('paid','Paid')]
+            platform_visibility_options = [('Mobile', 'Mobile'), ('Web','Web'), ('Both','Both')]
+            difficulty_level_options = DifficultyLevel.objects.all()
+            course_org_options = Organization.objects.all()
+            categories = Category.objects.all()
+            subcategories = SubCategory.objects.all()
+            regions = COUNTRIES
+            current_org = None
+            course_overview = CourseOverview.objects.get(id=course_module.id)
+            display_name = course_overview.display_name
+            id = course_overview.id
+
+            try:
+                if request.user.user_extra_info.organization:
+                    current_org = CourseOverview.objects.get(id=course_module.id).organization.name
+            except:
+                current_org = None
+
+            subcat_dict = {}
+            for obj in subcategories:
+                if obj.category.id in subcat_dict.keys():
+                    subcat_dict[obj.category.id].append({obj.id: obj.name})
+                else:
+                    subcat_dict[obj.category.id]=[{obj.id:obj.name}]
 
             settings_context = {
+                'course_id': id,
+                'display_name': display_name,
+                'current_org': current_org,
                 'context_course': course_module,
                 'course_locator': course_key,
                 'lms_link_for_about_page': get_link_for_about_page(course_module),
@@ -1120,6 +1225,14 @@ def settings_handler(request, course_key_string):
                 'upload_asset_url': upload_asset_url,
                 'course_handler_url': reverse_course_url('course_handler', course_key),
                 'language_options': settings.ALL_LANGUAGES,
+                'difficulty_level_options': difficulty_level_options,
+                'course_org_options': course_org_options,
+                'categories': categories,
+                'subcategories': subcategories,
+                'regions': regions,
+                'subcat_dict': subcat_dict,
+                'course_sale_type_options' : course_sale_type_options,
+                'platform_visibility_options' : platform_visibility_options,
                 'credit_eligibility_enabled': credit_eligibility_enabled,
                 'is_credit_course': False,
                 'show_min_grade_warning': False,
@@ -1158,19 +1271,62 @@ def settings_handler(request, course_key_string):
                             'show_min_grade_warning': show_min_grade_warning,
                         }
                     )
-
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
-                course_details = CourseDetails.fetch(course_key)
-                return JsonResponse(
+                user = User.objects.get(username="ecommerce_worker")
+                api_user = user
+                api = ecommerce_api_client(api_user)
+                try:
+                    
+                    res = api.courses(course_key).get()
+                    
+                    current_id = res['id']
+                    if current_id:
+                        course_overview = CourseOverview.objects.get(id=course_key)
+                        
+                        if course_overview.published_in_ecommerce == False:
+                            course_overview.published_in_ecommerce = True
+                            course_overview.save()
+                    course_details = CourseDetails.fetch(course_key)
+                except slumber.exceptions.HttpNotFoundError as e:
+                    
+                    log.exception('Failed to fetch the course: %s',course_key)
+                    course_overview = CourseOverview.objects.get(id=course_key)
+                    if course_overview.published_in_ecommerce:
+                            course_overview.published_in_ecommerce = False
+                            course_overview.save()
+                    course_details = CourseDetails.fetch(course_key)
+                
+
+                response = JsonResponse(
                     course_details,
                     # encoder serializes dates, old locations, and instances
                     encoder=CourseSettingsEncoder
                 )
+                response['Cache-Control'] = "private, no-cache, no-store"
+                return response
+
             # For every other possible method type submitted by the caller...
             else:
                 # if pre-requisite course feature is enabled set pre-requisite course
+                course = modulestore().get_course(course_key)
+                course_details = CourseDetails.fetch(course_key)
+                if not course_details.course_sale_type:
+                    course_details.course_sale_type = ""
+                if request.json['course_sale_type'] and request.json['course_sale_type'].lower() != course_details.course_sale_type.lower():
+                    if request.json['course_sale_type'].lower() == 'free':
+                        course_sale_type = 'audit'
+                    else:
+                        course_sale_type = 'professional'
+                    course_price = float(request.json['course_price'])
+                    course_name = course.display_name_with_default
+                    #course_id = CourseLocator.from_string(course_key)
+                    course_id = six.text_type(course_key)
+                    publish_course_output = publish_course_ecommerce(course_id, course_name, course_sale_type, course_price)
+                    update_published_in_ecommerce = CourseOverview.objects.get(id=course_id)
+                    update_published_in_ecommerce.published_in_ecommerce = publish_course_output
+                    update_published_in_ecommerce.save()
                 if is_prerequisite_courses_enabled():
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
                     if prerequisite_course_keys:
@@ -1220,6 +1376,44 @@ def settings_handler(request, course_key_string):
                     encoder=CourseSettingsEncoder
                 )
 
+def publish_course_ecommerce(course_key, display_name, course_type='audit', course_price=0.0):
+    """
+    calling function eg:
+    publish_course_ecommerce('course-v1:edX+DemoX+2020-t2','Demonstration Course 2')
+
+    for audit/free:
+        {"id":"course-v1:edx+cs870+2020-t2","name":"Test Course 12","verification_deadline":null,
+        "products":[{"course":{"id":"course-v1:edx+cs870+2020-t2","name":"Test Course 11","type":"audit",
+        "verification_deadline":null,"honor_mode":false},"expires":null,"price":0,"product_class":"Seat",
+        "attribute_values":[{"name":"id_verification_required","value":false}]}]}
+
+    for professional/paid:
+        {"id":"course-v1:edX+DemoX+2020-t2","name":"Demonstration Course 2","verification_deadline":null,
+        "products":[{"course":{"id":"course-v1:edX+DemoX+2020-t2","name":"Demonstration Course 2","type":"professional",
+        "verification_deadline":null,"honor_mode":null},"expires":null,"price":"20","product_class":"Seat",
+        "attribute_values":[{"name":"certificate_type","value":"professional"},{"name":"id_verification_required","value":false}]}]}
+    """
+    product_list = []
+    attribute_values_list = []
+    attribute_values = {'name': 'id_verification_required', 'value': False}
+    if course_type == 'professional':
+        attribute_values_list.append({'name': 'certificate_type', 'value': 'professional'})
+    attribute_values_list.append(attribute_values)
+    product = {'course': {'id': course_key, 'name': display_name, 'type': course_type,
+        'verification_deadline': None, 'honor_mode': False}, 'expires': None,
+        'price': course_price, 'product_class': 'Seat', 'attribute_values': attribute_values_list}
+    product_list.append(product)
+    data = {'id': course_key, 'name': display_name, 'verification_deadline': None,
+        'products': product_list}
+    user = User.objects.get(username="ecommerce_worker")
+    api_user = user
+    api = ecommerce_api_client(api_user)
+    try:
+        res = api.publication.post(data)
+        return True
+    except (ConnectionError, SlumberBaseException, Timeout):
+        log.exception('Failed to publish the course: %s',course_key)
+        return False
 
 @login_required
 @ensure_csrf_cookie

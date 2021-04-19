@@ -25,7 +25,7 @@ from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_gr
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track import segment
-
+utc=pytz.UTC
 # .. toggle_name: discounts.enable_discounting
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -60,12 +60,13 @@ def get_discount_expiration_date(user, course):
         mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES
     )
     if len(course_enrollment) != 1:
-        return None
+        pass
+        #return None
 
     time_limit_start = None
     try:
-        saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course))
-        time_limit_start = parse_datetime(saw_banner.value)
+        #saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course))
+        time_limit_start = parse_datetime(str(datetime.now().replace(tzinfo=utc)))    
     except ExperimentData.DoesNotExist:
         return None
 
@@ -74,11 +75,12 @@ def get_discount_expiration_date(user, course):
     # If the course has an upgrade deadline and discount time limit would put the discount expiration date
     # after the deadline, then change the expiration date to be the upgrade deadline
     verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
-    if not verified_mode:
-        return None
-    upgrade_deadline = verified_mode.expiration_datetime
-    if upgrade_deadline and discount_expiration_date > upgrade_deadline:
-        discount_expiration_date = upgrade_deadline
+    #if not verified_mode:
+        #return None
+    if verified_mode:
+        upgrade_deadline = verified_mode.expiration_datetime
+        if upgrade_deadline and discount_expiration_date > upgrade_deadline:
+            discount_expiration_date = upgrade_deadline
 
     return discount_expiration_date
 
@@ -112,8 +114,8 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     # Course needs to have a non-expired verified mode
     modes_dict = CourseMode.modes_for_course_dict(course=course, include_expired=False)
     verified_mode = modes_dict.get('verified', None)
-    if not verified_mode:
-        return False
+    #if not verified_mode:
+        #return False
 
     # Site, Partner, Course or Course Run not excluded from lms-controlled discounts
     if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
@@ -121,8 +123,8 @@ def can_receive_discount(user, course, discount_expiration_date=None):
 
     # Don't allow users who have enrolled in any courses in non-upsellable
     # modes
-    if CourseEnrollment.objects.filter(user=user).exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists():
-        return False
+    #if CourseEnrollment.objects.filter(user=user).exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists():
+        #return False
 
     # Don't allow any users who have entitlements (past or present)
     if CourseEntitlement.objects.filter(user=user).exists():
@@ -131,8 +133,8 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     # We can't import this at Django load time within the openedx tests settings context
     from openedx.features.enterprise_support.utils import is_enterprise_learner
     # Don't give discount to enterprise users
-    if is_enterprise_learner(user):
-        return False
+    #if is_enterprise_learner(user):
+        #return False
 
     # Turn holdback on
     if _is_in_holdback_and_bucket(user):
@@ -177,7 +179,18 @@ def discount_percentage(course):
     """
     Get the configured discount amount.
     """
-    configured_percentage = DiscountPercentageConfig.current(course_key=course.id).percentage
-    if configured_percentage:
-        return configured_percentage
-    return 15
+    #configured_percentage = DiscountPercentageConfig.current(course_key=course.id).percentage
+    configured_percentage = DiscountPercentageConfig.objects.filter(course=course.id).order_by('-id')
+    if len(configured_percentage) > 0 and configured_percentage[0].percentage > 0:
+        return configured_percentage[0].percentage
+    return 0
+
+
+def discount_percentage_configured(course):
+    """
+    Get the configured discount amount.
+    """
+    configured_percentage = DiscountPercentageConfig.objects.filter(course=course.id).order_by('-id')
+    if len(configured_percentage) and configured_percentage[0].percentage > 0:
+        return True
+    return False

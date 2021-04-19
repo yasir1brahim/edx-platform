@@ -71,7 +71,7 @@
             // thread_type describes the kind of post this is (e.g. "question" or "discussion");
             // time_ago is how much time has passed since the post was created (e.g. "4 hours ago")
             if (thread_type === 'discussion') {
-                postedTimeAgoMessage = gettext('discussion posted %(time_ago)s by %(author)s');
+                postedTimeAgoMessage = gettext('Q&A posted %(time_ago)s by %(author)s');
             } else {
                 postedTimeAgoMessage = gettext('question posted %(time_ago)s by %(author)s');
             }
@@ -714,7 +714,7 @@
         </span>
     </legend>
     <div class="field-help" id="field_help_post_type">
-        <%- gettext("Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)") %>
+        <%- gettext("Questions raise issues that need answers. Q&As share ideas and start conversations. (Required)") %>
     </div>
     <div class="field-label">
         <label for="<%- edx.StringUtils.interpolate(form_id) %>-post-type-question" class="post-type-label">
@@ -730,7 +730,8 @@
             <span class="field-input-label">
                 <span class="icon fa fa-comments" aria-hidden="true"></span>
                 <% // Translators: This is a forum post type %>
-                <%- gettext("Discussion") %>
+                <!-- <%- gettext("Discussion") %> -->
+                  Q&A
             </span>
         </label>
     </div>

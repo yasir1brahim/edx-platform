@@ -106,7 +106,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
           % else:
             <span>${course_overview.display_name_with_default}</span>
           % endif
-        </h3>
+	</h3>
         <div class="course-info">
           <span class="info-university">${course_overview.display_org_with_default} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
@@ -181,6 +181,14 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 </div>
             % endif
         </div>
+
+        <div class="course_number">
+           <ul>
+          <li class="total_chapters">Total Units <span> ${enrollment.total_units}</span> </li>
+          <li class="completed_chapters">Completed Units <span> ${enrollment.completed_units}</span> </li>
+          </ul>
+        </div>
+
         <div class="wrapper-course-actions">
           <div class="course-actions">
             % if (show_courseware_link or is_unfulfilled_entitlement) and not is_course_expired:
@@ -451,6 +459,46 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 </article>
 </div>
 </li>
+
+
+<style>
+
+.course-container .course_number ul {
+padding:0px;
+}
+.course-container .course_number ul li {
+background: #0075b4;
+color: #fff;
+font-weight: 600;
+padding: 5px 10px !important;
+border-radius: 0% !important;
+display:inline-block;
+vertical-align: middle !important;
+text-align: center;
+line-height: 1.5;
+font-size:10px;
+}
+.course-container .course_number ul li span {
+font-size:12px
+}
+.course-container .course_number {
+position: absolute;
+right: 18px;
+}
+.course-container .details {
+position: relative;
+}
+
+
+
+.course_number {
+
+    vertical-align: bottom;
+
+}
+
+
+</style>
 
 % if share_settings.get('DASHBOARD_FACEBOOK', False) and share_settings.get('DASHBOARD_TWITTER', False):
     <%static:require_module_async module_name="js/course_sharing/course_sharing_events" class_name="CourseSharingEvents">

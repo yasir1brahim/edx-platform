@@ -6,7 +6,9 @@ Registration related views.
 import datetime
 import json
 import logging
+import requests
 
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
@@ -229,6 +231,12 @@ def create_account_with_params(request, params):
         registration.activate()
     else:
         compose_and_send_activation_email(user, profile, registration)
+
+    # Perform operations that are non-critical parts of account creation
+    create_or_set_user_attribute_created_on_site(user, request.site)
+
+    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
+    preferences_api.set_user_preference(user, 'time_zone', 'Asia/Singapore')
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
@@ -749,3 +757,43 @@ class RegistrationValidationView(APIView):
                     form_field_key: handler(self, request)
                 })
         return Response({"validation_decisions": validation_decisions})
+
+
+class MigrateUserView(APIView):
+    """
+    End Point: /user_api/v2/account/migrate
+
+    * The API first registers the user.
+    * Reset password of the user.
+    * Auto activates the user.
+    """
+
+    def post(self, request):
+        lms_url = settings.LMS_ROOT_URL
+        register_url = lms_url+"/user_api/v2/account/registration/"
+        reset_password_url = lms_url+"/user_api/v2/account/password_reset"
+
+        register_res = self.send_req(register_url, request.POST)
+
+        if register_res:
+            return Response(register_res)
+
+        user = User.objects.get(username=request.POST.get("username"))
+        user.is_active = True
+        user.save()
+
+        reset_password_res = self.send_req(reset_password_url, request.POST)
+
+        if reset_password_res:
+            return Response(reset_password_res)
+
+        return Response({"status":True, "status_code":200, "message":"User has been migrated successfully.", "result":{}})
+
+
+    def send_req(self, url, data):
+        req = requests.post(url, data=data)
+        if req.status_code == 200:
+            return None
+        else:
+            return json.loads(req.text)
+

@@ -120,7 +120,13 @@
                                 // input elements that are visible on the page.
                                 this.hasOptionalFields = true;
                             }
+                            if (field.name =='nric' || field.name == 'industry')
+                            { continue;
+                             }
+                            else
+                           {
                             optionalFields.push(field);
+                           }
                         }
                     }
 

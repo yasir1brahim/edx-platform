@@ -17,7 +17,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from six import iteritems, text_type
 
@@ -63,7 +63,11 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger("edx.student")
 
 experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
-
+from lms.djangoapps.course_api.blocks.api import get_blocks
+from lms.djangoapps.courseware.module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+from lms.djangoapps.courseware.courses import get_course_with_access
+from django.http import HttpResponseRedirect
+from django.contrib.auth import logout
 
 def get_org_black_and_whitelist_for_site():
     """
@@ -152,7 +156,7 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):
         )
 
 
-def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None):
+def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None,request=None):
     """
     Given a user, return a filtered set of their course enrollments.
 
@@ -169,6 +173,24 @@ def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None
     for enrollment in CourseEnrollment.enrollments_for_user_with_overviews_preload(user, course_limit):
 
         # If the course is missing or broken, log an error and skip it.
+        completed_units = 0
+        course_usage_key = modulestore().make_course_usage_key(enrollment.course_id)
+        response = get_blocks(request,course_usage_key,user,requested_fields=['completion'],block_types_filter='vertical')
+        enrollment.total_units = len(response['blocks'])
+        for key,block in response['blocks'].items():
+            usage_key = UsageKey.from_string(block['id'])
+            usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+            course_key = usage_key.course_key
+            course = enrollment.course
+            #course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+            block, _ = get_module_by_usage_id(
+            request, text_type(course_key), text_type(usage_key), disable_staff_debug_info=True, course=course
+            )
+            completion_service = block.runtime.service(block, 'completion')
+            complete = completion_service.vertical_is_complete(block)
+            if complete:
+                completed_units+= 1
+        enrollment.completed_units = completed_units
         course_overview = enrollment.course_overview
         if not course_overview:
             log.error(
@@ -521,7 +543,7 @@ def student_dashboard(request):
 
     # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
-    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist, course_limit))
+    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist, course_limit,request=request))
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
     # If an entitlement has no available sessions, pass through a mock course overview object
@@ -742,6 +764,12 @@ def student_dashboard(request):
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
+    web_course_enrollments=[]
+    for course in course_enrollments:
+        platform = course._course_overview.platform_visibility
+        if platform == None or platform == 'Web' or platform == 'Both':
+            web_course_enrollments.append(course)
+
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -752,7 +780,7 @@ def student_dashboard(request):
         'redirect_message': Text(redirect_message),
         'account_activation_messages': account_activation_messages,
         'activate_account_message': activate_account_message,
-        'course_enrollments': course_enrollments,
+        'course_enrollments': web_course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
         'unfulfilled_entitlement_pseudo_sessions': unfulfilled_entitlement_pseudo_sessions,
@@ -827,4 +855,9 @@ def student_dashboard(request):
         'resume_button_urls': resume_button_urls
     })
 
-    return render_to_response('dashboard.html', context)
+    user_is_active = request.user.is_active
+    if user_is_active:
+        return render_to_response('dashboard.html', context)
+    else:
+        logout(request)
+        return redirect('/verify_email')

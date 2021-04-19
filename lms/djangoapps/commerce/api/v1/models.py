@@ -4,6 +4,8 @@
 import logging
 from itertools import groupby
 
+from babel.numbers import get_currency_symbol
+
 import six
 from django.db import transaction
 from opaque_keys import InvalidKeyError
@@ -11,19 +13,28 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview, SubCategory, CourseOverviewImageSet
+from student.models import CourseEnrollment
+from django.db.models import Avg
+from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
 UNDEFINED = object()
-
+import requests
+import json
+import jwt
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class Course(object):
     """ Pseudo-course model used to group CourseMode objects. """
     id = None  # pylint: disable=invalid-name
     modes = None
     _deleted_modes = None
-
+    jwt_token = None
     def __init__(self, id, modes, **kwargs):  # pylint: disable=redefined-builtin
         self.id = CourseKey.from_string(six.text_type(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
@@ -31,6 +42,7 @@ class Course(object):
         if 'verification_deadline' in kwargs:
             self.verification_deadline = kwargs['verification_deadline']
         self._deleted_modes = []
+
 
     @property
     def name(self):
@@ -44,6 +56,223 @@ class Course(object):
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.
             log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
             return None
+
+    @property
+    def difficulty_level(self):
+        """ Return course Difficulty Level. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).difficulty_level
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def created(self):
+        """ Return course Date Created. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).created
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def ratings(self):
+        """ Return course rating. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            ratings = CourseOverview.get_from_id(course_id).course_reviews.aggregate(Avg('rating'))['rating__avg']
+            if ratings:
+                return round(ratings,1)
+            else:
+                return 0.0
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return 0.0
+
+
+
+    @property
+    def subcategory_id(self):
+        """ Return course rating. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            subcategory = CourseOverview.get_from_id(course_id).subcategory
+            if subcategory:
+                subcategory_id =  subcategory.id
+                return str(subcategory_id)
+            else:
+                return str(0)
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return 0.0
+
+
+    @property
+    def category(self):
+        """ Return course category ID. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        try:
+            category = CourseOverview.get_from_id(course_id).new_category
+            if category:
+                category_id =  category.id
+                return str(category_id)
+            else:
+                return str(0)
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return 0.0
+
+
+    @property
+    def comments_count(self):
+        """ Return course Difficulty Level. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).course_reviews.all().count()
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def enrollments_count(self):
+        """ Return course Difficulty Level. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseEnrollment.objects.enrollment_counts(course_id)['total']
+        except CourseEnrollment.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+
+
+
+    @property
+    def discount_applicable(self):
+        if len(self.modes) > 0:
+            return self.modes[0].discount_percentage > 0.00
+
+        return False
+
+    @property
+    def currency(self):
+        try:
+            currency = self.modes[0].currency.upper()
+            symbol = get_currency_symbol(currency)
+            return symbol
+        except:
+            return "S$"
+
+
+
+    @property
+    def discounted_price(self):
+        if len(self.modes) > 0:
+            price = float(self.modes[0].min_price)
+            discounted_price = price -  (self.modes[0].discount_percentage/100) * price
+            return discounted_price
+        course_mode_price = self.get_paid_mode_price()
+        return course_mode_price
+
+
+    @property
+    def discount_percentage(self):
+        if len(self.modes) > 0:
+            return self.modes[0].discount_percentage
+        return 0.0
+
+
+    @property
+    def sale_type(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            if CourseOverview.get_from_id(course_id).course_sale_type:
+                return CourseOverview.get_from_id(course_id).course_sale_type.lower()
+            return CourseOverview.get_from_id(course_id).course_sale_type
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+
+    @property
+    def is_premium(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).premium
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+
+    @property
+    def platform_visibility(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            if CourseOverview.get_from_id(course_id).platform_visibility:
+                return CourseOverview.get_from_id(course_id).platform_visibility.lower()
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def image_urls(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        try:
+            if CourseOverview.get_from_id(course_id).image_urls:
+                return CourseOverview.get_from_id(course_id).image_urls
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def allow_review(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        try:
+            return CourseOverview.get_from_id(course_id).allow_review
+        except CourseOverview.DoesNotExist:
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    def get_paid_mode_price(self):
+        for mode in self.modes:
+            if mode.mode_slug != 'honor':
+                return mode.min_price
+            else:
+                continue
+        return None
+
 
     def get_mode_display_name(self, mode):
         """ Returns display name for the given mode. """
@@ -125,6 +354,7 @@ class Course(object):
 
     @classmethod
     def get(cls, course_id):
+
         """ Retrieve a single course. """
         try:
             course_id = CourseKey.from_string(six.text_type(course_id))
@@ -141,9 +371,12 @@ class Course(object):
         return None
 
     @classmethod
-    def iterator(cls):
+    def iterator(cls,filters=None):
         """ Generator that yields all courses. """
-        course_modes = CourseMode.objects.order_by('course_id')
-
+        if filters==None:
+            course_modes = CourseMode.objects.order_by('course_id')
+        else:
+            pass
+            #course_modes = CourseMode.objects.order_by('ratings')
         for course_id, modes in groupby(course_modes, lambda o: o.course_id):
             yield cls(course_id, list(modes))

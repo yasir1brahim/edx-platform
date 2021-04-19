@@ -8,7 +8,6 @@ import re
 
 import six
 from django.conf import settings
-
 from openedx.core.djangoapps.models.config.waffle import enable_course_detail_update_certificate_date
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from openedx.core.djangolib.markup import HTML
@@ -16,6 +15,10 @@ from openedx.core.lib.courses import course_image_url
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from django.apps import apps
+import logging
+log = logging.getLogger(__name__)
+
 
 # This list represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
@@ -33,6 +36,7 @@ ABOUT_ATTRIBUTES = [
     'entrance_exam_id',
     'entrance_exam_minimum_score_pct',
     'about_sidebar_html',
+    'allow_review',
 ]
 
 
@@ -47,6 +51,17 @@ class CourseDetails(object):
         self.course_id = course_id
         self.run = run
         self.language = None
+        self.region = None
+        self.difficulty_level = None
+        self.course_org = None
+        self.new_category = None
+        self.subcategory = None
+        self.platform_visibility = None
+        self.premium = None
+        self.course_sale_type = None
+        self.course_price = None
+        self.indexed_in_discovery = None
+        self.published_in_ecommerce = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -78,6 +93,7 @@ class CourseDetails(object):
         self.self_paced = None
         self.learning_info = []
         self.instructor_info = []
+        self.allow_review = "true"
 
     @classmethod
     def fetch_about_attribute(cls, course_key, attribute):
@@ -122,6 +138,18 @@ class CourseDetails(object):
         course_details.video_thumbnail_image_name = course_descriptor.video_thumbnail_image
         course_details.video_thumbnail_image_asset_path = course_image_url(course_descriptor, 'video_thumbnail_image')
         course_details.language = course_descriptor.language
+        course_details.region = course_descriptor.region
+        course_details.difficulty_level = course_descriptor.difficulty_level
+        course_details.course_org = course_descriptor.course_org
+        course_details.new_category = course_descriptor.new_category
+        course_details.subcategory = course_descriptor.subcategory
+        course_details.platform_visibility = course_descriptor.platform_visibility
+        course_details.premium = course_descriptor.premium
+        course_details.course_sale_type = course_descriptor.course_sale_type
+        course_details.course_price = course_descriptor.course_price
+        CourseOverview = apps.get_model('course_overviews', 'CourseOverview')
+        course_details.indexed_in_discovery = CourseOverview.get_from_id(course_key).indexed_in_discovery
+        course_details.published_in_ecommerce = CourseOverview.get_from_id(course_key).published_in_ecommerce
         course_details.self_paced = course_descriptor.self_paced
         course_details.learning_info = course_descriptor.learning_info
         course_details.instructor_info = course_descriptor.instructor_info
@@ -281,6 +309,43 @@ class CourseDetails(object):
 
         if 'language' in jsondict and jsondict['language'] != descriptor.language:
             descriptor.language = jsondict['language']
+            dirty = True
+
+        if 'region' in jsondict and jsondict['region'] != descriptor.region:
+            descriptor.region = jsondict['region']
+            dirty = True
+
+        if 'difficulty_level' in jsondict and jsondict['difficulty_level'] != descriptor.difficulty_level:
+            descriptor.difficulty_level = jsondict['difficulty_level']
+            dirty = True
+
+        if 'course_org' in jsondict and jsondict['course_org'] != descriptor.course_org:
+            descriptor.course_org = jsondict['course_org']
+            dirty = True
+
+        if 'new_category' in jsondict and jsondict['new_category'] != descriptor.new_category:
+            descriptor.new_category = jsondict['new_category']
+            dirty = True
+
+        if 'subcategory' in jsondict and jsondict['subcategory'] != descriptor.subcategory:
+            descriptor.subcategory = jsondict['subcategory']
+            dirty = True
+
+        if 'platform_visibility' in jsondict and jsondict['platform_visibility'] != descriptor.platform_visibility:
+            descriptor.platform_visibility = jsondict['platform_visibility']
+            dirty = True
+
+        if 'premium' in jsondict and jsondict['premium'] != descriptor.premium:
+            descriptor.premium = jsondict['premium']
+            dirty = True
+
+        if 'course_sale_type' in jsondict and jsondict['course_sale_type'] != descriptor.course_sale_type:
+            descriptor.course_sale_type = jsondict['course_sale_type']
+            dirty = True
+
+
+        if 'course_price' in jsondict and jsondict['course_price'] != descriptor.course_price:
+            descriptor.course_price = jsondict['course_price']
             dirty = True
 
         if (descriptor.can_toggle_course_pacing

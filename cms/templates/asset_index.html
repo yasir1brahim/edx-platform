@@ -56,4 +56,21 @@
     </div>
 </div>
 
+<script>
+jQuery(document).ready(function($) {
+
+  if (window.history && window.history.pushState) {
+
+    window.history.pushState('forward', null, './#forward');
+
+    $(window).on('popstate', function() {
+     current_location = String(window.location).split('/')
+     redirect_url = current_location[0]+"//"+current_location[2]+"/settings/details/"+current_location[4]
+     window.location = redirect_url
+    });
+
+  }
+});
+</script>
+
 </%block>

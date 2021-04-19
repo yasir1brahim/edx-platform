@@ -6,7 +6,7 @@ Programmatic integration point for User API Accounts sub-application
 
 
 import datetime
-
+import re
 import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -36,8 +36,11 @@ from openedx.core.djangoapps.user_api.preferences.api import update_user_prefere
 from openedx.core.djangoapps.user_authn.views.registration_form import validate_name, validate_username
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
-from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
+from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, AccountUserExtraInfoSerializer, UserReadOnlySerializer, UserExtraFieldReadOnlySerializer, _visible_fields
 
+import logging
+
+log = logging.getLogger(__name__)
 # Public access point for this function.
 visible_fields = _visible_fields
 
@@ -95,6 +98,59 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
 
     return serialized_users
 
+@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
+def get_account_extra_settings(request, usernames=None, configuration=None, view=None):
+    """Returns account information for a user serialized as JSON.
+
+    Note:
+        If `request.user.username` != `username`, this method will return differing amounts of information
+        based on who `request.user` is and the privacy settings of the user associated with `username`.
+
+    Args:
+        request (Request): The request object with account information about the requesting user.
+            Only the user with username `username` or users with "is_staff" privileges can get full
+            account information. Other users will get the account fields that the user has elected to share.
+        usernames (list): Optional list of usernames for the desired account information. If not
+            specified, `request.user.username` is assumed.
+        configuration (dict): an optional configuration specifying which fields in the account
+            can be shared, and the default visibility settings. If not present, the setting value with
+            key ACCOUNT_VISIBILITY_CONFIGURATION is used.
+        view (str): An optional string allowing "is_staff" users and users requesting their own
+            account information to get just the fields that are shared with everyone. If view is
+            "shared", only shared account information will be returned, regardless of `request.user`.
+
+    Returns:
+         A list of users account details.
+
+    Raises:
+         errors.UserNotFound: no user with username `username` exists (or `request.user.username` if
+            `username` is not specified)
+         errors.UserAPIInternalError: the operation failed due to an unexpected error.
+
+    """
+    requesting_user = request.user
+    usernames = usernames or [requesting_user.username]
+
+    requested_users = User.objects.select_related('profile').filter(username__in=usernames)
+    if not requested_users:
+        raise errors.UserNotFound()
+
+    serialized_users = []
+    for user in requested_users:
+        has_full_access = requesting_user.is_staff or requesting_user.username == user.username
+        if has_full_access and view != 'shared':
+            admin_fields = settings.ACCOUNT_VISIBILITY_CONFIGURATION.get('admin_fields')
+        else:
+            admin_fields = None
+        serialized_users.append(UserExtraFieldReadOnlySerializer(
+            user,
+            configuration=configuration,
+            custom_fields=admin_fields,
+            context={'request': request}
+        ).data)
+
+    return serialized_users
+
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
 def update_account_settings(requesting_user, update, username=None):
@@ -131,27 +187,37 @@ def update_account_settings(requesting_user, update, username=None):
     if requesting_user.username != username:
         raise errors.UserNotAuthorized()
     user, user_profile = _get_user_and_profile(username)
+    user_extra_info = user.user_extra_info
+
+    if 'date_of_birth' in update:
+        birth_year = str(update['date_of_birth']).split("-")[0]
+        update['year_of_birth'] = birth_year
 
     # Validate fields to update
     field_errors = {}
     _validate_read_only_fields(user, update, field_errors)
 
     user_serializer = AccountUserSerializer(user, data=update)
+    user_extra_info_serializer = AccountUserExtraInfoSerializer(user.user_extra_info, data=update)
     legacy_profile_serializer = AccountLegacyProfileSerializer(user_profile, data=update)
-    for serializer in user_serializer, legacy_profile_serializer:
+    for serializer in user_serializer, legacy_profile_serializer, user_extra_info_serializer:
         add_serializer_errors(serializer, update, field_errors)
 
     _validate_email_change(user, update, field_errors)
     _validate_secondary_email(user, update, field_errors)
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
+    #_validate_nric_change(user_extra_info,update, field_errors)
+    _validate_dob_change(user_extra_info,update, field_errors)
+    _validate_industry_change(user_extra_info,update, field_errors)
+    _validate_phone_number_change(user, update, field_errors)
 
     if field_errors:
         raise errors.AccountValidationError(field_errors)
 
     # Save requested changes
     try:
-        for serializer in user_serializer, legacy_profile_serializer:
+        for serializer in user_serializer, legacy_profile_serializer, user_extra_info_serializer:
             serializer.save()
 
         _update_preferences_if_needed(update, requesting_user, user)
@@ -188,6 +254,77 @@ def _validate_read_only_fields(user, data, field_errors):
         }
         del data[read_only_field]
 
+def _validate_nric_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "nric" not in data:
+        return
+
+    nric = data["nric"]
+    try:
+        if nric == '' or len(nric) != 4:
+            raise ValueError('Please enter a valid 4-digit NRIC.')
+    except ValueError as err:
+        field_errors["nric"] = {
+            "developer_message": u"Error thrown from NRIC: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
+
+def _validate_dob_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "date_of_birth" not in data:
+        return
+    log.info("===date_of_birth===")
+    log.info(data)
+    date_of_birth = data["date_of_birth"]
+    try:
+        if date_of_birth == '':
+            raise ValueError('Please enter your Date of Birth.')
+    except ValueError as err:
+        field_errors["date_of_birth"] = {
+            "developer_message": u"Error thrown from Date of Birth: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
+
+def _validate_phone_number_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "phone_number" not in data:
+        return
+    phone_number = data["phone_number"]
+    try:
+        if phone_number == '':
+            raise ValueError('Please enter valid phone number.')
+        else:
+            if not bool(re.match(r"^\+?1?\d{9,15}$", phone_number)):
+                raise ValueError('Phone number must be entered in the format: +999999999. Up to 15 digits allowed.')
+    except ValueError as err:
+        field_errors["phone_number"] = {
+            "developer_message": u"Error thrown from phone number: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
+
+
+def _validate_industry_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "industry" not in data:
+        return
+
+    industry = data["industry"]
+    try:
+        if industry == '':
+            raise ValueError('Please select an Industry of your choice.')
+    except ValueError as err:
+        field_errors["industry"] = {
+            "developer_message": u"Error thrown from Industry: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
 
 def _validate_email_change(user, data, field_errors):
     # If user has requested to change email, we must call the multi-step process to handle this.
@@ -424,6 +561,9 @@ def get_country_validation_error(country):
     """
     return _validate(_validate_country, errors.AccountCountryInvalid, country)
 
+def get_nric_validation_error(nric):
+    return _validate(_validate_nric, errors.AccountNricInvalid, nric)
+
 
 def get_username_existence_validation_error(username):
     """Get the built-in validation error message for when
@@ -589,6 +729,15 @@ def _validate_country(country):
     if country == '' or country == '--':
         raise errors.AccountCountryInvalid(accounts.REQUIRED_FIELD_COUNTRY_MSG)
 
+def _validate_nric(nric):
+    """Validate the NRIC input.
+
+    :param nric: The proposed nric value.
+    :return: None
+
+    """
+    if nric == '' or nric == '--':
+        raise errors.AccountNricInvalid(accounts.REQUIRED_FIELD_NRIC_MSG)
 
 def _validate_username_doesnt_exist(username):
     """Validate that the username is not associated with an existing user.

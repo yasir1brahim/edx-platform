@@ -1,0 +1,262 @@
+<%def name="online_help_token()"><% return "course" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+from six import text_type
+%>
+<%page args="course" expression_filter="h"/>
+<style>
+html, body, a, h1, h2, h3, h4, h5, h6, li, button, input, textarea, p, span, div, option, select, label, input, form, ul, ol, strong {
+font-family: 'Poppins', sans-serif;
+}
+@media (max-width: 991px){
+.courses-container .courses {
+    width: 90%;
+    margin: 0 auto;
+    float: none;
+}
+}
+@media (min-width: 992px) {
+.home .courses-container .courses .courses-listing .courses-listing-item {
+width: 21.23176%;
+margin: 0 25px 25px 25px;
+}
+}
+.price-off {
+color: #9b9b9b !important;
+}
+
+.price-off span {
+margin-right: 2%;
+}
+
+.courses article .course-info {
+padding: 0px 15px;
+}
+
+p.label-course {
+font-size: 12px;
+}
+
+.courses-container .courses .course .course-info .course-title {
+height: 25px;
+margin-bottom: 8px;
+color: #000000;
+font-weight: 600;
+font-size: 18px;
+overflow: hidden;
+display: -webkit-box !important;
+-webkit-line-clamp: 1;
+-webkit-box-orient: vertical;
+}
+
+.coure-label span {
+color: #1A345C;
+font-weight: 500;
+}
+
+p.coure-label {
+font-size: 13px;
+line-height: 0;
+margin: 0px 20px 0px 0px;
+display: inline-block;
+font-weight: 500;
+color: #7f7f7f;
+}
+
+.courses-container .courses .course .course-info .course-date {
+padding: 4px 0px 0px 0px;
+margin-top: 12px;
+color: #7f7f7f;
+font-size: 16px;
+}
+
+span.course-title,
+span.course-code,
+span.course-organization {
+padding-left: 0px !important;
+}
+
+.coure-label span {
+margin-left: 7px;
+}
+
+.courses-container .courses .course .course-info {
+height: 305px;
+}
+
+.courses-container .courses .courses-listing .courses-listing-item {
+max-height: 100% !important;
+}
+
+.course-date.localized_datetime {
+position: absolute;
+bottom: 10px;
+}
+
+.price_details ul li {
+list-style-type: none;
+font-size: 12px;
+padding: 2px 0px !important;
+color: #000000;
+font-weight: 600;
+}
+
+.price_details ul {
+padding: 0px;
+margin: 5px 0px;
+}
+
+.price_details ul li .cut_price {
+text-decoration: line-through;
+font-size: 14px;
+font-weight: 500;
+margin-left: 2%;
+color: #9b9b9b;
+}
+
+.price_details ul li .main_price {
+font-size: 16px;
+color: #249a56;
+font-weight: 600;
+}
+
+.courses-container .courses .course .course-image .cover-image img {
+height: 160px;
+object-fit: cover;
+}
+
+h2.course-name span.course-organization,
+h2.course-name span.course-code {
+color: #7f7f7f !important;
+font-weight: 400;
+}
+
+.price_details ul li span {
+font-weight: 600;
+}
+
+.courses-container .courses .course {
+border-bottom: none;
+}
+
+.highlighted-courses .courses .course,
+.find-courses .courses .course {
+border: none;
+border-radius: 10px !important;
+}
+
+.courses-container .courses header.course-image .cover-image {
+border-radius: 10px 10px 0px 0px;
+}
+
+.courses-container .courses .course .course-image .cover-image .learn-more {
+background: #ffffff;
+color: #18355e;
+border-radius: 10px;
+font-weight: 700;
+}
+
+span.course-organization {
+font-size: 15px !important;
+}
+
+span.course-code {
+font-size: 13px !important;
+}
+
+.price_details span.main_price_cut {
+background: #f8400f;
+border-radius: 5px;
+font-size: 11px;
+padding: 2px 4px;
+text-decoration: line-through;
+color: #ffffff;
+}
+
+.price_details ul li .main_price-percentage {
+font-size: 12px;
+color: #249a56;
+font-weight: 800 !important;
+}
+
+</style>
+<article class="course" id="${course.id}" role="region" aria-label="${course.display_name_with_default}">
+  <a href="${reverse('about_course', args=[text_type(course.id)])}">
+    <header class="course-image">
+      <div class="cover-image">
+        <img src="${course.course_image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
+        <div class="learn-more" aria-hidden="true">${_("LEARN MORE")}</div>
+      </div>
+    </header>
+    <div class="course-info" aria-hidden="true">
+      <h2 class="course-name">
+        <span class="course-organization">${course.display_org_with_default}</span>
+        <span class="course-code">${course.display_number_with_default}</span>
+        <span class="course-title">${course.display_name_with_default}</span>
+        <p class="coure-label">Difficulty Level:<span class="course-difficulty_level">${course.difficulty_level}</span></p>
+        <p class="coure-label">Enrollment Count:<span class="course-enrollments_count">${course.enrollments_count}</span></p>
+        <p class="coure-label">Rating:<span class="course-ratings">${course.ratings}</span></p>
+        <p class="coure-label">Comments Count:<span class="course-comments_count">${course.comments_count}</span></p>
+      % if course.discount_applicable:
+          <div class="price_details">
+
+    <ul>
+
+       <li>Discount Percentage: <span class="main_price-percentage">${format(course.discount_percentage, ".2f")}%</span></li>
+       % if course.discounted_price == 0:
+             <li>Price: <span class="main_price_cut">S$${format(course.price, ".2f")}</span></li>
+             <li>Discounted Price: <span class="main_price">Free</span>
+       % else:
+            <li>Price: <span class="main_price_cut">S$${format(course.price, ".2f")}</span></li>
+            <li>Discounted Price: <span class="main_price">S$${format(course.discounted_price, ".2f")}</span>
+       % endif
+     </ul>
+
+          </div>
+      % else:
+         <div class="price_details">
+
+    <ul>
+    
+    % if course.price == 0:
+        <li>Price: <span class="main_price">Free</span></li>
+    % else:
+        <li>Price: <span class="main_price">S$${format(course.price, ".2f")}</span></li>
+    %endif
+	</ul>
+
+</div>
+
+       
+      % endif
+      </h2>
+      <%
+      if course.start is not None:
+          course_date_string = course.start.strftime('%Y-%m-%dT%H:%M:%S%z')
+      else:
+          course_date_string = ''
+      %>
+      % if course.advertised_start is not None:
+          <div class="course-date" aria-hidden="true">${_("Starts")}: ${course.advertised_start}</div>
+      % else:
+          <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="${course_date_string}" data-language="${LANGUAGE_CODE}" data-string="${_("Starts: {date}")}"></div>
+      % endif
+    </div>
+    <div class="sr">
+      <ul>
+        <li>${course.display_org_with_default}</li>
+        <li>${course.display_number_with_default}</li>
+        % if course.advertised_start is not None:
+            <li>${_("Starts")}: <time itemprop="startDate">${course.advertised_start}</time></li>
+        % else:
+            <li>${_("Starts")}: <time class="localized_datetime" itemprop="startDate" data-format="shortDate" data-datetime="${course_date_string}" data-language="${LANGUAGE_CODE}"></time></li>
+        % endif
+      </ul>
+    </div>
+  </a>
+</article>
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized_datetime");
+</%static:require_module_async>

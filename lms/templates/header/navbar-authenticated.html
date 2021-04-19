@@ -28,13 +28,13 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
 <div class="nav-links">
   <div class="main">
-    % if show_dashboard_tabs:
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
         <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
              aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
              ${_("Courses")}
         </a>
       </div>
+     % if show_dashboard_tabs:
       % if show_program_listing:
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
           <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}"
@@ -46,7 +46,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     % endif
     % if show_explore_courses:
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
+          <a class="${'active ' if "/courses" in request.path else ''} tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
              aria-current="${'page' if '/courses' in request.path else 'false'}">
              ${_('Discover New')}
           </a>

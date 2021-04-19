@@ -47,6 +47,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
+from custom_reg_form.models import UserExtraInfo
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -302,6 +303,47 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     def queryset(self, request):
         return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
 
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_view_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be viewed via the admin view.
+        """
+        return super(CourseEnrollmentAdmin, self).has_view_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_add_permission(self, request):
+        """
+        Returns True if CourseEnrollment objects can be added via the admin view.
+        """
+        return super(CourseEnrollmentAdmin, self).has_add_permission(request)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_change_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be modified via the admin view.
+        """
+        return super(CourseEnrollmentAdmin, self).has_change_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_delete_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be deleted via the admin view.
+        """
+        return super(CourseEnrollmentAdmin, self).has_delete_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_module_permission(self, request):
+        """
+        Returns True if links to the CourseEnrollment admin view can be displayed.
+        """
+        return super(CourseEnrollmentAdmin, self).has_module_permission(request)
+
+class UserExtraInfoInline(admin.StackedInline):
+    """ Inline admin interface for UserExtraInfo model. """
+    model = UserExtraInfo
+    can_delete = False
+    verbose_name_plural = 'User Extra Info'
+    extra = 0
 
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
@@ -340,7 +382,7 @@ class UserChangeForm(BaseUserChangeForm):
 
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
-    inlines = (UserProfileInline, AccountRecoveryInline)
+    inlines = (UserProfileInline, AccountRecoveryInline, UserExtraInfoInline)
     form = UserChangeForm
 
     def get_readonly_fields(self, request, obj=None):

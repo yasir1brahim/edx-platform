@@ -35,7 +35,7 @@ from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
-
+from organizations.models import Organization
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +43,35 @@ log = logging.getLogger(__name__)
 class CourseOverviewCaseMismatchException(Exception):
     pass
 
+
+class DifficultyLevel(models.Model):
+    label = models.CharField(max_length=50)
+    level = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = 'Difficulty Level'
+
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+    category_image = models.ImageField(upload_to=u'category', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Category'
+
+    def __str__(self):
+        return self.name
+
+class SubCategory(models.Model):
+    name = models.CharField(max_length=50)
+    sub_category_image = models.ImageField(upload_to=u'sub_category', null=True, blank=True)
+    category = models.ForeignKey(Category, related_name='subcategories',
+            on_delete=models.PROTECT, null=True)
+
+    class Meta:
+        verbose_name = 'SubCategory'
+
+    def __str__(self):
+        return self.name
 
 @python_2_unicode_compatible
 class CourseOverview(TimeStampedModel):
@@ -75,6 +104,7 @@ class CourseOverview(TimeStampedModel):
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
+    allow_review = BooleanField(default=True)
 
     # Start/end dates
     # TODO Remove 'start' & 'end' in removing field in column renaming, DE-1822
@@ -125,11 +155,21 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     language = TextField(null=True)
+    difficulty_level = TextField(null=True)
+    organization = models.ForeignKey(Organization, related_name='course_org', on_delete=models.SET_NULL, null=True)
+    new_category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True)
+    platform_visibility = TextField(default='Both', null=True)
+    course_sale_type = TextField(null=True)
+    premium = BooleanField(default=False)
+    indexed_in_discovery = BooleanField(default=False)
+    published_in_ecommerce = BooleanField(null=True)
+    course_price = FloatField(default=0.0)
 
     history = HistoricalRecords()
 
     @classmethod
-    def _create_or_update(cls, course):
+    def _create_or_update(cls, course, load_from_modulestore=None):
         """
         Creates or updates a CourseOverview object from a CourseDescriptor.
 
@@ -184,6 +224,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.id = course.id
         course_overview._location = course.location
         course_overview.org = course.location.org
+        #organization = Organization.objects.get(short_name=course.location.org)
+        #course_overview.organization_id = organization.id
         course_overview.display_name = display_name
         course_overview.display_number_with_default = course.display_number_with_default
         course_overview.display_org_with_default = course.display_org_with_default
@@ -225,7 +267,35 @@ class CourseOverview(TimeStampedModel):
         course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
+        if hasattr(course, 'difficulty_level'):
+            course_overview.difficulty_level = course.difficulty_level
+        logging.info(course.new_category)
+        logging.info(type(course.new_category))
+        if course.new_category and course.new_category != '-':
+            category_object = Category.objects.filter(id=int(course.new_category)).first()
+            course_overview.new_category = category_object
 
+        else:
+            course_overview.new_category = None
+
+        if course.subcategory and course.subcategory != '-':
+            subcategory_object = SubCategory.objects.filter(id=int(course.subcategory)).first()
+            course_overview.subcategory = subcategory_object
+
+        else:
+            course_overview.subcategory = None
+
+        course_overview.course_sale_type = course.course_sale_type
+        course_overview.platform_visibility = course.platform_visibility
+        course_overview.premium = course.premium
+        course_overview.course_price = course.course_price
+        course_org_object = None
+        if  course.course_org and course.course_org != '-':
+            course_org_object = Organization.objects.filter(id=int(course.course_org)).first()
+        course_overview.organization = course_org_object
+        course_overview.allow_review = json.loads(
+            CourseDetails.fetch_about_attribute(course.id, 'allow_review') or 'true'
+        )
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
 
@@ -260,6 +330,11 @@ class CourseOverview(TimeStampedModel):
                 try:
                     course_overview = cls._create_or_update(course)
                     with transaction.atomic():
+                        course_overview.org = course.location.org
+                        if Organization.objects.filter(short_name=course.location.org).exists():
+                            organization = Organization.objects.get(short_name=course.location.org)
+                            course_overview.organization_id = organization.id
+                            course_overview.organization = organization
                         course_overview.save()
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
@@ -616,7 +691,7 @@ class CourseOverview(TimeStampedModel):
         log.info('Finished generating course overviews.')
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None):
+    def get_all_courses(cls, orgs=None, platform=None,filter_=None):
         """
         Return a queryset containing all CourseOverview objects in the database.
 
@@ -638,6 +713,9 @@ class CourseOverview(TimeStampedModel):
             for org in orgs:
                 org_filter |= Q(org__iexact=org)
             course_overviews = course_overviews.filter(org_filter)
+       
+        if platform: 
+            course_overviews = course_overviews.filter(Q(platform_visibility=platform) | Q(platform_visibility='Both'), platform_visibility__isnull=False)       
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)

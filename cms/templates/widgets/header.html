@@ -10,11 +10,28 @@
 %>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
-
     <div class="wrapper wrapper-l">
       <h1 class="branding">
         <a class="brand-link" href="/">
-          <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+          % if not user.is_anonymous:
+                % if hasattr(user, 'user_extra_info'):
+          		% if user.user_extra_info.organization:
+				% if user.user_extra_info.organization.logo:
+                           	 <img class="brand-image" src="${settings.LMS_ROOT_URL}/media/${user.user_extra_info.organization.logo}" alt="${settings.STUDIO_NAME}" />
+                        	% else:
+                            	<img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+                        	% endif
+                
+                	% else:
+                        	<img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+               		 % endif:
+		% else:
+			<img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+		% endif
+          % else:
+              <img class="brand-image" src="${static.url('images/studio-logo.png')}" alt="${settings.STUDIO_NAME}" />
+          % endif
+
         </a>
       </h1>
 

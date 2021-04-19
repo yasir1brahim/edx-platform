@@ -493,6 +493,9 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
     'ENABLE_COURSE_DISCOVERY': False,
 
+    # Set organization course visibility
+    'ENABLE_CREATOR_GROUP': True,
+
     # Setting for overriding default filtering facets for Course discovery
     # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
 
@@ -1068,7 +1071,7 @@ WIKI_ENABLED = True
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
-    'currency': u'usd',
+    'currency': u'SGD',
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
@@ -1611,7 +1614,7 @@ EMBARGO_SITE_REDIRECT_URL = None
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
 
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
-PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
+PAID_COURSE_REGISTRATION_CURRENCY = ['SGD', 'S$']
 
 ################################# EdxNotes config  #########################
 
@@ -1676,6 +1679,7 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 ################################# Middleware ###################################
 
 MIDDLEWARE = [
+    'openedx.core.custom_exception_handler.ExceptionMiddleware',
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
     # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
@@ -1710,7 +1714,7 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
-    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
@@ -2575,6 +2579,21 @@ INSTALLED_APPS = [
     # Different Course Modes
     'common.djangoapps.course_modes.apps.CourseModesConfig',
 
+    # for managing course reviews.
+    'common.djangoapps.feedback',
+
+    # for authentication
+    'lms.djangoapps.gsauthentication',
+
+    # for managing terms and conditions.
+    'lms.djangoapps.terms_conditions',
+
+    # for Stripe API for mobile client
+    'lms.djangoapps.stripe_api',
+
+    # for HTML editor.
+    'ckeditor',
+
     # Enrollment API
     'openedx.core.djangoapps.enrollments',
 
@@ -2700,6 +2719,12 @@ INSTALLED_APPS = [
     # Course Goals
     'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
+    # FAQ
+    'lms.djangoapps.faq.apps.FaqApiConfig',
+
+    # Note
+    'lms.djangoapps.note.apps.NoteApiConfig',
+
     # Features
     'openedx.features.calendar_sync',
     'openedx.features.course_bookmarks',
@@ -2743,6 +2768,13 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
     'ratelimitbackend',
+    'cms.djangoapps.course_creators',
+
+    #LHUB Mobile APIs
+    'lms.djangoapps.lhub_mobile.apps.LhubMobileConfig',
+
+    'lms.djangoapps.lhub_notification.apps.NotificationConfig',
+    'lms.djangoapps.lhub_extended_api.apps.LhubExtendedApiConfig',
 ]
 
 ######################### CSRF #########################################
@@ -2760,6 +2792,7 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
+    'EXCEPTION_HANDLER': 'openedx.core.custom_exception_handler.handle_exception',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
@@ -3508,6 +3541,9 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "secondary_email_enabled",
         "year_of_birth",
         "phone_number",
+        "nric",
+        "industry",
+        "date_of_birth",
     ]
 )
 
@@ -4168,3 +4204,16 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+CKEDITOR_CONFIGS = {
+    'default': {
+	'width': 900,
+        'toolbar': 'Custom',
+	'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+	    ['Styles', 'Format', 'Font', 'FontSize'],
+	    ['TextColor', 'BGColor'],
+        ]
+    },
+}

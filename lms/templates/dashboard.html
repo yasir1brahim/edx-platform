@@ -149,7 +149,6 @@ from common.djangoapps.student.models import CourseEnrollment
           % if display_dashboard_courses:
           <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
           % endif
-
           % if len(course_entitlements + course_enrollments) > 0:
             <ul class="listing-courses">
             <%

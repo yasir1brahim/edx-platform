@@ -128,18 +128,18 @@ width: 70% !important;
               <input type="checkbox" class="field-radio" disabled="disabled"  name="Indexed in Discovery" id="course-indexed-in-discovery" value="true" aria-labelledby="course-pace-indexed-in-discovery-label"/>
               <label id="course-indexed-in-discovery-label" class="course-label" for="course-indexed-in-discovery">${_("Indexed in Discovery")}</label>
               <span class="tip">${_("Indexed in Discovery")}</span>
+
               <div id="field-course-published-in-ecommerce" class="yes_no" style="display:none;">
              
               <span class="tip">${_("Ecommerce Creation Status: ")}  <input type="text" disabled="disabled" name="Published in Ecommerce" id="course-published-in-ecommerce" aria-labelledby="course-pace-published-in-ecommerce-label"/></span> 
               <span><button type="button" id="published-in-ecommerce-retry"><i class="fa fa-refresh"></i>Retry</button></span>
               <span class="tip"><p id="retry-text" style="color: red"><b>Failed creating ecommerce</b></p></span>
             </div>
+            <div id="field-link-of-ecommerce" style="display: none;">
+              <span class="tip"><a href=${settings.ECOMMERCE_PUBLIC_URL_ROOT}/courses/${course_id} id="manage_your_product"><b>Go to Oscar</b></a></span>
+            </div>
             </li>
           </div>
-            
-
-            
-
           </ol>
 <style>
 

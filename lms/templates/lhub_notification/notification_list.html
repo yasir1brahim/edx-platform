@@ -34,6 +34,7 @@ from django.utils.translation import ugettext as _
   vertical-align: top;
   font-weight: 700;
   margin-bottom: 10px;
+  color: #0a0a0a !important;
 }
 
 .notification-list-item-date {
@@ -64,6 +65,8 @@ from django.utils.translation import ugettext as _
   margin-right: 30px;
   font-size: 35px;
   line-height: 70px;
+  margin-left: 10px;
+  background: #ffffff;
 }
 
 .lhub-notifications-list li .notification-list-item {
@@ -86,11 +89,13 @@ from django.utils.translation import ugettext as _
   text-align: right;
   width: 200px;
   min-width: 200px;
+  margin-right: 10px;
 }
 
 .notification-list-actions a {
   display: block;
   padding-bottom: 15px;
+  color: #0a0a0a !important;
 }
 
 .lhub-pagination {
@@ -133,7 +138,8 @@ from django.utils.translation import ugettext as _
       <h2 class="lhub-notifications-page-title">${_("Notifications")}</h2>
       <ul class="lhub-notifications-list">
         % for notification in notification_list:
-          <li class="${'new-notification' if not notification.is_read else ''} js-item-notification">
+          <li class="${'new-notification' if not notification.is_read else ''}
+                     ${notification.notification_type} js-item-notification">
             <div class="lhub-img-holder">
               <i class="fa fa-book" aria-hidden="true"></i>
             </div>

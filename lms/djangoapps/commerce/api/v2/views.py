@@ -78,21 +78,36 @@ class CourseListView(ListAPIView):
             platform_courses_list = []
             user = self.request.user
             user_org = user.user_extra_info.organization
+            authorization = self.request.META.get('HTTP_AUTHORIZATION')
 
-            for course in courses:
-                try:
-                    course_overview = CourseOverview.get_from_id(course.id)
-                    platform = course_overview.platform_visibility
-                    organization = course_overview.organization
-                    if user.is_staff:
-                        platform_courses_list.append(course)
-                    elif user_org == organization or organization == None:
-                        platform_courses_list.append(course)
-                    elif organization == None and user_org == None:
-                        platform_courses_list.append(course)
-                except:
-                    pass
-            courses = platform_courses_list
+            if "JWT" not in authorization:
+                for course in courses:
+                    try:
+                        course_overview = CourseOverview.get_from_id(course.id)
+                        platform = course_overview.platform_visibility
+                        organization = course_overview.organization
+                        if user.is_staff:
+                            platform_courses_list.append(course)
+                        elif user_org == organization or organization == None:
+                            platform_courses_list.append(course)
+                        elif organization == None and user_org == None:
+                            platform_courses_list.append(course)
+                    except:
+                        pass
+                courses = platform_courses_list
+
+            else:
+                for course in courses:
+                    try:
+                        course_overview = CourseOverview.get_from_id(course.id)
+                        platform = course_overview.platform_visibility
+                        organization = course_overview.organization
+                        if organization == None:
+                            platform_courses_list.append(course)
+                    except:
+                        pass
+                courses = platform_courses_list
+
         except:
             platform_courses_list = []
             for course in courses:

@@ -7,6 +7,7 @@ from rest_framework import mixins
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.response import Response
 from openedx.core.lib.api.authentication import BearerAuthentication
 from common.djangoapps.edxmako.shortcuts import render_to_response
 
@@ -33,6 +34,25 @@ class NotificationViewSet(mixins.RetrieveModelMixin,
     def perform_destroy(self, instance):
         instance.is_delete = True
         instance.save()
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response.data.update({
+            'message': '',
+            'status': True,
+            'status_code': 200
+        })
+        response.data['result'] = response.data.pop('results')
+        return response
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return Response(data={
+            "message": "",
+            "status": True,
+            "status_code": 200,
+            "result": response.data
+        })
 
 
 class NotificationListView(ListView):

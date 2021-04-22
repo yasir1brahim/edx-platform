@@ -211,6 +211,10 @@ urlpatterns = [
     url(r'^lhub/', include('lms.djangoapps.lhub_notification.urls')),
 ]
 
+urlpatterns += [
+    url(r'^lhub_extended_api/', include('lms.djangoapps.lhub_extended_api.urls')),
+]
+
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
         url(r'^api/mobile/(?P<api_version>v(1|0.5))/', include('lms.djangoapps.mobile_api.urls')),

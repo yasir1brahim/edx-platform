@@ -118,18 +118,18 @@ $('.wish-list').append(b)
 add_remove_click_function();
 }
 $('.list-group').empty();
-$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 font-weight-bold bg-transparent color">Sub Total<span id="sub_total">S$`+response['result']['basket_total']+`</span></li>`)
+$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0 font-weight-bold bg-transparent color">Sub Total<span id="sub_total">S$`+response['result']['basket_total_excl_tax']+`</span></li>`)
 $('.list-group').append(`<li class="list-group-item d-flex justify-content-end align-items-center px-0 bg-transparent border-0">
 </li>
 `)
 
 
-//$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
-//<div>
-//<strong class="color">Tax (7% GST)</strong>
-//</div>
-//<span><strong class="color">S$18.90</strong></span>
-//</li>`)
+$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
+<div>
+<strong class="color">Tax (7% GST)</strong>
+</div>
+<span><strong class="color">+S$`+response['result']['tax']+`</strong></span>
+</li>`)
 
 
 

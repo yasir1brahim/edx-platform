@@ -42,7 +42,19 @@ class NotificationViewSet(mixins.RetrieveModelMixin,
             'status': True,
             'status_code': 200
         })
-        response.data['result'] = response.data.pop('results')
+        response.data.update({
+            'result': {
+                'pagination': {
+                    'next': response.data.pop('next'),
+                    'previous': response.data.pop('previous'),
+                    'count': response.data.pop('count'),
+                    'num_pages': response.data.pop('num_pages'),
+                    'current_page': response.data.pop('current_page'),
+                    'start': response.data.pop('start')
+                },
+                'results': response.data.pop('results')
+            }
+        })
         return response
 
     def retrieve(self, request, *args, **kwargs):

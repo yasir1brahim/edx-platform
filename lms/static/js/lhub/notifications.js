@@ -79,14 +79,14 @@
                                 data: {page: this.page}
                             }).done(function(data) {
                                 if (that.page === 1) {
-                                    that.newCount = (data.result.length) ? data.result[0].num_new_notifications : 0;
+                                    that.newCount = (data.result.results.length) ? data.result.results[0].num_new_notifications : 0;
                                     that.renderNewNotificationsCount();
                                 }
 
                                 if (that.isOpen) {
-                                    that.renderNotifications(data.result);
+                                    that.renderNotifications(data.result.results);
                                     that.page += 1;
-                                    that.numPages = data.num_pages;
+                                    that.numPages = data.result.pagination.num_pages;
                                 }
                             }).always(function() {
                                 that.$('.loading').remove();

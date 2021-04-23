@@ -15,6 +15,12 @@ from rest_framework.permissions import IsAuthenticated
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from django.core.paginator import InvalidPage
 from rest_framework.serializers import ValidationError
+from rest_framework.status import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
+
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 
 class LazyPageNumberPagination(NamespacedPageNumberPagination):
     """
@@ -48,7 +54,7 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
         return super(LazyPageNumberPagination, self).get_paginated_response(data)
 
-@view_auth_classes(is_authenticated=False)
+@view_auth_classes(is_authenticated=True)
 class BannerApi(DeveloperErrorViewMixin, ListAPIView):
 
     class BannerApiPageNumberPagination(LazyPageNumberPagination):
@@ -63,13 +69,27 @@ class BannerApi(DeveloperErrorViewMixin, ListAPIView):
     )
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
-        """
-        The query will return 1 to 10 images of banner, platform is both(mobile, web) or mobile alone as of now
-        """
-        queryset = Banner.objects.filter(platform__in=['MOBILE', 'BOTH'], enabled=True)
-        return queryset
-        # raise CustomAPIException("Invalid course ID.", status_code=status.HTTP_404_NOT_FOUND)
+    # def get_queryset(self):
+    #     """
+    #     The query will return 1 to 10 images of banner, platform is both(mobile, web) or mobile alone as of now
+    #     """
+    #     queryset = Banner.objects.filter(platform__in=['MOBILE', 'BOTH'], enabled=True)
+    #     return queryset
+    #     # raise CustomAPIException("Invalid course ID.", status_code=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, format=None):
+        banners = Banner.objects.filter(platform__in=['MOBILE', 'BOTH'], enabled=True)
+        serializer = BannerSerializer(banners, many=True)
+        result = {"results":serializer.data}
+        pagination = {"next":None, "previous": None, "count": 1, "num_pages": 1 if len(serializer.data)<=100 else int(len(serializer.data)/100)}
+        x = Response({"message": "", "result": result, "pagination":pagination, "status": True, "status_code": 200})
+        if x and serializer.data:
+            return x
+        elif not serializer.data:
+            return Response({"message": "No data found", "result": result, "pagination":pagination, "status": True, "status_code": 200})
+        else:
+            return Response({"message": "Error", "result": result, "pagination":pagination, "status": False, "status_code": 400})
+
 
 class CustomAPIException(ValidationError):
     """

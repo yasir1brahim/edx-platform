@@ -10,6 +10,7 @@ from django.urls import reverse
    <div id="myCarousel" class="carousel slide" data-ride="carousel">
     <!-- Indicators -->
             <ul class="carousel-indicators">
+        % if banner_list:
             % for y in banner_list:
                 % if loop.index==1:
                     <li data-target="#myCarousel" data-slide-to="${y.slide_position}" class="active"></li>
@@ -17,9 +18,11 @@ from django.urls import reverse
                     <li data-target="#myCarousel" data-slide-to="${y.slide_position}" ></li>
                 % endif
             % endfor
+        % endif
             </ul>
             <!-- Wrapper for slides -->
-            <div class="carousel-inner" >
+            <div class="carousel-inner">
+            % if banner_list:
                 % for y in banner_list:
                         % if loop.index==1:
                         <div class="item active" >
@@ -40,8 +43,8 @@ from django.urls import reverse
                         </div>
                         </div>
                         % endif
-
                 % endfor
+            % endif
             </div>
 
     <!-- Left and right controls -->

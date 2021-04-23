@@ -2775,6 +2775,9 @@ INSTALLED_APPS = [
 
     'lms.djangoapps.lhub_notification.apps.NotificationConfig',
     'lms.djangoapps.lhub_extended_api.apps.LhubExtendedApiConfig',
+
+    #banner related
+    'lms.djangoapps.banner.apps.BannerConfig'
 ]
 
 ######################### CSRF #########################################

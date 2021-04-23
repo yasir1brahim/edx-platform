@@ -1027,3 +1027,9 @@ urlpatterns += [
 urlpatterns += [
     url(r'^api/course_experience/', include('openedx.features.course_experience.api.v1.urls')),
 ]
+
+#Banner API
+urlpatterns += [
+    url(r'^api/banner/', include('lms.djangoapps.banner.api.urls')),
+
+]

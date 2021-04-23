@@ -1,30 +1,46 @@
-<%page expression_filter="h"/>
+<%page expression_filter="h" />
 
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
+from django.urls import reverse
 %>
 
-<div class="container">
+<div class="heading-group carousel">
    <div id="myCarousel" class="carousel slide" data-ride="carousel">
     <!-- Indicators -->
-
-
-            <ol class="carousel-indicators">
-            % for x in banner_list:
-              <li data-target="#myCarousel" data-slide-to="${x.slide_position}" ></li>
+            <ul class="carousel-indicators">
+            % for y in banner_list:
+                % if loop.index==1:
+                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" class="active"></li>
+                % else:
+                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" ></li>
+                % endif
             % endfor
-            </ol>
+            </ul>
             <!-- Wrapper for slides -->
-            <div class="carousel-inner">
+            <div class="carousel-inner" >
                 % for y in banner_list:
                         % if loop.index==1:
                         <div class="item active" >
+                            <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
+                            <img src="${y.banner_img_url_txt}"  class="d-block w-100">
+                                </a>
+                        <div class="carousel-caption">
+                            <h4 >${y.course_over_view.display_name_with_default}</h4>
+                        </div>
+                        </div>
                         % else:
                         <div class="item">
+                             <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
+                            <img src="${y.banner_img_url_txt}"  class="d-block w-100">
+                             </a>
+                        <div class="carousel-caption">
+                            <h3>${y.course_over_view.display_name_with_default}</h3>
+                        </div>
+                        </div>
                         % endif
-                        <img src="${y.banner_img_url_txt}" alt="Los Angeles" style="width:100%;">
-                  </div>
+
                 % endfor
             </div>
 
@@ -37,8 +53,10 @@ from openedx.core.djangolib.markup import HTML, Text
       <span class="glyphicon glyphicon-chevron-right"></span>
       <span class="sr-only">Next</span>
     </a>
+
   </div>
 </div>
+
 
 
 

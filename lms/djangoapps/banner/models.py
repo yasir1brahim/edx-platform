@@ -3,10 +3,12 @@ from django.db import models
 from django.db import models
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from django.contrib.auth.models import User
+
+
 # Create your models here.
 class Banner(models.Model):
     PLATFORM_CHOICES=(('mobile', 'MOBILE'), ('web', 'WEB'), ('both', 'BOTH'))
-    course_over_view = models.OneToOneField(CourseOverview, related_name='course_over_view', on_delete=models.CASCADE)
+    course_over_view = models.ForeignKey(CourseOverview, related_name='course_over_view', on_delete=models.CASCADE)
     banner_img_url_txt = models.TextField(blank=True, default=u"")
     banner_img = models.ImageField(upload_to = 'banner/lms/courses')
     enabled = models.BooleanField(default = True)

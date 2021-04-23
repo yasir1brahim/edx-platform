@@ -150,13 +150,13 @@ from django.utils.translation import ugettext as _
               <div class="notification-list-item-date">${notification.created.strftime('%d/%m/%Y')}</div>
             </div>
             <div class="notification-list-actions">
-              % if not notification.is_read:
-                <a href="#" class="js-mark-as-read"
-                   data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}">
-                  ${_("Mark as read")}
+                <a href="#" class="js-mark-read-status"
+                   data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}"
+                   data-is-read="${'true' if notification.is_read else 'false'}">
+                    <span class="js-mark-as-read ${'hidden' if notification.is_read else ''}">${_("Mark as read")}</span>
+                    <span class="js-mark-as-unread ${'hidden' if not notification.is_read else ''}">${_("Mark as unread")}</span>
                 </a>
-              % endif
-              <a href="#" class="js-delete-notification"
+                <a href="#" class="js-delete-notification"
                  data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}">
                 ${_("Delete")}
               </a>

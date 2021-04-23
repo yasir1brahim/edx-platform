@@ -10,18 +10,21 @@ from django.urls import reverse
    <div id="myCarousel" class="carousel slide" data-ride="carousel">
     <!-- Indicators -->
             <ul class="carousel-indicators">
-            % for y in banner_list:
-                % if loop.index==1:
-                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" class="active"></li>
+	 % if banner_list:
+            % for x in banner_list:
+                % if x and loop.index==1:
+                    <li data-target="#myCarousel" data-slide-to="${x.slide_position}" class="active"></li>
                 % else:
-                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" ></li>
+                    <li data-target="#myCarousel" data-slide-to="${x.slide_position}" ></li>
                 % endif
             % endfor
+	% endif
             </ul>
             <!-- Wrapper for slides -->
             <div class="carousel-inner" >
-                % for y in banner_list:
-                        % if loop.index==1:
+	% if banner_list:
+            % for y in banner_list:
+                % if y and loop.index==1:
                         <div class="item active" >
                             <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
                             <img src="${y.banner_img_url_txt}"  class="d-block w-100">
@@ -30,7 +33,7 @@ from django.urls import reverse
                             <h4 >${y.course_over_view.display_name_with_default}</h4>
                         </div>
                         </div>
-                        % else:
+                % else:
                         <div class="item">
                              <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
                             <img src="${y.banner_img_url_txt}"  class="d-block w-100">
@@ -38,10 +41,11 @@ from django.urls import reverse
                         <div class="carousel-caption">
                             <h3>${y.course_over_view.display_name_with_default}</h3>
                         </div>
-                        </div>
-                        % endif
+                      </div>
+                % endif
 
-                % endfor
+           % endfor
+	% endif
             </div>
 
     <!-- Left and right controls -->

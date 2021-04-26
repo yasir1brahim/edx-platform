@@ -124,11 +124,11 @@ $('.list-group').append(`<li class="list-group-item d-flex justify-content-end a
 `)
 
 
-$('.list-group').append(`<li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
+$('.list-group').append(`<li id="tax" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">
 <div>
-<strong class="color">Tax (7% GST)</strong>
+<strong class="color">Tax `+response['result']['tax_percent']+`% GST</strong>
 </div>
-<span><strong class="color">+S$`+response['result']['tax']+`</strong></span>
+<span><strong id="total_tax" class="color">S$`+response['result']['tax']+`</strong></span>
 </li>`)
 
 
@@ -248,7 +248,6 @@ function onclick_select()
 $(".form-check-input").change(function(){
 
 $('#loader-sec').css('display', '')
-
 //Set timeout is needed because without this, execution is so fast that user will not be able to know that cart total has been updated
 setTimeout(
 function()
@@ -269,8 +268,15 @@ cart_total += float_price
 var currency = 'S$'
 var two_decimal_price = append_decimal_point(cart_total)
 var total = currency.concat(two_decimal_price)
-$("#cart_total").text(total)
+var tax = two_decimal_price*0.07
+var tax = tax.toFixed(2)
+var updated_cart_total = ((+two_decimal_price) + (+tax)).toFixed(2)
+var updated_cart_total = currency.concat(updated_cart_total)
+var tax = currency.concat(tax)
+
+$("#cart_total").text(updated_cart_total)
 $("#sub_total").text(total)
+$("#total_tax").text(tax)
 if (selected.length == 0)
 {
 $('#btn-checkout').attr("disabled", true)

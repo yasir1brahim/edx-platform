@@ -125,7 +125,7 @@ $(document).ready(function() {
     </li>
     `)
     
-    var tax_percent = response['result']['tax_percent']
+    tax_percent = response['result']['tax_percent']
     var tax = response['result']['tax']
     tax = append_decimal_point(tax)
     $('.list-group').append(`<li id="tax" class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3 bg-transparent">

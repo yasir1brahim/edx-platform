@@ -96,17 +96,19 @@ class LHUBOrdersHistoryView(APIView):
             )
 
         for order in user_orders:
-            product = order.get('lines')[0].get('product')
-            attribute_values = product.pop('attribute_values')
+            lines = order.get('lines', [])
+            for line in lines:
+                product = line.get('product', {})
+                attribute_values = product.pop('attribute_values')
 
-            course_id = next(attribute_value.get('value') for attribute_value in attribute_values if
-                             attribute_value.get('code') == 'course_key')
+                course_id = next(attribute_value.get('value') for attribute_value in attribute_values if
+                                 attribute_value.get('code') == 'course_key')
 
-            course = CourseOverview.objects.filter(id=course_id).first()
-            product.update({
-                "course_id": course_id,
-                "course_image_url": course.course_image_url if course else ''
-            })
+                course = CourseOverview.objects.filter(id=course_id).first()
+                product.update({
+                    "course_id": course_id,
+                    "course_image_url": course.course_image_url if course else ''
+                })
 
         return Response(
             {

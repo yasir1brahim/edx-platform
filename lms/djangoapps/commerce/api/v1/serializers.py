@@ -220,6 +220,7 @@ class CourseDetailSerializer(serializers.Serializer):
     description = serializers.CharField(required=False)
     allow_review = serializers.BooleanField()
     is_enrolled = serializers.BooleanField(required=False)
+    own_feedback = serializers.BooleanField(required=False)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema

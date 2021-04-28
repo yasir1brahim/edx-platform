@@ -58,7 +58,7 @@ width: 195px;
     <footer>
       <div class="row">
         <div class="col-md-9">
-          <nav class="navbar site-nav navbar-expand-sm" aria-label="${_('About')}">
+          <nav style="display:none" class="navbar site-nav navbar-expand-sm" aria-label="${_('About')}">
             <ul class="navbar-nav">
               % for item_num, link in enumerate(footer['navigation_links'], start=1):
                 <li class="nav-item">
@@ -93,7 +93,7 @@ width: 195px;
               % endif
           </p>
 
-          <nav class="navbar legal-nav navbar-expand-sm" aria-label="${_('Legal')}">
+          <nav style="display:none" class="navbar legal-nav navbar-expand-sm" aria-label="${_('Legal')}">
             <ul class="navbar-nav">
               % for item_num, link in enumerate(footer['legal_links'], start=1):
                 <li class="nav-item">
@@ -135,7 +135,7 @@ width: 195px;
       % endif
     >
       <div class="colophon">
-        <nav class="nav-colophon" aria-label="${_('About')}">
+        <nav style="display:none" class="nav-colophon" aria-label="${_('About')}">
           <ol>
               % for item_num, link in enumerate(footer['navigation_links'], start=1):
               <li class="nav-colophon-0${item_num}">
@@ -159,7 +159,7 @@ width: 195px;
               ## can be included in the footer on other sites
               ## (e.g. a blog or marketing front-end) to provide a consistent
               ## user experience.  See the branding app for details.
-              <img alt="${_('organization logo')}" src="${footer['logo_image']}">
+              <img class="footer-logo" alt="${_('organization logo')}" src="/static/lhub/images/logo.2a2e45d88249.png">
             </a>
           </p>
         </div>
@@ -174,7 +174,7 @@ width: 195px;
               % endif
           </p>
 
-        <nav class="nav-legal" aria-label="${_('Legal')}">
+        <nav style="display:none" class="nav-legal" aria-label="${_('Legal')}">
           <ul>
             % for item_num, link in enumerate(footer['legal_links'], start=1):
               <li class="nav-legal-0${item_num}">

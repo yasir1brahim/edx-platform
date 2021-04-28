@@ -30,6 +30,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.response import Response
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from django.apps import apps
+from common.djangoapps.feedback.models import CourseReview
 
 CourseEnrollment = apps.get_model('student', 'CourseEnrollment')
 
@@ -201,6 +202,7 @@ class CourseDetailView(RetrieveAPIView):
             course.name = course_overview.display_name
             course.allow_review = course_overview.allow_review
             course.is_enrolled = CourseEnrollment.is_enrolled(self.request.user, course_id)
+            course.own_feedback = CourseReview.is_reviewed(self.request.user, course_id)
 
             if len(course_extra_info.modes) == 0:
                 course.price = 0

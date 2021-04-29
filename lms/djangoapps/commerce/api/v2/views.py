@@ -191,7 +191,7 @@ class CourseDetailView(RetrieveAPIView):
             course.comments_count = course_extra_info.comments_count
             course.difficulty_level = course.difficulty_level.capitalize() if course.difficulty_level else "Unknown"
             course.discount_applicable = course_extra_info.discount_applicable
-            course.discount_percentage = course_extra_info.discount_percentage
+            course.discount_percentage = course_extra_info.discount_percentage_string
             course.discounted_price = course_extra_info.discounted_price
             course.currency = course_extra_info.currency
             course.description = course_overview.short_description

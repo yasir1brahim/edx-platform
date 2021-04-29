@@ -135,7 +135,7 @@ class CourseSerializer(serializers.Serializer):
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'commerce.Course'
-
+    
     def validate(self, attrs):
         """ Ensure the verification deadline occurs AFTER the course mode enrollment deadlines. """
         verification_deadline = attrs.get('verification_deadline', None)

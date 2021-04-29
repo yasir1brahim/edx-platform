@@ -142,6 +142,7 @@ from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
 from commerce.api.v1.models import Course
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from lms.djangoapps.banner.models import Banner
 
 log = logging.getLogger("edx.courseware")
 
@@ -351,6 +352,7 @@ def courses(request):
             'selected_difficulty_level_id': difficulty_level.id if difficulty_level else '',
             'selected_mode': mode,
             'sort': sort,
+            'banner_list': banner_list,
         }
     )
 

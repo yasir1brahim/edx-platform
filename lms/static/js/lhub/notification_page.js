@@ -50,7 +50,11 @@ $(document).ready(function() {
     $.ajax({
       url: url,
       type: 'POST',
-      data: {"ids": checkedInputs},
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      data: JSON.stringify({
+        ids: checkedInputs
+      }),
       success: function () {
         $.each(checkedInputs, function(){
           let checkbox = $(`#notification-${this}`);
@@ -77,7 +81,11 @@ $(document).ready(function() {
     $.ajax({
       url: url,
       type: 'POST',
-      data: {"ids": checkedInputs},
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      data: JSON.stringify({
+        ids: checkedInputs
+      }),
       success: function () {
         $.each(checkedInputs, function() {
           let checkbox = $(`#notification-${this}`);
@@ -104,7 +112,11 @@ $(document).ready(function() {
     $.ajax({
       url: url,
       type: 'POST',
-      data: {"ids": checkedInputs},
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      data: JSON.stringify({
+        ids: checkedInputs
+      }),
       success: function () {
         $.each(checkedInputs, function() {
           $(`#notification-${this}`).parents('.js-item-notification').remove();

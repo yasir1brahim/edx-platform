@@ -69,7 +69,7 @@ class NotificationViewSet(mixins.RetrieveModelMixin,
 
     @action(methods=['post'], detail=False, url_path='mark-selected-read')
     def mark_selected_read(self, request, *args, **kwargs):
-        ids = request.POST.getlist('ids[]', [])
+        ids = request.data.get('ids', [])
         Notification.objects.filter(id__in=ids).update(is_read=True)
         return Response(
             status=200,
@@ -83,7 +83,7 @@ class NotificationViewSet(mixins.RetrieveModelMixin,
 
     @action(methods=['post'], detail=False, url_path='mark-selected-unread')
     def mark_selected_unread(self, request, *args, **kwargs):
-        ids = request.POST.getlist('ids[]', [])
+        ids = request.data.get('ids', [])
         Notification.objects.filter(id__in=ids).update(is_read=False)
         return Response(
             status=200,
@@ -97,7 +97,7 @@ class NotificationViewSet(mixins.RetrieveModelMixin,
 
     @action(methods=['post'], detail=False, url_path='selected-delete')
     def selected_delete(self, request, *args, **kwargs):
-        ids = request.POST.getlist('ids[]', [])
+        ids = request.data.get('ids', [])
         Notification.objects.filter(id__in=ids).delete()
         return Response(
             status=200,

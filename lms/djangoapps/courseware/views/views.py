@@ -340,6 +340,8 @@ def courses(request):
     elif sub_category:
         selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
 
+    banner_list = Banner.objects.filter(platform__in = ['WEB', 'BOTH'], enabled=True)
+
     return render_to_response(
         "courseware/courses.html",
         {

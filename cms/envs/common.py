@@ -273,7 +273,7 @@ FEATURES = {
     'ALLOW_COURSE_RERUNS': True,
 
     # Certificates Web/HTML Views
-    'CERTIFICATES_HTML_VIEW': False,
+    'CERTIFICATES_HTML_VIEW': True,
 
     # Teams feature
     'ENABLE_TEAMS': True,
@@ -1516,6 +1516,9 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
     'ratelimitbackend',
+
+    #banner related
+    'lms.djangoapps.banner.apps.BannerConfig'
 ]
 
 

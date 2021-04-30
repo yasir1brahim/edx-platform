@@ -25,7 +25,7 @@
                         this.fetchData();
 
                         $('.js-user-notifications').on('click', this.slideToggle.bind(this));
-                        $('.js-wrap-block-notifications').on('scroll', this.scroll.bind(this));
+                        $('.js-block-notifications').on('scroll', this.scroll.bind(this));
                         $('body').on('click', function(){
                             that.close();
                         });
@@ -79,14 +79,14 @@
                                 data: {page: this.page}
                             }).done(function(data) {
                                 if (that.page === 1) {
-                                    that.newCount = (data.results.length) ? data.results[0].num_new_notifications : 0;
+                                    that.newCount = (data.result.results.length) ? data.result.results[0].num_new_notifications : 0;
                                     that.renderNewNotificationsCount();
                                 }
 
                                 if (that.isOpen) {
-                                    that.renderNotifications(data.results);
+                                    that.renderNotifications(data.result.results);
                                     that.page += 1;
-                                    that.numPages = data.num_pages;
+                                    that.numPages = data.result.pagination.num_pages;
                                 }
                             }).always(function() {
                                 that.$('.loading').remove();

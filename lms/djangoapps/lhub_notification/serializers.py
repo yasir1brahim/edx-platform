@@ -10,8 +10,8 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ['id', 'title', 'message', 'is_read', 'course_url', 'num_new_notifications',
-                  'notification_type', 'created']
-        read_only_fields = ('title', 'message', 'notification_type', 'created')
+                  'notification_type', 'created', 'days_warning']
+        read_only_fields = ('title', 'message', 'notification_type', 'created', 'days_warning')
 
     def get_course_url(self, obj):
         return reverse('course_root', kwargs={'course_id': obj.course_id}) if obj.course else ''

@@ -34,6 +34,7 @@ from django.utils.translation import ugettext as _
   vertical-align: top;
   font-weight: 700;
   margin-bottom: 10px;
+  color: #0a0a0a !important;
 }
 
 .notification-list-item-date {
@@ -64,6 +65,8 @@ from django.utils.translation import ugettext as _
   margin-right: 30px;
   font-size: 35px;
   line-height: 70px;
+  margin-left: 10px;
+  background: #ffffff;
 }
 
 .lhub-notifications-list li .notification-list-item {
@@ -86,11 +89,13 @@ from django.utils.translation import ugettext as _
   text-align: right;
   width: 200px;
   min-width: 200px;
+  margin-right: 10px;
 }
 
 .notification-list-actions a {
   display: block;
   padding-bottom: 15px;
+  color: #0a0a0a !important;
 }
 
 .lhub-pagination {
@@ -125,6 +130,21 @@ from django.utils.translation import ugettext as _
   border: 1px solid #1a345c;
   text-decoration: none;
 }
+
+.lhub-notifications-checkbox {
+    margin-left: 10px;
+    padding: inherit;
+}
+
+.lhub-notifications-multiple-actions {
+    margin-top: 10px;
+}
+
+.js-delete-all {
+    background: #f23d3d !important;
+    border-color: #bf3434 !important;
+    box-shadow: none !important;
+}
 </style>
 
 <main id="main" aria-label="Content" tabindex="-1">
@@ -133,7 +153,11 @@ from django.utils.translation import ugettext as _
       <h2 class="lhub-notifications-page-title">${_("Notifications")}</h2>
       <ul class="lhub-notifications-list">
         % for notification in notification_list:
-          <li class="${'new-notification' if not notification.is_read else ''} js-item-notification">
+          <li class="${'new-notification' if not notification.is_read else ''}
+                     ${notification.notification_type} js-item-notification">
+            <div class="lhub-notifications-checkbox">
+                <input type="checkbox" id="notification-${notification.id}" data-id="${notification.id}" name="notification">
+            </div>
             <div class="lhub-img-holder">
               <i class="fa fa-book" aria-hidden="true"></i>
             </div>
@@ -144,19 +168,24 @@ from django.utils.translation import ugettext as _
               <div class="notification-list-item-date">${notification.created.strftime('%d/%m/%Y')}</div>
             </div>
             <div class="notification-list-actions">
-              % if not notification.is_read:
-                <a href="#" class="js-mark-as-read"
-                   data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}">
-                  ${_("Mark as read")}
+                <a href="#" class="js-mark-read-status"
+                   data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}"
+                   data-is-read="${'true' if notification.is_read else 'false'}">
+                    <span class="js-mark-as-read ${'hidden' if notification.is_read else ''}">${_("Mark as read")}</span>
+                    <span class="js-mark-as-unread ${'hidden' if not notification.is_read else ''}">${_("Mark as unread")}</span>
                 </a>
-              % endif
-              <a href="#" class="js-delete-notification"
+                <a href="#" class="js-delete-notification"
                  data-url="${reverse('notification-detail', kwargs={'pk': notification.id})}">
                 ${_("Delete")}
               </a>
             </div>
           </li>
         % endfor
+          <div class="lhub-notifications-multiple-actions">
+              <input type="button" value="Mark all as read" class="js-mark-all-as-read" data-url="${reverse('notification-mark-selected-read')}">
+              <input type="button" value="Mark all as unread" class="js-mark-all-as-unread" data-url="${reverse('notification-mark-selected-unread')}">
+              <input type="button" value="Delete all" class="js-delete-all" data-url="${reverse('notification-selected-delete')}">
+          </div>
       </ul>
     </div>
     % if is_paginated:

@@ -74,7 +74,7 @@ from common.djangoapps.student.text_me_the_app import TextMeTheAppFragmentView
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
-
+from lms.djangoapps.banner.models import Banner
 log = logging.getLogger("edx.student")
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -185,7 +185,8 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     # allow for theme override of the courses list
     context['courses_list'] = theming_helpers.get_template_path('courses_list.html')
-
+    #fetch banner for courses to show in home page
+    context['banner_list'] = Banner.objects.filter(platform__in = ['WEB', 'BOTH'], enabled=True)
     # Insert additional context for use in the template
     context.update(extra_context)
 

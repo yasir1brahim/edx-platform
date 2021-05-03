@@ -5,8 +5,10 @@ from django.views.generic import DetailView, ListView
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import mixins
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.response import Response
 from openedx.core.lib.api.authentication import BearerAuthentication
 from common.djangoapps.edxmako.shortcuts import render_to_response
 
@@ -33,6 +35,79 @@ class NotificationViewSet(mixins.RetrieveModelMixin,
     def perform_destroy(self, instance):
         instance.is_delete = True
         instance.save()
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response.data.update({
+            'message': '',
+            'status': True,
+            'status_code': 200
+        })
+        response.data.update({
+            'result': {
+                'pagination': {
+                    'next': response.data.pop('next'),
+                    'previous': response.data.pop('previous'),
+                    'count': response.data.pop('count'),
+                    'num_pages': response.data.pop('num_pages'),
+                    'current_page': response.data.pop('current_page'),
+                    'start': response.data.pop('start')
+                },
+                'results': response.data.pop('results')
+            }
+        })
+        return response
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return Response(data={
+            "message": "",
+            "status": True,
+            "status_code": 200,
+            "result": response.data
+        })
+
+    @action(methods=['post'], detail=False, url_path='mark-selected-read')
+    def mark_selected_read(self, request, *args, **kwargs):
+        ids = request.data.get('ids', [])
+        Notification.objects.filter(id__in=ids).update(is_read=True)
+        return Response(
+            status=200,
+            data={
+                "message": "",
+                "status": True,
+                "status_code": 200,
+                "result": {}
+            }
+        )
+
+    @action(methods=['post'], detail=False, url_path='mark-selected-unread')
+    def mark_selected_unread(self, request, *args, **kwargs):
+        ids = request.data.get('ids', [])
+        Notification.objects.filter(id__in=ids).update(is_read=False)
+        return Response(
+            status=200,
+            data={
+                "message": "",
+                "status": True,
+                "status_code": 200,
+                "result": {}
+            }
+        )
+
+    @action(methods=['post'], detail=False, url_path='selected-delete')
+    def selected_delete(self, request, *args, **kwargs):
+        ids = request.data.get('ids', [])
+        Notification.objects.filter(id__in=ids).delete()
+        return Response(
+            status=200,
+            data={
+                "message": "",
+                "status": True,
+                "status_code": 200,
+                "result": {}
+            }
+        )
 
 
 class NotificationListView(ListView):

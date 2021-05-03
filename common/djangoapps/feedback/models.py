@@ -33,4 +33,8 @@ class CourseReview(models.Model):
                 fields=['user_id', 'course_id'],
             )
         ]
+    @classmethod
+    def is_reviewed(cls, user=None, course_id=None):
+        reviews = cls.objects.filter(user_id=user, course_id=course_id)
+        return True if reviews else False
 

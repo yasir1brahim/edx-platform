@@ -1,5 +1,5 @@
 <% _.each(notifications, function(notification) { %>
-    <div class="js-notifications-item <% if (!notification.is_read) { %>new-notification<% } %>">
+    <div class="js-notifications-item <% if (!notification.is_read) { %>new-notification<% } %> <%- notification.notification_type %>">
         <p class="notification-title"><%= notification.title %></p>
         <div>
             <a href="<%- notification.course_url %>" class="<% if (!notification.is_read) { %>js-mark-read<% } %>" data-id=<%- notification.id %>>

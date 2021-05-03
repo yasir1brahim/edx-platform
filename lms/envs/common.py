@@ -478,7 +478,7 @@ FEATURES = {
     'LICENSING': False,
 
     # Certificates Web/HTML Views
-    'CERTIFICATES_HTML_VIEW': False,
+    'CERTIFICATES_HTML_VIEW': True,
 
     # .. toggle_name: ENABLE_COURSE_DISCOVERY
     # .. toggle_implementation: DjangoSetting
@@ -2775,6 +2775,9 @@ INSTALLED_APPS = [
 
     'lms.djangoapps.lhub_notification.apps.NotificationConfig',
     'lms.djangoapps.lhub_extended_api.apps.LhubExtendedApiConfig',
+
+    #banner related
+    'lms.djangoapps.banner.apps.BannerConfig'
 ]
 
 ######################### CSRF #########################################

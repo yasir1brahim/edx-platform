@@ -403,7 +403,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                     this.$el.find('#course-course-price').prop("disabled", true)
                 }
                 else {
-                    this.$el.find('#course-course-price').prop("disabled", false)
+                    this.$el.find('#course-course-price').prop("disabled", true)
                 }
             },
             updateModel: function (event) {

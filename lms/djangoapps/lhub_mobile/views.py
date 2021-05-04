@@ -14,6 +14,8 @@ from .permissions import ApiKeyOrModelPermission
 from .serializers import CourseSerializer
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.api.v1.models import Course
+from django.http import Http404
+
 
 class UserSessionCookieView(ViewSet):
     """

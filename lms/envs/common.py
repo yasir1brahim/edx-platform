@@ -2778,6 +2778,9 @@ INSTALLED_APPS = [
 
     #banner related
     'lms.djangoapps.banner.apps.BannerConfig'
+
+    #course_block_user related
+    'lms.djangoapps.course_block_user.apps.CourseBlockUserConfig'
 ]
 
 ######################### CSRF #########################################

@@ -208,7 +208,7 @@ class Course(object):
     @property
     def discount_percentage(self):
         if len(self.modes) > 0:
-            return self.modes[0].discount_percentage
+            return "{:.2f}".format(self.modes[0].discount_percentage)
         return 0.0
 
     @property

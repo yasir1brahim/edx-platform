@@ -124,7 +124,6 @@ class CourseSerializer(serializers.Serializer):
     modes = CourseModeSerializer(many=True)
     discount_applicable = serializers.BooleanField(required=False)
     discounted_price = serializers.FloatField(required=False)
-    discounted_price_string = serializers.CharField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)
     category = serializers.CharField(required=False)
@@ -138,7 +137,6 @@ class CourseSerializer(serializers.Serializer):
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'commerce.Course'
-    
     def validate(self, attrs):
         """ Ensure the verification deadline occurs AFTER the course mode enrollment deadlines. """
         verification_deadline = attrs.get('verification_deadline', None)
@@ -212,13 +210,15 @@ class CourseDetailSerializer(serializers.Serializer):
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
     discount_applicable = serializers.BooleanField(required=False)
-    discounted_price = serializers.CharField(required=False)
+    discounted_price = serializers.FloatField(required=False)
+    discounted_price_string = serializers.CharField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)
     platform_visibility = serializers.CharField(required=False)
     is_premium = serializers.BooleanField(required=False)
     media = _CourseApiMediaCollectionSerializer(source='*',required=False)
-    discount_percentage = serializers.CharField(required=False)
+    discount_percentage = serializers.FloatField(required=False)
+    discount_percentage_string = serializers.CharField(required=False)
     chapter_count = serializers.IntegerField(required=False)
     description = serializers.CharField(required=False)
     allow_review = serializers.BooleanField()

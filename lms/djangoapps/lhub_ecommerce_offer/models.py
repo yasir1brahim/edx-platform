@@ -1,4 +1,5 @@
 from django.db import models
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 # Create your models here.
 
@@ -12,12 +13,8 @@ class Offer(models.Model):
     priority = models.CharField(max_length=250)
     is_exclusive = models.BooleanField()
     associated_ecommerce_offer_id = models.IntegerField()
-
+    course = models.ManyToManyField(CourseOverview)
     
     class Meta(object):
         app_label = "lhub_ecommerce_offer"
-
-
-class Course(models.Model):
-    course = models.CharField(max_length=250)
         

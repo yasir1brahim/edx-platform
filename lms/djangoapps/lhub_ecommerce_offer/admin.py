@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Offer, Course
+from .models import Offer
 
 # Register your models here.
 
@@ -28,11 +28,5 @@ class OfferAdmin(admin.ModelAdmin):
         'associated_ecommerce_offer_id'
     ]
 
-class CourseAdmin(admin.ModelAdmin):
-    """ Admin class for Course model """
-    fields = ('course',)
-    list_display = ['course']
-
 
 admin.site.register(Offer, OfferAdmin)
-admin.site.register(Course, CourseAdmin)

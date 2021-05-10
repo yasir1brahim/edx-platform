@@ -124,6 +124,7 @@ class CourseSerializer(serializers.Serializer):
     modes = CourseModeSerializer(many=True)
     discount_applicable = serializers.BooleanField(required=False)
     discounted_price = serializers.FloatField(required=False)
+    discounted_price_string = serializers.CharField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)
     category = serializers.CharField(required=False)

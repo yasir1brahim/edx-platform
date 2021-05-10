@@ -14,7 +14,8 @@ class OfferAdmin(admin.ModelAdmin):
         'end_datetime',
         'priority',
         'is_exclusive',
-        'associated_ecommerce_offer_id'
+        'associated_ecommerce_offer_id',
+        # 'course'
     )
     list_display = [
         'incentive_type',
@@ -25,7 +26,8 @@ class OfferAdmin(admin.ModelAdmin):
         'end_datetime',
         'priority',
         'is_exclusive',
-        'associated_ecommerce_offer_id'
+        'associated_ecommerce_offer_id',
+        # 'course'
     ]
 
 

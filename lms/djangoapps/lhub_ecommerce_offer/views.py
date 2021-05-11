@@ -5,7 +5,6 @@ from rest_framework import status
 from .models import Offer
 import datetime
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import logging
 
 # Create your views here.
 
@@ -75,4 +74,17 @@ class Ecommerce_Offer(APIView):
                 ecommerce_offer.course.add(CourseOverview.get_from_id(course_id))
 
         
+        return Response({'status': 'Succes'}, status=status.HTTP_200_OK)
+
+
+    def delete(self, *args, **kwargs):
+        
+        offer_id = self.kwargs.get('offer_id')
+        try:
+            offer = Offer.objects.get(associated_ecommerce_offer_id=offer_id)
+        except Offer.DoesNotExist:
+            return Response('No offer found', status=status.HTTP_404_NOT_FOUND)
+        
+        offer.delete()
+
         return Response({'status': 'Succes'}, status=status.HTTP_200_OK)

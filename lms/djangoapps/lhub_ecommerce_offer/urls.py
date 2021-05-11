@@ -6,5 +6,6 @@ from .views import Ecommerce_Offer
 
 urlpatterns = [
     url(r'^add/', Ecommerce_Offer.as_view(), name="lhub_ecommerce_offer"),
+    url(r'^delete/(?P<offer_id>[0-9]+)$', Ecommerce_Offer.as_view(), name="lhub_ecommerce_offer")
 ]
 

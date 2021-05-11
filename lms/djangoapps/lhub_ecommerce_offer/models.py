@@ -10,7 +10,7 @@ class Offer(models.Model):
     condition_value = models.DecimalField(max_digits=12, decimal_places=2)
     start_datetime = models.DateTimeField('date published')
     end_datetime = models.DateTimeField('date published')
-    priority = models.CharField(max_length=250)
+    priority = models.IntegerField()
     is_exclusive = models.BooleanField()
     associated_ecommerce_offer_id = models.IntegerField()
     course = models.ManyToManyField(CourseOverview)

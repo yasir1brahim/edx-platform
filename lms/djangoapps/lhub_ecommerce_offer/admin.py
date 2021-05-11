@@ -1,5 +1,8 @@
 from django.contrib import admin
 from .models import Offer
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+import logging
+
 
 # Register your models here.
 
@@ -15,7 +18,7 @@ class OfferAdmin(admin.ModelAdmin):
         'priority',
         'is_exclusive',
         'associated_ecommerce_offer_id',
-        # 'course'
+        'course'
     )
     list_display = [
         'incentive_type',
@@ -27,8 +30,14 @@ class OfferAdmin(admin.ModelAdmin):
         'priority',
         'is_exclusive',
         'associated_ecommerce_offer_id',
-        # 'course'
+        'courses_sku'
     ]
+
+
+    def courses_sku(self, obj):
+        # return "\n".join([a.course_sku for a in obj.CourseOverview.all()])
+        # for a in obj.CourseOverview.all():
+        pass
 
 
 admin.site.register(Offer, OfferAdmin)

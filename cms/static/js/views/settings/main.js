@@ -97,8 +97,9 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 }
                 else {
                     this.$el.find('#course-course-sale-type').prop("disabled", true)
-                    this.$el.find('#course-course-price').prop("disabled", false)
+                    this.$el.find('#course-course-price').prop("disabled", true)
                 }
+
             },
 
             render: function () {
@@ -399,7 +400,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                 $('#course-subcategory option[value="0"]').attr('selected', 'selected');
             },
             disableCoursePrice: function () {
-                if (this.$el.find('#course-course-sale-type').val() === "free") {
+                if (this.$el.find('#course-course-sale-type').val() === "paid") {
                     this.$el.find('#course-course-price').prop("disabled", true)
                 }
                 else {

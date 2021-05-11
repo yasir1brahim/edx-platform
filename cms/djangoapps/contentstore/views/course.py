@@ -863,13 +863,13 @@ def course_outline_initial_state(locator_to_show, course_structure):
 
 def refresh_course_metadata(request,course_id):
     data = {'client_id': 'discovery-backend-service-key', 'client_secret': 'discovery-backend-service-secret', 'grant_type': 'client_credentials', 'token_type': 'jwt'}
-    response = requests.post(url = settings.LMS_ROOT_URL + '/oauth2/access_token', data=data)
+    response = requests.post(url = 'http://192.168.0.127:18000/oauth2/access_token', data=data)
     json_response = json.loads(response.text)
     if "access_token" in json_response.keys():
         jwt_token = json_response['access_token']
         param_dict = {'course_id':course_id}
         headers = {'Authorization' : 'JWT ' + jwt_token}
-        URL = settings.DISCOVERY_ROOT_URL + '/api/v1/refresh_course_metadata'
+        URL = 'http://192.168.0.127:18381/api/v1/refresh_course_metadata'
         response = requests.get(url = URL, headers = headers, params = param_dict)
         json_response = json.loads(response.text)
         result = json_response['is_successful']
@@ -1132,6 +1132,8 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
 @require_http_methods(("GET", "PUT", "POST"))
 @expect_json
 def settings_handler(request, course_key_string):
+
+    print("==================")
     """
     Course settings for dates and about pages
     GET
@@ -1185,6 +1187,8 @@ def settings_handler(request, course_key_string):
             course_sale_type_options = [('free', 'Free'), ('paid','Paid')]
             platform_visibility_options = [('Mobile', 'Mobile'), ('Web','Web'), ('Both','Both')]
             difficulty_level_options = DifficultyLevel.objects.all()
+            
+            
             course_org_options = Organization.objects.all()
             categories = Category.objects.all()
             subcategories = SubCategory.objects.all()
@@ -1320,6 +1324,7 @@ def settings_handler(request, course_key_string):
                     else:
                         course_sale_type = 'professional'
                     course_price = float(request.json['course_price'])
+                    course_price.disabled= True
                     course_name = course.display_name_with_default
                     #course_id = CourseLocator.from_string(course_key)
                     course_id = six.text_type(course_key)

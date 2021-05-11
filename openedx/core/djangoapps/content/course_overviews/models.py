@@ -75,6 +75,7 @@ class SubCategory(models.Model):
 
 @python_2_unicode_compatible
 class CourseOverview(TimeStampedModel):
+    print("=================")
     """
     Model for storing and caching basic information about a course.
 
@@ -293,9 +294,9 @@ class CourseOverview(TimeStampedModel):
         if  course.course_org and course.course_org != '-':
             course_org_object = Organization.objects.filter(id=int(course.course_org)).first()
         course_overview.organization = course_org_object
-        course_overview.allow_review = json.loads(
-            CourseDetails.fetch_about_attribute(course.id, 'allow_review') or 'true'
-        )
+        #course_overview.allow_review = json.loads(
+        #    CourseDetails.fetch_about_attribute(course.id, 'allow_review') or 'true'
+        # )
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
 

@@ -152,6 +152,7 @@ CELERY_QUEUES = {
 
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # STATIC_ROOT specifies the directory where static files are
 # collected

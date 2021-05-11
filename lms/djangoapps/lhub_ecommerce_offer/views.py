@@ -44,7 +44,7 @@ class Ecommerce_Offer(APIView):
                 # but not in the api courses
                 elif str(course.id) not in ecommerce_data['courses_id']:
                     # remove the course from Offer courses
-                    course.delete()
+                    course.offer_set.remove(ecommerce_offer[0])
  
             # condition 03: course is not present in offer courses
             # but present in the api courses

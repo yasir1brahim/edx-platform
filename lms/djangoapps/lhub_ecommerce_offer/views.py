@@ -92,7 +92,7 @@ class Ecommerce_Offer(APIView):
         try:
             offer = Offer.objects.get(associated_ecommerce_offer_id=offer_id)
         except Offer.DoesNotExist:
-            return Response('No offer found', status=status.HTTP_404_NOT_FOUND)
+            return Response({'status': 'Not Found'}, status=status.HTTP_404_NOT_FOUND)
         
         offer.delete()
 

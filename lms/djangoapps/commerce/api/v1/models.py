@@ -29,6 +29,10 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
+from lms.djangoapps.lhub_ecommerce_offer.models import Offer
+from decimal import Decimal as D
+
+
 class Course(object):
     """ Pseudo-course model used to group CourseMode objects. """
     id = None  # pylint: disable=invalid-name
@@ -170,8 +174,10 @@ class Course(object):
 
     @property
     def discount_applicable(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
         if len(self.modes) > 0:
-            return self.modes[0].discount_percentage > 0.00
+            if Offer.objects.filter(course__pk=course_id).exists():
+                return True
 
         return False
 
@@ -184,14 +190,23 @@ class Course(object):
         except:
             return "S$"
 
-
-
     @property
     def discounted_price(self):
         if len(self.modes) > 0:
             price = float(self.modes[0].min_price)
-            discounted_price = price -  (self.modes[0].discount_percentage/100) * price
-            return "%.2f" % discounted_price
+            course_id = CourseKey.from_string(six.text_type(self.id))
+
+            if Offer.objects.filter(course__pk=course_id).exists():
+                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                incentive_type = offer.incentive_type
+                incentive_value = float(offer.incentive_value)
+                if incentive_type == 'Percentage':
+                    discounted_price = price - (price * (incentive_value/100))
+                else:
+                    pass
+
+                return "%.2f" % discounted_price
+
         course_mode_price = self.get_paid_mode_price()
         return course_mode_price
 
@@ -199,22 +214,41 @@ class Course(object):
     def discounted_price_string(self):
         if len(self.modes) > 0:
             price = float(self.modes[0].min_price)
-            discounted_price_string = price -  (self.modes[0].discount_percentage/100) * price
-            return str("%.2f" % discounted_price_string)
+            course_id = CourseKey.from_string(six.text_type(self.id))
+
+            if Offer.objects.filter(course__pk=course_id).exists():
+                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                incentive_type = offer.incentive_type
+                incentive_value = float(offer.incentive_value)
+                if incentive_type == 'Percentage':
+                    discounted_price = price - (price * (incentive_value/100))
+                else:
+                    pass
+
+                return str("%.2f" % discounted_price)
+        
         course_mode_price = self.get_paid_mode_price()
         return course_mode_price
 
 
     @property
     def discount_percentage(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
         if len(self.modes) > 0:
-            return self.modes[0].discount_percentage
+            if Offer.objects.filter(course__pk=course_id).exists():
+                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                self.modes[0].discount_percentage = offer.incentive_value
+                return self.modes[0].discount_percentage
         return 0.0
 
     @property
     def discount_percentage_string(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
         if len(self.modes) > 0:
-            return str("%.2f" % self.modes[0].discount_percentage)
+            if Offer.objects.filter(course__pk=course_id).exists():
+                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                self.modes[0].discount_percentage = offer.incentive_value
+                return str("%.2f" % self.modes[0].discount_percentage)
         return "%.2f" % 0.0
 
 

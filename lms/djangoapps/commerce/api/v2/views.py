@@ -59,7 +59,7 @@ class CourseListView(ListAPIView):
                 else:
                     request_filters[f] = filter_val.split(',')
 
-        courses = list(Course.iterator())        
+        courses = list(Course.iterator())
         platform_only_courses = []
         for course in courses:
             platform = course.platform_visibility
@@ -172,7 +172,7 @@ class WebCourseListView(CourseListView):
     """ List courses and modes. """
     class CourseListPageNumberPagination(LazyPageNumberPagination):
         max_page_size = 100
-    authentication_classes = (JwtAuthentication,BearerAuthentication,)
+    authentication_classes = (JwtAuthentication,BearerAuthentication,SessionAuthentication)
     permission_classes = (IsAuthenticated,)
     serializer_class = WebCourseSerializer
     pagination_class = CourseListPageNumberPagination

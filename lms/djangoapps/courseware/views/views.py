@@ -338,10 +338,15 @@ def courses(request):
         selected_category_name = category.name
     elif sub_category:
         selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
+    if (difficulty_level_id == "") and (sort == '') and (mode == ''):
+        show_categorized_view = True
+    else:
+        show_categorized_view = False
 
     return render_to_response(
         "courseware/courses.html",
         {
+
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
@@ -351,7 +356,9 @@ def courses(request):
             'selected_difficulty_level_id': difficulty_level.id if difficulty_level else '',
             'selected_mode': mode,
             'sort': sort,
-        }
+            'show_categorized_view': show_categorized_view,
+        },
+
     )
 
 

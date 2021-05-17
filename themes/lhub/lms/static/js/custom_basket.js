@@ -338,6 +338,7 @@ $(document).ready(function() {
     course_price = response['result']['result'][i]['price']
     course_discounted_price = response['result']['result'][i]['discounted_price']
     course_discount_percentage = response['result']['result'][i]['discount_percentage']
+    course_discount_type = response['result']['result'][i]['discount_type']
     
     
     
@@ -363,10 +364,17 @@ $(document).ready(function() {
     <ul>`
     if (course_discount_applicable == true)
     {
-    
+    if (course_discount_type == 'Percentage')
+    {
     course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
     <li>Price: <span class="main_price_cut">S$`+course_price+`</span></li>
     <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+    }
+    else{
+        course +=`<li>Discount: <span class="main_price-percentage">`+course_discount_percentage+`</span></li>
+    <li>Price: <span class="main_price_cut">S$`+course_price+`</span></li>
+    <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+    }
     }
     else if (course_discount_applicable == false && course_price > 0 )
     {

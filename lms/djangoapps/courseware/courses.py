@@ -729,6 +729,7 @@ def get_courses_with_extra_info(user, org=None, filter_=None):
         course.discount_percentage = course_extra_info.discount_percentage
         course.discounted_price = course_extra_info.discounted_price
         course.currency = course_extra_info.currency
+        course.discount_type = course_extra_info.discount_type
         if len(course_extra_info.modes) == 0:
             course.price = 0
         else:
@@ -775,6 +776,7 @@ def get_courses_with_extra_info_json(user, org=None, platform=None, filter_=None
         course.discount_percentage = course_extra_info.discount_percentage
         course.discounted_price = course_extra_info.discounted_price
         course.currency = course_extra_info.currency
+        course.discount_type = course_extra_info.discount_type
         if len(course_extra_info.modes) == 0:
             course.price = 0
         else:

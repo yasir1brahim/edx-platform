@@ -203,9 +203,12 @@ font-weight: 800 !important;
           <div class="price_details">
 
     <ul>
-
-       <li>Discount Percentage: <span class="main_price-percentage">${format(course.discount_percentage, ".2f")}%</span></li>
-       % if course.discounted_price == 0:
+       % if course.discount_type == 'Percentage':
+          <li>Discount Percentage: <span class="main_price-percentage">${format(course.discount_percentage, ".2f")}%</span></li>
+      % else:
+      <li>Discount: <span class="main_price-percentage">-${format(course.discount_percentage, ".2f")}</span></li>
+      % endif
+          % if course.discounted_price == 0:
              <li>Price: <span class="main_price_cut">S$${format(course.price, ".2f")}</span></li>
              <li>Discounted Price: <span class="main_price">Free</span>
        % else:

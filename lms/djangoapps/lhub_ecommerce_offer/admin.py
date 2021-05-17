@@ -19,7 +19,7 @@ class OfferAdmin(admin.ModelAdmin):
         'is_exclusive',
         'associated_ecommerce_offer_id',
         'course',
-        'is_active'
+        'is_suspended'
     )
     list_display = [
         'incentive_type',
@@ -32,7 +32,7 @@ class OfferAdmin(admin.ModelAdmin):
         'is_exclusive',
         'associated_ecommerce_offer_id',
         'courses_sku',
-        'is_active'
+        'is_suspended'
     ]
 
 

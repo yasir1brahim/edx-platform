@@ -356,16 +356,16 @@ section.find-courses {
 
 .card-slider-courses{
     position: relative;
-} 
+}
 
-#loader-sec {
+.loader-sec {
     width: 100%;
     height: 100%;
     background: #ffffffe0;
     position: absolute;
     z-index: 99999999;
 }
-#loader {
+.loader {
     position: absolute;
     left: 50%;
     top: 35%;
@@ -377,7 +377,7 @@ section.find-courses {
     border-radius: 50%;
     border-top: 8px solid #3498db;
     -webkit-animation: spin 2s linear infinite;
-}   
+}
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }
   100% { -webkit-transform: rotate(360deg); }
@@ -474,311 +474,57 @@ section.find-courses {
         %else:
               <!--   from here -->
    <section class="card-slider-container">
+<input id="user_industry" type="hidden" value="${user_industry}">
+
+
       <h2 class="card-slider-title" style="">Recommended Courses for You</h2>
       <div class="card-slider-courses">
-            <div id="loader-sec" style="display:none;">
-            <div id="loader"></div>
+            <div class="loader-sec" id = "recommended_courses_loader" style="display:none;">
+            <div class="loader"></div>
         </div>
-        <div class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
-         <div class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
+        <div class="card-slider-prev-btn" id = "recommended_prev_btn" style="display:none"><i class="fas fa-chevron-left"></i></div>
+         <div id="recommended_next_btn" style="display:none" class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
          <ul id="recommended_courses_ul" class="card-slider-card-container owl-carousel owl-theme">
-            <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
+
          </ul>
       </div>
    </section>
       <section class="card-slider-container">
       <h2 class="card-slider-title" style="">Most Popular Courses</h2>
       <div class="card-slider-courses">
-            <div id="loader-sec" style="display:none;">
-            <div id="loader"></div>
+            <div class="loader-sec" id = "most_popular_loader" style="display:none;">
+            <div class="loader"></div>
             </div>
-        <div class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
-         <div class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
+        <div id = "popular_prev_btn" style="display:none" class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
+         <div id = "popular_next_btn" style="display:none" class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
          <ul id="most_popular_ul" class="card-slider-card-container owl-carousel owl-theme">
-            <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
+
          </ul>
       </div>
    </section>
       <section class="card-slider-container">
       <h2 class="card-slider-title" style="">Top Rated Courses</h2>
       <div class="card-slider-courses">
-            <div id="loader-sec" style="display:none;">
-            <div id="loader"></div>
+            <div class="loader-sec" id = "top_rated_loader" style="display:none;">
+            <div class="loader"></div>
             </div>
-        <div class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
-         <div class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
-         <ul class="card-slider-card-container owl-carousel owl-theme">
-            <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
+        <div id = "top_prev_btn" style="display:none" class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
+         <div id = "top_next_btn" style="display:none" class=" card-slider-next-btn" ><i class="fas fa-chevron-right"></i></div>
+         <ul id = "top_rated_ul" class="card-slider-card-container owl-carousel owl-theme">
+
          </ul>
       </div>
    </section>
       <section class="card-slider-container">
       <h2 class="card-slider-title" style="">Free Courses</h2>
       <div class="card-slider-courses">
-            <div id="loader-sec" style="display:none;">
-            <div id="loader"></div>
+            <div class="loader-sec" id = "free_courses_loader" style="display:none;">
+            <div class="loader"></div>
             </div>
-        <div class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
-         <div class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
-         <ul class="card-slider-card-container owl-carousel owl-theme">
-            <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
-              <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
-              <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
-              <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
-              <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
-              <li class="card-slider-card-items owl-item">
-               <article class="card-slider-course">
-                  <a href="#">
-                     <header class="card-slider-card-img-cont">
-                        <div class="card-slider-card-cover-img">
-                           <img src="http://gsedxdev.com/asset-v1:waz+MAd0-01+MAd0-001+type@asset+block@Mobile_Application_development_03.jpg">
-                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
-                        </div>
-                     </header>
-                     <div class="card-slider-card-course-info" aria-hidden="true">
-                        <h2 class="crd-sldr-course-info ">
-                           <span class="crd-sldr-course-info-org">waz</span>
-                           <span class="crd-sldr-course-info-code fl">MAd0-01</span>
-                           <span class="crd-sldr-course-info-title">Mobile Application development 03</span>
-                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">Beginner</span></p>
-                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">1</span></p>
-                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">None</span></p>
-                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">0</span></p>
-                           <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">S$17.99</span></li>
-                              </ul>
-                           </div>
-                        </h2>
-                        <div class="crd-sldr-course-info-date">Starts: Jan 1, 2021</div>
-                     </div>
-                  </a>
-               </article>
-            </li>
+        <div id = "free_prev_btn" style="display:none" class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
+         <div id = "free_next_btn" style="display:none" class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
+         <ul id="free_courses_ul" class="card-slider-card-container owl-carousel owl-theme">
+
          </ul>
       </div>
    </section>
@@ -801,7 +547,6 @@ section.find-courses {
 
 <!--Course Card slider JS -->
 <script>
-    
 $(document).ready(function() {
 
 
@@ -827,14 +572,12 @@ $(document).ready(function() {
 
 
 
-         if($('.card-slider-prev-btn').length)
-         {
-         var prev = $('.card-slider-prev-btn');
-         prev.on('click', function()
-         {
-     viewedSlider.trigger('prev.owl.carousel');
-         });
-    }
+        if ($('.card-slider-prev-btn').length) {
+            var prev = $('.card-slider-prev-btn');
+            prev.on('click', function() {
+                viewedSlider.trigger('prev.owl.carousel');
+            });
+        }
 
         if ($('.card-slider-next-btn').length) {
             var next = $('.card-slider-next-btn');
@@ -845,6 +588,384 @@ $(document).ready(function() {
         }
     }
 
+    show_most_popular_courses();
+    show_free_courses();
+    show_top_rated_courses();
+    show_recommended_courses();
+
+
 
 });
+
+
+
+
+function show_most_popular_courses() {
+
+
+    var form = new FormData();
+    var settings = {
+        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4",
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+    $("#most_popular_loader").css("display", "");
+
+    $.ajax(settings).done(function(response) {
+        $("#most_popular_loader").css("display", "None");
+        console.log(response);
+        if (response['status_code'] == 200) {
+            $('#heading_recommended_courses').css('display', '')
+            $('.courses-listing').empty()
+        if(response['result']['pagination']["next"] != null){
+            $("#popular_next_btn").css("display","")
+        }
+        if(response['result']['pagination']["previous"] != null){
+            $("#popular_prev_btn").css("display","")
+        }
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+                if (course_price == 0) {
+                    course_price = "Free"
+                } else {
+                    course_price = "S$" + course_price
+                }
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 328px;"><div class="owl-item active" style="width: 307.75px; margin-right: 20px;">
+            <li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price">` + course_price + `</span></li>
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li></div></div></div>`;
+
+
+                $("#most_popular_ul").append(course)
+
+            }
+
+        }
+    });
+
+}
+
+
+function show_free_courses() {
+
+    var form = new FormData();
+    var settings = {
+        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4",
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+
+    $("#free_courses_loader").css("display", "");
+    $.ajax(settings).done(function(response) {
+        $("#free_courses_loader").css("display", "None")
+        console.log(response);
+        if (response['status_code'] == 200) {
+            $('#heading_recommended_courses').css('display', '')
+            $('.courses-listing').empty()
+        if(response['result']['pagination']["next"] != null){
+            $("#free_next_btn").css("display","")
+        }
+        if(response['result']['pagination']["previous"] != null){
+            $("#free_prev_btn").css("display","")
+        }
+
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 328px;"><div class="owl-item active" style="width: 307.75px; margin-right: 20px;">
+            <li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price"> Free </span></li>
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li></div></div></div>`;
+
+
+                $("#free_courses_ul").append(course)
+
+            }
+
+        }
+    });
+
+}
+
+function show_top_rated_courses() {
+
+    var form = new FormData();
+    var settings = {
+        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4",
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+
+    $("#top_rated_loader").css("display", "");
+    $.ajax(settings).done(function(response) {
+        $("#top_rated_loader").css("display", "None")
+        console.log(response);
+        if (response['status_code'] == 200) {
+            $('#heading_recommended_courses').css('display', '')
+            $('.courses-listing').empty()
+        if(response['result']['pagination']["next"] != null){
+            $("#top_next_btn").css("display","")
+        }
+        if(response['result']['pagination']["previous"] != null){
+            $("#top_prev_btn").css("display","")
+        }
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+                if (course_price == 0) {
+                    course_price = "Free"
+                } else {
+                    course_price = "S$" + course_price
+                }
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 328px;"><div class="owl-item active" style="width: 307.75px; margin-right: 20px;">
+            <li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price">  ` + course_price + ` </span></li>
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li></div></div></div>`;
+
+
+                $("#top_rated_ul").append(course)
+
+            }
+
+        }
+    });
+
+}
+
+function show_recommended_courses() {
+
+
+    var recommended_settings = {
+        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4",
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+
+    $("#recommended_courses_loader").css("display", "");
+    $.ajax(recommended_settings).done(function(response) {
+        $("#recommended_courses_loader").css("display", "None")
+        console.log(response);
+        if (response['status_code'] == 200) {
+            //$('#recommended_courses_loader').css('display', '')
+            $('.courses-listing').empty()
+            if (response['result']['pagination']['next'] != null){
+                $("#recommended_next_btn").css("display","")
+            }
+            if (response['result']['pagination']['previous'] != null){
+                $("#recommended_prev_btn").css("display","")
+            }
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+                if (course_price == 0) {
+                    course_price = "Free"
+                } else {
+                    course_price = "S$" + course_price
+                }
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 328px;"><div class="owl-item active" style="width: 307.75px; margin-right: 20px;">
+            <li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price">  ` + course_price + ` </span></li>
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li></div></div></div>`;
+
+
+                $("#recommended_courses_ul").append(course)
+
+            }
+
+        }
+    });
+
+}
+
+
 </script>

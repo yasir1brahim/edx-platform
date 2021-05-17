@@ -7,7 +7,7 @@ import json
 import logging
 from collections import OrderedDict, namedtuple
 from datetime import datetime
-
+from custom_reg_form.models import UserExtraInfo
 import bleach
 import requests
 import six
@@ -342,7 +342,10 @@ def courses(request):
         show_categorized_view = True
     else:
         show_categorized_view = False
-
+    user_category = None
+    user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
+    if hasattr(user_extra_info, 'industry_id'):
+        user_category = Category.objects.filter(id=user_extra_info.industry_id).first().id
     return render_to_response(
         "courseware/courses.html",
         {
@@ -357,6 +360,7 @@ def courses(request):
             'selected_mode': mode,
             'sort': sort,
             'show_categorized_view': show_categorized_view,
+            'user_industry': user_category,
         },
 
     )

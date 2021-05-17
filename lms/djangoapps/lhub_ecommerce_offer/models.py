@@ -14,6 +14,7 @@ class Offer(models.Model):
     is_exclusive = models.BooleanField()
     associated_ecommerce_offer_id = models.IntegerField()
     course = models.ManyToManyField(CourseOverview)
+    is_active = models.BooleanField()
     
     class Meta(object):
         app_label = "lhub_ecommerce_offer"

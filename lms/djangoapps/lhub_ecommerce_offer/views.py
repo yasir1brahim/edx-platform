@@ -33,6 +33,7 @@ class Ecommerce_Offer(APIView):
                 condition_type = ecommerce_data['condition_type'],
                 condition_value = ecommerce_data['condition_value'],
                 is_exclusive = ecommerce_data['is_exclusive'],
+                is_active = ecommerce_data['is_active'],
             )
 
             for course in ecommerce_offer[0].course.all():
@@ -75,6 +76,7 @@ class Ecommerce_Offer(APIView):
                 condition_type = ecommerce_data['condition_type'],
                 condition_value = ecommerce_data['condition_value'],
                 is_exclusive = ecommerce_data['is_exclusive'],
+                is_active = ecommerce_data['is_active'],
             )   
 
             ecommerce_offer.save()  

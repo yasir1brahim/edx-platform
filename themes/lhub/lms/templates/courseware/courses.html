@@ -30,6 +30,11 @@
 % endif
 
 <style>
+
+html, body, a, h1, h2, h3, h4, h5, h6, li, button, input, textarea, p, span, div, option, select, label, input, form, ul, ol, strong {
+    font-family: 'Poppins', sans-serif;
+}
+
     .selects-wrapper-all {
         display: flex;
         flex-wrap: wrap;
@@ -46,6 +51,12 @@
         border-radius: 8px;
         min-width: 200px;
     }
+
+.slider-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
 
     .selects-wrapper-all .select-name {
         display: block;
@@ -64,11 +75,23 @@
 .card-slider-container .price-off span {
     margin-right: 2%;
 }
-
+.main_price {
+    font-size: 16px;
+    color: #249a56;
+    font-weight: 600;
+}
 .card-slider-container article .card-slider-card-course-info {
     padding: 0px 15px;
     height: 305px;
     position: relative;
+}
+span.main_price_cut {
+    background: #f8400f;
+    border-radius: 5px;
+    font-size: 11px;
+    padding: 2px 4px;
+    text-decoration: line-through;
+    color: #ffffff;
 }
 
 .card-slider-container .label-course {
@@ -82,6 +105,7 @@
     font-weight: 600;
     font-size: 18px;
     overflow: hidden;
+    width: 100%;
     display: -webkit-box !important;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
@@ -141,6 +165,11 @@
     padding: 0px;
     margin: 5px 0px;
 }
+.main_price-percentage {
+    font-size: 12px;
+    color: #249a56;
+    font-weight: 800 !important;
+}
 
 .card-slider-container .crd-sldr-course-info-price ul li .cut_price {
     text-decoration: line-through;
@@ -150,11 +179,6 @@
     color: #9b9b9b;
 }
 
-.crd-sldr-course-info-price ul li .crd-sldr-course-info-main-price {
-    font-size: 16px;
-    color: #249a56;
-    font-weight: 600;
-}
 
 .card-slider-container .card-slider-card-img-cont .card-slider-card-cover-img img {
     height: 160px;
@@ -166,6 +190,8 @@
     color: #7f7f7f !important;
     font-weight: 400;
     line-height: 1.5;
+    display: block;
+    width: 100%;
 }
 
 .card-slider-container .crd-sldr-course-info-price ul li span {
@@ -477,8 +503,11 @@ section.find-courses {
 <input id="user_industry" type="hidden" value="${user_industry}">
 
 
+      <div class="slider-heading">
       <h2 class="card-slider-title" style="">Recommended Courses for You</h2>
-      <div class="card-slider-courses">
+      <a href="">View All</a>
+      </div>
+            <div class="card-slider-courses">
             <div class="loader-sec" id = "recommended_courses_loader" style="display:none;">
             <div class="loader"></div>
         </div>
@@ -490,7 +519,11 @@ section.find-courses {
       </div>
    </section>
       <section class="card-slider-container">
+      <div class="slider-heading">
       <h2 class="card-slider-title" style="">Most Popular Courses</h2>
+      <a href="/courses?mode=paid&sort=rating">View All</a>
+      </div>
+
       <div class="card-slider-courses">
             <div class="loader-sec" id = "most_popular_loader" style="display:none;">
             <div class="loader"></div>
@@ -503,7 +536,10 @@ section.find-courses {
       </div>
    </section>
       <section class="card-slider-container">
+      <div class="slider-heading">
       <h2 class="card-slider-title" style="">Top Rated Courses</h2>
+      <a href="/courses?mode=paid&sort=rating">View All</a>
+      </div>
       <div class="card-slider-courses">
             <div class="loader-sec" id = "top_rated_loader" style="display:none;">
             <div class="loader"></div>
@@ -516,7 +552,10 @@ section.find-courses {
       </div>
    </section>
       <section class="card-slider-container">
+      <div class="slider-heading">
       <h2 class="card-slider-title" style="">Free Courses</h2>
+      <a href="/courses?mode=free">View All</a>
+      </div>
       <div class="card-slider-courses">
             <div class="loader-sec" id = "free_courses_loader" style="display:none;">
             <div class="loader"></div>
@@ -547,11 +586,159 @@ section.find-courses {
 
 <!--Course Card slider JS -->
 <script>
+var popular_next_url = "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4";
+var free_next_url = "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4";
+var top_next_url = "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4";
+var recommended_next_url = "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4";
+
 $(document).ready(function() {
 
 
-    if ($('.card-slider-card-container').length) {
-        var viewedSlider = $('.card-slider-card-container');
+
+    var viewedSlider_rec = $('#recommended_courses_ul');
+
+    viewedSlider_rec.owlCarousel({
+        loop: true,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 4,
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+        var viewedSlider_pop = $('#most_popular_ul');
+        viewedSlider_pop.owlCarousel({
+        loop: false,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 4,
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+        var viewedSlider_top = $('#top_rated_ul');
+        viewedSlider_top.owlCarousel({
+        loop: false,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 4,
+
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+        var viewedSlider_free = $('#free_courses_ul');
+        viewedSlider_free.owlCarousel({
+        loop: false,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 4,
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+
+
+        if ($('#recommended_prev_btn').length) {
+            var prev = $('#recommended_prev_btn');
+            prev.on('click', function() {
+                viewedSlider_rec.trigger('prev.owl.carousel');
+            });
+        }
+
+/*        if ($('.card-slider-next-btn').length) {
+            var next = $('.card-slider-next-btn');
+            next.on('click', function() {
+                show_recommended_courses()
+*/
+        if ($('#recommended_next_btn').length) {
+            var next = $('#recommended_next_btn');
+            next.on('click', function() {
+                show_recommended_courses();
+
+                viewedSlider_rec.trigger('next.owl.carousel');
+                $('#recommended_next_btn').show();
+            });
+        }
+        if ($('#popular_prev_btn').length) {
+            var prev = $('#popular_prev_btn');
+            prev.on('click', function() {
+                viewedSlider_pop.trigger('prev.owl.carousel');
+            });
+        }
+        if ($('#popular_next_btn').length) {
+            var next = $('#popular_next_btns');
+            next.on('click', function() {
+                show_most_popular_courses()()
+
+                viewedSlider_pop.trigger('next.owl.carousel');
+                $('#popular_next_btn').show();
+            });
+        }
+        if ($('#top_prev_btn').length) {
+            var prev = $('#top_prev_btn');
+            prev.on('click', function() {
+                viewedSlider_top.trigger('prev.owl.carousel');
+            });
+        }
+        if ($('#top_next_btn').length) {
+            var next = $('#top_next_btn');popular_next_btn
+            next.on('click', function() {
+                show_top_rated_courses()
+
+                viewedSlider_top.trigger('next.owl.carousel');
+                $('#top_next_btn').show();
+            });
+        }
+        if ($('#free_prev_btn').length) {
+            var prev = $('#free_prev_btn');
+            prev.on('click', function() {
+                viewedSlider_free.trigger('prev.owl.carousel');
+            });
+        }
+        if ($('#free_next_btn').length) {
+            var next = $('#free_next_btn');
+            next.on('click', function() {
+                show_free_courses()
+
+                viewedSlider_free.trigger('next.owl.carousel');
+                $('#recommended_next_btn').show();
+            });
+        }
+    //if ($('.card-slider-card-container').length) {
+        /*var viewedSlider = $('.card-slider-card-container');
 
         viewedSlider.owlCarousel({
             loop: false,
@@ -585,8 +772,8 @@ $(document).ready(function() {
                 viewedSlider.trigger('next.owl.carousel');
                 $('.card-slider-prev-btn').show();
             });
-        }
-    }
+        }*/
+    //}
 
     show_most_popular_courses();
     show_free_courses();
@@ -602,10 +789,10 @@ $(document).ready(function() {
 
 function show_most_popular_courses() {
 
-
+//    popular_next_url = "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4";
     var form = new FormData();
     var settings = {
-        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4",
+        "url": popular_next_url,
         "method": "GET",
         "headers": {
             'X-CSRFToken': $('#web_csrf_token').val()
@@ -622,11 +809,16 @@ function show_most_popular_courses() {
         if (response['status_code'] == 200) {
             $('#heading_recommended_courses').css('display', '')
             $('.courses-listing').empty()
-        if(response['result']['pagination']["next"] != null){
-            $("#popular_next_btn").css("display","")
+        pagination_popular_url = response['result']['pagination']["next"];
+        if( pagination_popular_url != null){
+            $("#top_next_btn").css("display","");
+            popular_next_url = pagination_popular_url;
+        }
+        else {
+            $("#popular_next_btn").css("display","None")
         }
         if(response['result']['pagination']["previous"] != null){
-            $("#popular_prev_btn").css("display","")
+            $("#popular_prev_btn").css("display","");
         }
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
@@ -664,7 +856,7 @@ function show_most_popular_courses() {
                      <div class="card-slider-card-course-info" aria-hidden="true">
                         <h2 class="crd-sldr-course-info ">
                            <span class="crd-sldr-course-info-org">` + course_org + `</span>
-                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
                            <span class="crd-sldr-course-info-title">` + course_name + `</span>
                            <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
                            <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
@@ -672,8 +864,25 @@ function show_most_popular_courses() {
                            <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
 
                            <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">` + course_price + `</span></li>
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
                               </ul>
                            </div>
                         </h2>
@@ -684,7 +893,8 @@ function show_most_popular_courses() {
             </li></div></div></div>`;
 
 
-                $("#most_popular_ul").append(course)
+
+                $("#most_popular_ul").append(course);
 
             }
 
@@ -695,10 +905,9 @@ function show_most_popular_courses() {
 
 
 function show_free_courses() {
-
     var form = new FormData();
     var settings = {
-        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4",
+        "url": free_next_url,
         "method": "GET",
         "headers": {
             'X-CSRFToken': $('#web_csrf_token').val()
@@ -713,12 +922,17 @@ function show_free_courses() {
         $("#free_courses_loader").css("display", "None")
         console.log(response);
         if (response['status_code'] == 200) {
-            $('#heading_recommended_courses').css('display', '')
-            $('.courses-listing').empty()
-        if(response['result']['pagination']["next"] != null){
-            $("#free_next_btn").css("display","")
+            $('#heading_recommended_courses').css('display', '');
+            $('.courses-listing').empty();
+        pagination_free_url = response['result']['pagination']["next"];
+        if( pagination_free_url != null){
+            $("#top_next_btn").css("display","");
+            free_next_url = pagination_free_url;
         }
-        if(response['result']['pagination']["previous"] != null){
+        else {
+            $("#free_next_btn").css("display","None")
+        }
+           if(response['result']['pagination']["previous"] != null){
             $("#free_prev_btn").css("display","")
         }
 
@@ -754,7 +968,7 @@ function show_free_courses() {
                      <div class="card-slider-card-course-info" aria-hidden="true">
                         <h2 class="crd-sldr-course-info ">
                            <span class="crd-sldr-course-info-org">` + course_org + `</span>
-                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
                            <span class="crd-sldr-course-info-title">` + course_name + `</span>
                            <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
                            <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
@@ -762,8 +976,25 @@ function show_free_courses() {
                            <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
 
                            <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price"> Free </span></li>
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
                               </ul>
                            </div>
                         </h2>
@@ -772,6 +1003,7 @@ function show_free_courses() {
                   </a>
                </article>
             </li></div></div></div>`;
+
 
 
                 $("#free_courses_ul").append(course)
@@ -784,10 +1016,9 @@ function show_free_courses() {
 }
 
 function show_top_rated_courses() {
-
     var form = new FormData();
     var settings = {
-        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4",
+        "url": top_next_url,
         "method": "GET",
         "headers": {
             'X-CSRFToken': $('#web_csrf_token').val()
@@ -802,14 +1033,20 @@ function show_top_rated_courses() {
         $("#top_rated_loader").css("display", "None")
         console.log(response);
         if (response['status_code'] == 200) {
-            $('#heading_recommended_courses').css('display', '')
-            $('.courses-listing').empty()
-        if(response['result']['pagination']["next"] != null){
-            $("#top_next_btn").css("display","")
+            $('#heading_recommended_courses').css('display', '');
+            $('.courses-listing').empty();
+        pagination_top_url = response['result']['pagination']["next"];
+        if( pagination_top_url != null){
+            $("#top_next_btn").css("display","");
+            top_next_url = pagination_top_url;
+        }
+        else {
+            $("#top_next_btn").css("display","None")
         }
         if(response['result']['pagination']["previous"] != null){
-            $("#top_prev_btn").css("display","")
+            $("#top_prev_btn").css("display","");
         }
+
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
@@ -846,7 +1083,7 @@ function show_top_rated_courses() {
                      <div class="card-slider-card-course-info" aria-hidden="true">
                         <h2 class="crd-sldr-course-info ">
                            <span class="crd-sldr-course-info-org">` + course_org + `</span>
-                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
                            <span class="crd-sldr-course-info-title">` + course_name + `</span>
                            <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
                            <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
@@ -854,8 +1091,25 @@ function show_top_rated_courses() {
                            <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
 
                            <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">  ` + course_price + ` </span></li>
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
                               </ul>
                            </div>
                         </h2>
@@ -876,10 +1130,8 @@ function show_top_rated_courses() {
 }
 
 function show_recommended_courses() {
-
-
     var recommended_settings = {
-        "url": "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4",
+        "url": recommended_next_url,
         "method": "GET",
         "headers": {
             'X-CSRFToken': $('#web_csrf_token').val()
@@ -896,12 +1148,19 @@ function show_recommended_courses() {
         if (response['status_code'] == 200) {
             //$('#recommended_courses_loader').css('display', '')
             $('.courses-listing').empty()
-            if (response['result']['pagination']['next'] != null){
-                $("#recommended_next_btn").css("display","")
+            pagination_next_url = response['result']['pagination']["next"];
+
+            if (pagination_next_url != null){
+                $("#recommended_next_btn").css("display","");
+                recommended_next_url = pagination_next_url;
+            }
+            else {
+            $("#free_next_btn").css("display","None")
             }
             if (response['result']['pagination']['previous'] != null){
                 $("#recommended_prev_btn").css("display","")
             }
+
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
@@ -938,7 +1197,7 @@ function show_recommended_courses() {
                      <div class="card-slider-card-course-info" aria-hidden="true">
                         <h2 class="crd-sldr-course-info ">
                            <span class="crd-sldr-course-info-org">` + course_org + `</span>
-                           <span class="crd-sldr-course-info-code fl">` + course_code + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
                            <span class="crd-sldr-course-info-title">` + course_name + `</span>
                            <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
                            <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
@@ -946,8 +1205,25 @@ function show_recommended_courses() {
                            <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
 
                            <div class="crd-sldr-course-info-price fl">
-                              <ul>
-                                 <li>Price: <span class="crd-sldr-course-info-main-price">  ` + course_price + ` </span></li>
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
                               </ul>
                            </div>
                         </h2>

@@ -265,9 +265,16 @@ def courses(request):
     category_id = request.GET.get('category')
     subcategory_id = request.GET.get('subcategory')
     difficulty_level_id = request.GET.get('difficulty_level')
+    if difficulty_level_id == "":
+        difficulty_level_id = None
     mode = request.GET.get('mode', '')
+    if mode == "":
+        mode = None
+    logging.info("=================")
+    logging.info(mode)
+    logging.info("=================")
     category = sub_category = difficulty_level = None
-
+    show_categorized_view = True
     courses_list = []
     filter_ = None
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
@@ -291,8 +298,10 @@ def courses(request):
             courses_list = sort_by_rating(courses_list)
         elif sort == 'price':
             courses_list = sort_by_price(courses_list)
+        # else:
+        #     courses_list = sort_by_announcement(courses_list)
         else:
-            courses_list = sort_by_announcement(courses_list)
+            sort = None
 
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
@@ -313,7 +322,7 @@ def courses(request):
             return False
 
         if sub_category and course.subcategory_id != sub_category.id:
-            return False
+            return Falselogginglogging
 
         if difficulty_level and course.difficulty_level != difficulty_level.level.capitalize():
             return False
@@ -338,7 +347,7 @@ def courses(request):
         selected_category_name = category.name
     elif sub_category:
         selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
-    if (difficulty_level_id == "") and (sort == '') and (mode == ''):
+    if (difficulty_level_id == None) and (sort==None) and (mode==None) :
         show_categorized_view = True
     else:
         show_categorized_view = False

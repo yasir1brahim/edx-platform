@@ -632,6 +632,7 @@ $(document).ready(function() {
             // 1199:{items:6}
             // }
         });
+        /*
         var viewedSlider_top = $('#top_rated_ul');
         viewedSlider_top.owlCarousel({
         loop: false,
@@ -640,7 +641,7 @@ $(document).ready(function() {
         autoplayTimeout: 6000,
         dots: false,
         items: 4,
-        slideBy: 4,
+        //slideBy: 4,
 
             // responsive:
             // {
@@ -651,6 +652,7 @@ $(document).ready(function() {
             // 1199:{items:6}
             // }
         });
+        */
         var viewedSlider_free = $('#free_courses_ul');
         viewedSlider_free.owlCarousel({
         loop: false,
@@ -714,7 +716,7 @@ $(document).ready(function() {
             });
         }
         if ($('#top_next_btn').length) {
-            var next = $('#top_next_btn');popular_next_btn
+            var next = $('#top_next_btn');
             next.on('click', function() {
                 show_top_rated_courses()
 
@@ -1016,6 +1018,8 @@ function show_free_courses() {
 }
 
 function show_top_rated_courses() {
+    $('#top_rated_ul').owlCarousel('destroy');
+    $("#top_rated_ul").html('');
     var form = new FormData();
     var settings = {
         "url": top_next_url,
@@ -1070,8 +1074,7 @@ function show_top_rated_courses() {
                 course_discounted_price = response['result']['results'][i]['discounted_price'];
                 course_discount_percentage = response['result']['results'][i]['discount_percentage'];
 
-                var course = `<div class="owl-stage-outer"><div class="owl-stage" style="transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 328px;"><div class="owl-item active" style="width: 307.75px; margin-right: 20px;">
-            <li class="card-slider-card-items owl-item">
+                var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
                   <a href="#">
                      <header class="card-slider-card-img-cont">
@@ -1117,12 +1120,32 @@ function show_top_rated_courses() {
                      </div>
                   </a>
                </article>
-            </li></div></div></div>`;
+            </li>`;
 
 
                 $("#top_rated_ul").append(course)
 
             }
+
+            var viewedSlider_top = $('#top_rated_ul');
+        viewedSlider_top.owlCarousel({
+        loop: false,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 1,
+
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
 
         }
     });

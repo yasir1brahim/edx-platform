@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Offer
+from .models import Offer, Coupon
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 import logging
 
@@ -42,4 +42,38 @@ class OfferAdmin(admin.ModelAdmin):
         pass
 
 
+
+class CouponAdmin(admin.ModelAdmin):
+    """ Coupon class for Offer model """
+    fields = (
+        'coupon_code',
+        'incentive_type',
+        'incentive_value',
+        'usage',
+        'start_datetime',
+        'end_datetime',
+        'is_exclusive',
+        'course',
+        'associated_ecommerce_coupon_id',
+    )
+    list_display = [
+        'coupon_code',
+        'incentive_type',
+        'incentive_value',
+        'usage',
+        'start_datetime',
+        'end_datetime',
+        'is_exclusive',
+        'courses_sku',
+        'associated_ecommerce_coupon_id',
+    ]
+
+
+    def courses_sku(self, obj):
+        # return "\n".join([a.course_sku for a in obj.CourseOverview.all()])
+        # for a in obj.CourseOverview.all():
+        pass
+
+
 admin.site.register(Offer, OfferAdmin)
+admin.site.register(Coupon, CouponAdmin)

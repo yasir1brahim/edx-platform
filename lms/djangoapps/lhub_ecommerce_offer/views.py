@@ -1,13 +1,14 @@
+from logging import info
+import logging
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Offer
+from .models import Offer, Coupon
 from datetime import datetime
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
-# Create your views here.
 class Ecommerce_Offer(APIView):
 
     def post(self, request):
@@ -99,3 +100,98 @@ class Ecommerce_Offer(APIView):
         offer.delete()
 
         return Response({'status': 'Succes'}, status=status.HTTP_200_OK)
+
+
+
+class Ecommerce_Coupon(APIView):
+
+    def post(self, request):
+        ecommerce_data = request.data
+
+        logging.info("========================================")
+        logging.info(ecommerce_data)
+
+        # If Coupon already exists
+        # Update it
+        if Coupon.objects.filter(associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id']).exists():
+            ecommerce_coupon = Coupon.objects.filter(associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id'])
+            start_datetime_str = ecommerce_data['start_datetime']
+            start_datetime = datetime.strptime(start_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
+
+            end_datetime_str = ecommerce_data['end_datetime']
+            end_datetime = datetime.strptime(end_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
+
+            ecommerce_coupon.update(
+                associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id'],
+                coupon_code = ecommerce_data['coupon_code'],
+                start_datetime = start_datetime,
+                end_datetime = end_datetime,
+                incentive_type = ecommerce_data['incentive_type'],
+                incentive_value = ecommerce_data['incentive_value'],
+                usage = ecommerce_data['usage'],
+                is_exclusive = ecommerce_data['is_exclusive'],
+            )
+
+            for course in ecommerce_coupon[0].course.all():
+                # Condition 01: course is present in coupon courses
+                # and also in the api courses
+                if str(course.id) in ecommerce_data['courses_id']:
+                    # do nothing
+                    pass
+
+                # Condition 02: course is present in coupon courses
+                # but not in the api courses
+                elif str(course.id) not in ecommerce_data['courses_id']:
+                    # remove the course from coupon courses
+                    course.coupon_set.remove(ecommerce_coupon[0])
+ 
+            # Condition 03: course is not present in coupon courses
+            # but present in the api courses
+            for course in ecommerce_data['courses_id']:
+                if course not in str(ecommerce_coupon[0].course.all()):
+                    # add course in the coupon courses
+                    ecommerce_coupon[0].course.add(CourseOverview.get_from_id(course))    
+
+
+        # Else if Offer does not exist
+        # Create it
+        else: 
+            start_datetime_str = ecommerce_data['start_datetime']
+            start_datetime = datetime.strptime(start_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
+
+            end_datetime_str = ecommerce_data['end_datetime']
+            end_datetime = datetime.strptime(end_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
+
+            ecommerce_coupon = Coupon(
+                associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id'],
+                coupon_code = ecommerce_data['coupon_code'],
+                start_datetime = start_datetime,
+                end_datetime = end_datetime,
+                incentive_type = ecommerce_data['incentive_type'],
+                incentive_value = ecommerce_data['incentive_value'],
+                usage = ecommerce_data['usage'],
+                is_exclusive = ecommerce_data['is_exclusive'],
+            )   
+
+            ecommerce_coupon.save()  
+
+            for course_id in ecommerce_data['courses_id']:
+                ecommerce_coupon.course.add(CourseOverview.get_from_id(course_id))
+
+        
+        return Response({'status': 'Succes'}, status=status.HTTP_200_OK)
+
+
+    def delete(self, *args, **kwargs):
+        
+        coupon_id = self.kwargs.get('coupon_id')
+        try:
+            coupon = Coupon.objects.get(associated_ecommerce_coupon_id=coupon_id)
+        except Coupon.DoesNotExist:
+            return Response({'status': 'Not Found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        coupon.delete()
+
+        return Response({'status': 'Succes'}, status=status.HTTP_200_OK)
+
+

@@ -1,7 +1,7 @@
 from django.db import models
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
-# Create your models here.
+
 
 class Offer(models.Model):
     incentive_type = models.CharField(max_length=250)
@@ -18,4 +18,19 @@ class Offer(models.Model):
     
     class Meta(object):
         app_label = "lhub_ecommerce_offer"
-        
+
+
+
+class Coupon(models.Model):
+    coupon_code = models.CharField(max_length=250)
+    incentive_type = models.CharField(max_length=250)
+    incentive_value = models.DecimalField(max_digits=12, decimal_places=2)
+    usage = models.CharField(max_length=250)
+    start_datetime = models.DateTimeField('start date')
+    end_datetime = models.DateTimeField('end date')
+    is_exclusive = models.BooleanField()
+    course = models.ManyToManyField(CourseOverview)
+    associated_ecommerce_coupon_id = models.IntegerField()
+    
+    class Meta(object):
+        app_label = "lhub_ecommerce_offer"

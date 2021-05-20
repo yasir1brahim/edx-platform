@@ -566,3 +566,55 @@ class Course(object):
             #course_modes = CourseMode.objects.order_by('ratings')
         for course_id, modes in groupby(course_modes, lambda o: o.course_id):
             yield cls(course_id, list(modes))
+
+
+
+class WebCourse(Course):
+
+    @property
+    def start_date(self):
+        """ Return course Date Created. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            courseoverview = CourseOverview.get_from_id(course_id)
+            if courseoverview.advertised_start:
+                start_date = courseoverview.advertised_start.strftime("%b") + " " + str(courseoverview.advertised_start.day) +", " + str(courseoverview.advertised_start.year)
+            else:
+                start_date = courseoverview.start.strftime("%b") + " " + str(courseoverview.start.day) + ", " + str(courseoverview.start.year)
+            logging.info(type(start_date))
+            return start_date
+
+
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def organization(self):
+        """ Return course Date Created. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).display_org_with_default
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+
+    @property
+    def course_number(self):
+        """ Return course Date Created. """
+        course_id = CourseKey.from_string(six.text_type(self.id))
+
+        try:
+            return CourseOverview.get_from_id(course_id).display_number_with_default
+        except CourseOverview.DoesNotExist:
+            # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
+            # modulestore. If that is not the case, say for local development/testing, carry on without failure.
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            return None
+

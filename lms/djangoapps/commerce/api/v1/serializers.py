@@ -236,6 +236,11 @@ class CourseSerializer(serializers.Serializer):
             CourseMode(**modes_dict)
             for modes_dict in modes_data
         ]
+class WebCourseSerializer(CourseSerializer):
+    """ Web Course serializer. """
+    start_date = serializers.CharField()
+    organization = serializers.CharField()
+    course_number = serializers.CharField()
 
 class CourseDetailSerializer(serializers.Serializer):
     """ Course serializer. """
@@ -330,8 +335,8 @@ class CourseDetailSerializer(serializers.Serializer):
             for modes_dict in modes_data
         ]
 
-
-
+class WebCourseDetailSerializer(CourseDetailSerializer):
+    """ WebCourse serializer. """
 
 class CourseDetailCheckoutSerializer(serializers.Serializer):
     """ Course serializer. """
@@ -421,5 +426,5 @@ class CourseDetailCheckoutSerializer(serializers.Serializer):
             CourseMode(**modes_dict)
             for modes_dict in modes_data
         ]
-
-
+class WebCourseDetailCheckoutSerializer(CourseDetailCheckoutSerializer):
+    """ WebCourse serializer. """

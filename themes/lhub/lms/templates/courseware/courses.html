@@ -31,6 +31,11 @@
 % endif
 
 <style>
+
+html, body, a, h1, h2, h3, h4, h5, h6, li, button, input, textarea, p, span, div, option, select, label, input, form, ul, ol, strong {
+    font-family: 'Poppins', sans-serif;
+}
+
     .selects-wrapper-all {
         display: flex;
         flex-wrap: wrap;
@@ -48,11 +53,370 @@
         min-width: 200px;
     }
 
+.slider-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
     .selects-wrapper-all .select-name {
         display: block;
         margin-bottom: 5px;
         font-size: 14px;
     }
+
+
+/*Coure Card slider CSS*/
+
+
+    .card-slider-container .price-off {
+    color: #9b9b9b !important;
+}
+
+.card-slider-container .price-off span {
+    margin-right: 2%;
+}
+.main_price {
+    font-size: 16px;
+    color: #249a56;
+    font-weight: 600;
+}
+.card-slider-container article .card-slider-card-course-info {
+    padding: 0px 15px;
+    height: 305px;
+    position: relative;
+}
+span.main_price_cut {
+    background: #f8400f;
+    border-radius: 5px;
+    font-size: 11px;
+    padding: 2px 4px;
+    text-decoration: line-through;
+    color: #ffffff;
+}
+
+.card-slider-container .label-course {
+    font-size: 12px;
+}
+
+.card-slider-container .crd-sldr-course-info-title {
+    height: 25px;
+    margin-bottom: 8px;
+    color: #000000;
+    font-weight: 600;
+    font-size: 18px;
+    overflow: hidden;
+    width: 100%;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+.card-slider-container .crd-sldr-course-info-label span {
+    color: #1A345C;
+    font-weight: 500;
+}
+
+.card-slider-container .crd-sldr-course-info-label {
+    font-size: 12px;
+    line-height: 25px;
+    margin: 0px 20px 0px 0px;
+    display: inline-block;
+    font-weight: 500;
+    color: #7f7f7f;
+}
+
+.card-slider-container .card-slider-card-course-info .crd-sldr-course-info-date {
+    padding: 4px 0px 0px 0px;
+    margin-top: 12px;
+    color: #7f7f7f;
+    font-size: 16px;
+}
+
+.card-slider-container span.crd-sldr-course-info-title,
+.card-slider-container span.crd-sldr-course-info-code,
+.card-slider-container span.crd-sldr-course-info-org {
+    padding-left: 0px !important;
+}
+
+.card-slider-container .crd-sldr-course-info-label span {
+    margin-left: 7px;
+}
+
+.card-slider-container .card-slider-card-container .card-slider-card-items {
+    max-height: 100% !important;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.card-slider-container .crd-sldr-course-info-date {
+    position: absolute;
+    bottom: 10px;
+}
+
+.card-slider-container .crd-sldr-course-info-price ul li {
+    list-style-type: none;
+    font-size: 12px;
+    padding: 2px 0px !important;
+    color: #000000;
+    font-weight: 600;
+}
+
+.card-slider-container .crd-sldr-course-info-price ul {
+    padding: 0px;
+    margin: 5px 0px;
+}
+.main_price-percentage {
+    font-size: 12px;
+    color: #249a56;
+    font-weight: 800 !important;
+}
+
+.card-slider-container .crd-sldr-course-info-price ul li .cut_price {
+    text-decoration: line-through;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 2%;
+    color: #9b9b9b;
+}
+
+
+.card-slider-container .card-slider-card-img-cont .card-slider-card-cover-img img {
+    height: 160px;
+    object-fit: cover;
+}
+
+.card-slider-container h2.crd-sldr-course-info span.crd-sldr-course-info-org,
+.card-slider-container h2.crd-sldr-course-info span.crd-sldr-course-info-code {
+    color: #7f7f7f !important;
+    font-weight: 400;
+    line-height: 1.5;
+    display: block;
+    width: 100%;
+}
+
+.card-slider-container .crd-sldr-course-info-price ul li span {
+    font-weight: 600;
+}
+
+.card-slider-container .card-slider-card-learn-more-btn {
+    background: #ffffff;
+    color: #18355e;
+    border-radius: 10px;
+    font-weight: 700;
+    position: absolute;
+    top: 38%;
+    left: 15%;
+    padding: 11px;
+    display: block;
+    width: 100%;
+    text-align: center;
+    max-width: 200px;
+    opacity: 0;
+}
+
+.card-slider-course:hover .card-slider-card-learn-more-btn,
+.card-slider-course:focus .card-slider-card-learn-more-btn {
+    transition: ease-out 0.25s;
+    opacity: 1 !important;
+    z-index: 999
+}
+
+.card-slider-container span.crd-sldr-course-info-org {
+    font-size: 15px !important;
+}
+
+.card-slider-container span.crd-sldr-course-info-code {
+    font-size: 13px !important;
+}
+
+.card-slider-container .crd-sldr-course-info-price span.crd-sldr-course-info-main-price_cut {
+    background: #f8400f;
+    border-radius: 5px;
+    font-size: 11px;
+    padding: 2px 4px;
+    text-decoration: line-through;
+    color: #ffffff;
+}
+
+.card-slider-container .crd-sldr-course-info-price ul li .crd-sldr-course-info-main-price-percentage {
+    font-size: 12px;
+    color: #249a56;
+    font-weight: 800 !important;
+}
+
+.card-slider-container .crd-sldr-course-info {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+span.crd-sldr-course-info-code.f1 {
+    width: 100% !important;
+}
+.crd-sldr-course-info-price.fl {
+    width: 100% !important;
+}
+.card-slider-container .crd-sldr-course-info-price li {
+    margin: 8px 0px 5px 0px !important;
+}
+
+.card-slider-title {
+    font-size: 22px !important;
+    font-weight: 600;
+    color: #1a345c;
+    margin-bottom: 40px;
+    margin-top: 30px;
+}
+
+.card-slider-container article:hover {
+    background: #f5f5f5;
+    border-color: #bebebe;
+    box-shadow: 0 1px 4px 0 rgb(0 117 180 / 40%);
+    transition: all 0.125s linear 0s;
+    transition-property: all;
+    transition-duration: 0.125s;
+    transition-timing-function: linear;
+    transition-delay: 0s;
+}
+
+.card-slider-container .price-set {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.card-slider-container .img-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.card-slider-container .card-slider-course {
+    display: block;
+    float: left;
+    width: 100%;
+    overflow: hidden;
+    padding-top: 0px;
+    min-width: 100% !important;
+}
+
+.card-slider-container ul.card-slider-card-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    list-style: none;
+    padding: 0px;
+}
+
+.card-slider-container article {
+    border-radius: 10px !important;
+    box-shadow: 0 1px 10px 0 rgb(0 0 0 / 13%), inset 0 0 0 1px rgb(255 255 255 / 75%);
+}
+
+.card-slider-next-btn, .card-slider-prev-btn {
+    position: absolute;
+    top: 52%;
+    z-index: 9999999;
+    color: #1a345c;
+}
+.card-slider-next-btn {
+    right: 0;
+}
+.card-slider-prev-btn{
+    left: 0;
+}
+
+.card-slider-next-btn i, .card-slider-prev-btn i  {
+    font-size: 24px;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+}
+.card-slider-next-btn i::before {
+    position: absolute;
+    top: 21%;
+    left: 36%;
+}
+.card-slider-prev-btn i::before {
+    position: absolute;
+    top: 21%;
+    left: 28%;
+}
+
+.card-slider-container .card-slider-card-cover-img {
+    height: 160px;
+    overflow: hidden;
+    border-radius: 10px 10px 0px 0px;
+    position: relative;
+}
+
+.card-slider-container .card-slider-card-cover-img::before {
+    left: 0;
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    background: #000;
+    width: 100%;
+    height: 160px;
+    content: '';
+    z-index: 10;
+}
+
+.card-slider-course:hover .card-slider-card-cover-img::before,
+.card-slider-course:focus .card-slider-card-cover-img::before {
+    transition: opacity 0.25s ease-out 0.25s;
+    opacity: 0.6;
+}
+
+.card-slider-container article a {
+    text-decoration: none !important;
+}
+section.find-courses {
+    background: none;
+}
+
+.card-slider-courses{
+    position: relative;
+}
+
+.loader-sec {
+    width: 100%;
+    height: 100%;
+    background: #ffffffe0;
+    position: absolute;
+    z-index: 99999999;
+}
+.loader {
+    position: absolute;
+    left: 50%;
+    top: 35%;
+    z-index: 99999999;
+    width: 80px;
+    height: 80px;
+    margin: -76px 0 0 -76px;
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    -webkit-animation: spin 2s linear infinite;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
 </style>
 
 <%block name="pagetitle">${_("Courses")}</%block>
@@ -124,6 +488,43 @@
         <div id="filter-bar" class="filters hide-phone is-collapsed">
         </div>
         % endif
+        %if show_categorized_view == False:
+            <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
+            <ul class="courses-listing courses-list">
+                %for course in courses:
+                <li class="courses-listing-item">
+                <%include file="../course.html" args="course=course"/>
+                </li>
+                %endfor
+            </ul>
+        %else:
+              <!--   from here -->
+%if user.is_authenticated:
+   <section class="card-slider-container">
+<input id="user_industry" type="hidden" value="${user_industry}">
+
+
+      <div class="slider-heading">
+      <h2 class="card-slider-title" style="">Recommended Courses for You</h2>
+      <a href="#" id="rec_id" = >View All</a>
+      </div>
+            <div class="card-slider-courses">
+            <div class="loader-sec" id = "recommended_courses_loader" style="display:none;">
+            <div class="loader"></div>
+        </div>
+        <div class="card-slider-prev-btn" id = "recommended_prev_btn" style="display:none"><i class="fas fa-chevron-left"></i></div>
+         <div id="recommended_next_btn" style="display:none" class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
+         <ul id="recommended_courses_ul" class="card-slider-card-container owl-carousel owl-theme">
+
+         </ul>
+      </div>
+   </section>
+%endif
+      <section class="card-slider-container">
+      <div class="slider-heading">
+      <h2 class="card-slider-title" style="">Most Popular Courses</h2>
+      <a href="/courses?sort=-enrollments">View All</a>
+      </div>
 
 	<div class="carousel">
    <div id="myCarousel" class="carousel slide" data-ride="carousel">
@@ -179,14 +580,51 @@
   </div>
 </div>
 
-        <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
-          <ul class="courses-listing courses-list">
-            %for course in courses:
-            <li class="courses-listing-item">
-              <%include file="../course.html" args="course=course" />
-            </li>
-            %endfor
-          </ul>
+      <div class="card-slider-courses">
+            <div class="loader-sec" id = "most_popular_loader" style="display:none;">
+            <div class="loader"></div>
+            </div>
+        <div id = "popular_prev_btn" style="display:none" class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
+         <div id = "popular_next_btn" style="display:none" class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
+         <ul id="most_popular_ul" class="card-slider-card-container owl-carousel owl-theme">
+
+         </ul>
+      </div>
+   </section>
+      <section class="card-slider-container">
+      <div class="slider-heading">
+      <h2 class="card-slider-title" style="">Top Rated Courses</h2>
+      <a href="/courses?sort=rating">View All</a>
+      </div>
+      <div class="card-slider-courses">
+            <div class="loader-sec" id = "top_rated_loader" style="display:none;">
+            <div class="loader"></div>
+            </div>
+        <div id = "top_prev_btn" style="display:none" class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
+         <div id = "top_next_btn" style="display:none" class=" card-slider-next-btn" ><i class="fas fa-chevron-right"></i></div>
+         <ul id = "top_rated_ul" class="card-slider-card-container owl-carousel owl-theme">
+
+         </ul>
+      </div>
+   </section>
+      <section class="card-slider-container">
+      <div class="slider-heading">
+      <h2 class="card-slider-title" style="">Free Courses</h2>
+      <a href="/courses?mode=free">View All</a>
+      </div>
+      <div class="card-slider-courses">
+            <div class="loader-sec" id = "free_courses_loader" style="display:none;">
+            <div class="loader"></div>
+            </div>
+        <div id = "free_prev_btn" style="display:none" class="card-slider-prev-btn"><i class="fas fa-chevron-left"></i></div>
+         <div id = "free_next_btn" style="display:none" class=" card-slider-next-btn"><i class="fas fa-chevron-right"></i></div>
+         <ul id="free_courses_ul" class="card-slider-card-container owl-carousel owl-theme">
+
+         </ul>
+      </div>
+   </section>
+   <!-- to here -->
+        %endif
         </div>
 
 
@@ -201,3 +639,720 @@
       </section>
     </section>
 </main>
+
+<!--Course Card slider JS -->
+<script>
+var popular_next_url;
+var popular_prev_url;
+var free_next_url;
+var free_prev_url;
+var top_next_url ;
+var top_prev_url;
+var recommended_next_url;
+var recommended_prev_url;
+var viewedSlider_top = $('#top_rated_ul');
+$(document).ready(function() {
+
+$('#rec_id').click(function() {
+    window.location.href = window.location.protocol + "//" + window.location.host + "/courses?category_id=" + $("#user_industry").val();
+    return false;
+});
+
+
+// Recommended Courses Slider Button
+// From here
+        if ($('#recommended_prev_btn').length) {
+            var prev = $('#recommended_prev_btn');
+            prev.on('click', function() {
+                viewedSlider_rec.trigger('prev.owl.carousel');
+                show_recommended_courses(recommended_prev_url);
+                $('#recommended_prev_btn').show();
+            });
+        }
+        if ($('#recommended_next_btn').length) {
+            var next = $('#recommended_next_btn');
+            next.on('click', function() {
+                viewedSlider_rec.trigger('next.owl.carousel');
+                show_recommended_courses(recommended_next_url);
+                $('#recommended_next_btn').show();
+            });
+        }
+// till here
+
+
+// Most Popular Courses Slider Button
+// From here
+
+        if ($('#popular_prev_btn').length) {
+            var prev = $('#popular_prev_btn');
+            prev.on('click', function() {
+                show_most_popular_courses(popular_prev_url);
+                viewedSlider_pop.trigger('prev.owl.carousel');
+                $('#popular_prev_btn').show();
+            });
+        }
+        if ($('#popular_next_btn').length) {
+            var next = $('#popular_next_btn');
+            next.on('click', function() {
+                show_most_popular_courses(popular_next_url);
+                viewedSlider_pop.trigger('next.owl.carousel');
+                $('#popular_next_btn').show();
+            });
+        }
+// till here
+
+// Free Courses Slider Button
+// From here
+
+        if ($('#free_prev_btn').length) {
+        var prev = $('#free_prev_btn');
+        prev.on('click', function() {
+            viewedSlider_free.trigger('prev.owl.carousel');
+            show_free_courses(free_prev_url);
+            $('#free_prev_btn').show();
+        });
+        }
+        if ($('#free_next_btn').length) {
+            var next = $('#free_next_btn');
+            next.on('click', function() {
+                viewedSlider_free.trigger('next.owl.carousel');
+                show_free_courses(free_next_url);
+                $('#free_next_btn').show();
+            });
+        }
+
+// till here
+
+// Top Rated Courses Slider Button
+// From here
+
+        if ($('#top_prev_btn').length) {
+            var prev = $('#top_prev_btn');
+            prev.on('click', function() {
+                show_top_rated_courses(top_prev_url);
+                viewedSlider_top.trigger('prev.owl.carousel');
+                $('#top_prev_btn').show()
+            });
+        }
+        if ($('#top_next_btn').length) {
+            var next = $('#top_next_btn');
+            next.on('click', function() {
+                show_top_rated_courses(top_next_url);
+
+                viewedSlider_top.trigger('next.owl.carousel');
+                $('#top_next_btn').show();
+            });
+        }
+// till here
+
+// generic slider button
+
+    //if ($('.card-slider-card-container').length) {
+        /*var viewedSlider = $('.card-slider-card-container');
+
+        viewedSlider.owlCarousel({
+            loop: false,
+            margin: 20,
+            autoplay: false,
+            autoplayTimeout: 6000,
+            dots: false,
+            items: 4,
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+
+
+
+        if ($('.card-slider-prev-btn').length) {
+            var prev = $('.card-slider-prev-btn');
+            prev.on('click', function() {
+                viewedSlider.trigger('prev.owl.carousel');
+            });
+        }
+
+        if ($('.card-slider-next-btn').length) {
+            var next = $('.card-slider-next-btn');
+            next.on('click', function() {
+                viewedSlider.trigger('next.owl.carousel');
+                $('.card-slider-prev-btn').show();
+            });
+        }*/
+    //}
+
+
+// Till here
+%if show_categorized_view:
+    show_most_popular_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4");
+    show_free_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4");
+    show_top_rated_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4");
+%if user.is_authenticated:
+    show_recommended_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4");
+%endif
+%endif
+
+
+});
+
+
+
+
+function show_most_popular_courses(target) {
+
+//    popular_next_url = "http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4";
+    $('#most_popular_ul').owlCarousel('destroy');
+    $("#most_popular_ul").html('');
+    var form = new FormData();
+    var settings = {
+        "url": target,
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+    $("#most_popular_loader").css("display", "");
+
+    $.ajax(settings).done(function(response) {
+        $("#most_popular_loader").css("display", "None");
+        console.log(response);
+        if (response['status_code'] == 200) {
+            $('#heading_recommended_courses').css('display', '')
+            $('.courses-listing').empty()
+        pagination_popular_url = response['result']['pagination']["next"];
+        if( pagination_popular_url != null){
+            $("#top_next_btn").css("display","");
+            popular_next_url = pagination_popular_url;
+        }
+        else {
+            $("#popular_next_btn").css("display","None")
+        }
+        if(response['result']['pagination']["previous"] != null){
+            $("#popular_prev_btn").css("display","");
+            popular_prev_url = response['result']['pagination']["previous"];
+        }
+        else {
+            $("#popular_prev_btn").css("display","None");
+        }
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+                if (course_price == 0) {
+                    course_price = "Free"
+                } else {
+                    course_price = "S$" + course_price
+                }
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li>`;
+
+
+
+                $("#most_popular_ul").append(course);
+
+            }
+        var viewedSlider_pop = $('#most_popular_ul');
+        viewedSlider_pop.owlCarousel({
+        loop: false,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 4,
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+
+
+        }
+    });
+
+}
+
+
+function show_free_courses(target) {
+    $('#free_courses_ul').owlCarousel('destroy');
+    $("#free_courses_ul").html('');
+    var form = new FormData();
+    var settings = {
+        "url": target,
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+
+    $("#free_courses_loader").css("display", "");
+    $.ajax(settings).done(function(response) {
+        $("#free_courses_loader").css("display", "None")
+        console.log(response);
+        if (response['status_code'] == 200) {
+            $('#heading_recommended_courses').css('display', '');
+            $('.courses-listing').empty();
+        pagination_free_url = response['result']['pagination']["next"];
+        if( pagination_free_url != null){
+            $("#top_next_btn").css("display","");
+            free_next_url = pagination_free_url;
+        }
+        else {
+            $("#free_next_btn").css("display","None")
+        }
+           if(response['result']['pagination']["previous"] != null){
+            $("#free_prev_btn").css("display","");
+            free_prev_url = response['result']['pagination']["previous"];
+        }
+        else {
+            $("#free_prev_btn").css("display","None")
+        }
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li>`;
+
+
+
+                $("#free_courses_ul").append(course)
+
+            }
+
+        var viewedSlider_free = $('#free_courses_ul');
+        viewedSlider_free.owlCarousel({
+        loop: false,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 4,
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+
+        }
+    });
+
+}
+
+function show_top_rated_courses(top_rated) {
+    $('#top_rated_ul').owlCarousel('destroy');
+    $("#top_rated_ul").html('');
+    var form = new FormData();
+    var settings = {
+        "url": top_rated,
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+
+    $("#top_rated_loader").css("display", "");
+    $.ajax(settings).done(function(response) {
+        $("#top_rated_loader").css("display", "None")
+        console.log(response);
+        if (response['status_code'] == 200) {
+           // $('#heading_recommended_courses').css('display', '');
+            $('.courses-listing').empty();
+        pagination_top_url = response['result']['pagination']["next"];
+        if( pagination_top_url != null){
+            $("#top_next_btn").css("display","");
+            top_next_url = pagination_top_url;
+        }
+        else {
+            $("#top_next_btn").css("display","None");
+        }
+        if(response['result']['pagination']["previous"] != null){
+            $("#top_prev_btn").css("display","");
+            top_prev_url = response['result']['pagination']["previous"];
+        }
+        else {
+            $("#top_prev_btn").css("display","None");
+        }
+
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+                if (course_price == 0) {
+                    course_price = "Free"
+                } else {
+                    course_price = "S$" + course_price
+                }
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li>`;
+
+
+                $("#top_rated_ul").append(course)
+
+            }
+
+        var viewedSlider_top = $('#top_rated_ul');
+        viewedSlider_top.owlCarousel({
+        loop: false,
+        margin: 20,
+        autoplay: false,
+        autoplayTimeout: 6000,
+        dots: false,
+        items: 4,
+        slideBy: 4,
+
+            // responsive:
+            // {
+            // 0:{items:1},
+            // 575:{items:2},
+            // 768:{items:3},
+            // 991:{items:4},
+            // 1199:{items:6}
+            // }
+        });
+
+        }
+    });
+
+}
+
+function show_recommended_courses(target) {
+    console.log("===Hey There===");
+    $('#recommended_courses_ul').owlCarousel('destroy');
+    $("#recommended_courses_ul ").html('');
+        var recommended_settings = {
+        "url": target,
+        "method": "GET",
+        "headers": {
+            'X-CSRFToken': $('#web_csrf_token').val()
+        },
+        "processData": false,
+
+        "contentType": false,
+    };
+
+    $("#recommended_courses_loader").css("display", "");
+    $.ajax(recommended_settings).done(function(response) {
+        $("#recommended_courses_loader").css("display", "None")
+        console.log(response);
+        if (response['status_code'] == 200) {
+            //$('#recommended_courses_loader').css('display', '')
+            $('.courses-listing').empty()
+            pagination_next_url = response['result']['pagination']["next"];
+
+            if (pagination_next_url != null){
+                $("#recommended_next_btn").css("display","");
+                recommended_next_url = pagination_next_url;
+            }
+            else {
+            $("#recommended_next_btn").css("display","None")
+            }
+            if (response['result']['pagination']['previous'] != null){
+                $("#recommended_prev_btn").css("display","");
+                recommended_prev_url = response['result']['pagination']['previous'];
+            }
+
+
+            for (var i = 0; i < response['result']['results'].length; i++) {
+                course_id = response['result']['results'][i]['course_number'];
+                course_org = response['result']['results'][i]['organization'];
+                course_code = response['result']['results'][i]['code'];
+                course_name = response['result']['results'][i]['name'];
+                course_image = response['result']['results'][i]['image'];
+                course_difficulty_level = response['result']['results'][i]['difficulty_level'];
+                course_enrollments_count = response['result']['results'][i]['enrollments_count'];
+                course_ratings = response['result']['results'][i]['ratings'];
+                course_ratings = course_ratings !== null ? course_ratings : "None";
+                course_comments_count = response['result']['results'][i]['comments_count'];
+
+                course_start = response['result']['results'][i]['start_date'];
+                course_discount_applicable = response['result']['results'][i]['discount_applicable'];
+                course_price = response['result']['results'][i]['modes'][0]['price'];
+                if (course_price == 0) {
+                    course_price = "Free"
+                } else {
+                    course_price = "S$" + course_price
+                }
+                course_discounted_price = response['result']['results'][i]['discounted_price'];
+                course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+
+                var course = `<li class="card-slider-card-items owl-item">
+               <article class="card-slider-course">
+                  <a href="#">
+                     <header class="card-slider-card-img-cont">
+                        <div class="card-slider-card-cover-img">
+                           <img src="` + course_image + `" alt="` + course_name + `">
+                           <div class="card-slider-card-learn-more-btn" aria-hidden="true">LEARN MORE</div>
+                        </div>
+                     </header>
+                     <div class="card-slider-card-course-info" aria-hidden="true">
+                        <h2 class="crd-sldr-course-info ">
+                           <span class="crd-sldr-course-info-org">` + course_org + `</span>
+                           <span class="crd-sldr-course-info-code fl">` + course_id + `</span>
+                           <span class="crd-sldr-course-info-title">` + course_name + `</span>
+                           <p class="crd-sldr-course-info-label">Difficulty Level:<span class="course-difficulty_level">` + course_difficulty_level + `</span></p>
+                           <p class="crd-sldr-course-info-label">Enrollment Count:<span class="course-enrollments_count">` + course_enrollments_count + `</span></p>
+                           <p class="crd-sldr-course-info-label">Rating:<span class="course-ratings">` + course_ratings + `</span></p>
+                           <p class="crd-sldr-course-info-label">Comments Count:<span class="course-comments_count">` + course_comments_count + `</span></p>
+
+                           <div class="crd-sldr-course-info-price fl">
+                              <ul>`
+                                if (course_discount_applicable == true)
+                                {
+                                 course +=`<li>Discount Percentage: <span class="main_price-percentage">`+course_discount_percentage+`%</span></li>
+                                 <li>Price: <span class="crd-sldr-course-info-main-price main_price_cut">  ` + course_price + ` </span></li>
+                                 <li>Discounted Price: <span class="main_price">S$`+course_discounted_price+`</span></li>`
+                                }
+                                else if (course_discount_applicable == false && course_price > 0 )
+                                {
+
+                                    course +=`<li>Price: <span class="main_price">S$`+course_price+`</span></li>`
+                                }
+                                else
+                                {
+                                    course +=`<li>Price: <span class="main_price">Free</span></li>`
+                                }
+
+                                course +=`
+
+                              </ul>
+                           </div>
+                        </h2>
+                        <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
+                     </div>
+                  </a>
+               </article>
+            </li>`;
+
+
+                $("#recommended_courses_ul").append(course)
+
+            }
+            var viewedSlider_rec = $('#recommended_courses_ul');
+
+            viewedSlider_rec.owlCarousel({
+                loop: true,
+                margin: 20,
+                autoplay: false,
+                autoplayTimeout: 6000,
+                dots: false,
+                items: 4,
+                slideBy: 4,
+                    // responsive:
+                    // {
+                    // 0:{items:1},
+                    // 575:{items:2},
+                    // 768:{items:3},
+                    // 991:{items:4},
+                    // 1199:{items:6}
+                    // }
+        });
+
+
+        }
+    });
+
+}
+
+
+</script>

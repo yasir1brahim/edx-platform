@@ -7,7 +7,7 @@ import json
 import logging
 from collections import OrderedDict, namedtuple
 from datetime import datetime
-
+from custom_reg_form.models import UserExtraInfo
 import bleach
 import requests
 import six
@@ -73,6 +73,7 @@ from lms.djangoapps.courseware.courses import (
     get_studio_url,
     sort_by_announcement,
     sort_by_start_date,
+    sort_by_enrollments,
     sort_by_rating,
     sort_by_price,
 
@@ -266,9 +267,17 @@ def courses(request):
     category_id = request.GET.get('category')
     subcategory_id = request.GET.get('subcategory')
     difficulty_level_id = request.GET.get('difficulty_level')
+    if difficulty_level_id == "":
+        difficulty_level_id = None
     mode = request.GET.get('mode', '')
+    logging.info("==============")
+    # if request.GET.keys()
+    logging.info(len(request.GET.keys()))
+    logging.info("==============")
+    if mode == "":
+        mode = None
     category = sub_category = difficulty_level = None
-
+    show_categorized_view = True
     courses_list = []
     filter_ = None
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
@@ -292,8 +301,12 @@ def courses(request):
             courses_list = sort_by_rating(courses_list)
         elif sort == 'price':
             courses_list = sort_by_price(courses_list)
+        elif sort == "enrollments":
+            courses_list = sort_by_enrollments(courses_list)
+        # else:
+        #     courses_list = sort_by_announcement(courses_list)
         else:
-            courses_list = sort_by_announcement(courses_list)
+            sort = None
 
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
@@ -342,9 +355,18 @@ def courses(request):
 
     banner_list = Banner.objects.filter(platform__in = ['WEB', 'BOTH'], enabled=True)
 
+    if len(request.GET.keys()) > 0:
+        show_categorized_view = False
+    else:
+        show_categorized_view = True
+    user_category = None
+    user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
+    if hasattr(user_extra_info, 'industry_id'):
+        user_category = Category.objects.filter(id=user_extra_info.industry_id).first().id
     return render_to_response(
         "courseware/courses.html",
         {
+
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
@@ -355,7 +377,10 @@ def courses(request):
             'selected_mode': mode,
             'sort': sort,
             'banner_list': banner_list,
-        }
+            'show_categorized_view': show_categorized_view,
+            'user_industry': user_category,
+        },
+
     )
 
 

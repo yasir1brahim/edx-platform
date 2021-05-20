@@ -352,6 +352,7 @@ class CourseDetailCheckoutSerializer(serializers.Serializer):
     description = serializers.CharField(required=False)
     new_category = serializers.CharField(required=False)
     organization = serializers.CharField(required=False)
+    available_vouchers = AvailableVouchersSerializer(many=True)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema

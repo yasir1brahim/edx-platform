@@ -264,7 +264,11 @@ def courses(request):
     """
     sort = request.GET.get('sort', '')
     category_id = request.GET.get('category')
+    if category_id == "":
+        category_id = None
     subcategory_id = request.GET.get('subcategory')
+    if subcategory_id == "":
+        subcategory_id = None
     difficulty_level_id = request.GET.get('difficulty_level')
     if difficulty_level_id == "":
         difficulty_level_id = None
@@ -321,7 +325,8 @@ def courses(request):
     def filter_courses(course):
         if course.platform_visibility not in ["Web", "Both", None]:
             return False
-
+        print('===========123123')
+        print(course.new_category_id)
         if category and course.new_category_id != category.id:
             return False
 
@@ -351,10 +356,23 @@ def courses(request):
         selected_category_name = category.name
     elif sub_category:
         selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
-    if len(request.GET.keys()) > 0:
-        show_categorized_view = False
-    else:
+    if len(request.GET.keys()) ==  0:
         show_categorized_view = True
+        logging.info("TURE========================")
+        logging.info(category_id)
+    elif len(request.GET.keys()) > 0:
+        if (difficulty_level_id==None) and (sort==None) and (mode==None) and (category_id==None) and (subcategory_id == None):
+            show_categorized_view = True
+            logging.info("TURE========================")
+            logging.info(category_id)
+        else:
+            show_categorized_view = False
+            logging.info("========================")
+            logging.info(category_id)
+    else:
+        show_categorized_view = False
+        logging.info("========================")
+        logging.info(category_id)
     user_category = None
     user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
     if hasattr(user_extra_info, 'industry_id'):

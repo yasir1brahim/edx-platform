@@ -522,7 +522,7 @@ section.find-courses {
       <section class="card-slider-container">
       <div class="slider-heading">
       <h2 class="card-slider-title" style="">Most Popular Courses</h2>
-      <a href="/courses?sort=-enrollments">View All</a>
+      <a href="/courses?sort=enrollments">View All</a>
       </div>
 
       <div class="card-slider-courses">
@@ -599,8 +599,11 @@ var viewedSlider_top = $('#top_rated_ul');
 $(document).ready(function() {
 
 $('#rec_id').click(function() {
-    window.location.href = window.location.protocol + "//" + window.location.host + "/courses?category_id=" + $("#user_industry").val();
+    window.location.href = window.location.protocol + "//" + window.location.host + "/courses?category=" + $("#user_industry").val();
     return false;
+    %if show_categorized_view == True:
+    show_categorized_view = False
+    %endif
 });
 
 
@@ -737,7 +740,7 @@ $('#rec_id').click(function() {
     show_free_courses("http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4");
     show_top_rated_courses("http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4");
 %if user.is_authenticated:
-    show_recommended_courses("http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4");
+    show_recommended_courses(window.location.protocol + "//" + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&category=" + $("#user_industry").val());
 %endif
 %endif
 

@@ -733,11 +733,11 @@ $('#rec_id').click(function() {
 
 // Till here
 %if show_categorized_view:
-    show_most_popular_courses("http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4");
-    show_free_courses("http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4");
-    show_top_rated_courses("http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4");
+    show_most_popular_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4");
+    show_free_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4");
+    show_top_rated_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4");
 %if user.is_authenticated:
-    show_recommended_courses("http://edx.devstack.lms:18000/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4");
+    show_recommended_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4");
 %endif
 %endif
 

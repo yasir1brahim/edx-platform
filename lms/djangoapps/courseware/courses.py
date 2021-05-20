@@ -730,6 +730,11 @@ def get_courses_with_extra_info(user, org=None, filter_=None):
         course.discounted_price = course_extra_info.discounted_price
         course.currency = course_extra_info.currency
         course.discount_type = course_extra_info.discount_type
+        course.coupon_type = course_extra_info.coupon_type
+        course.coupon_available = course_extra_info.coupon_available
+        course.coupon_value = course_extra_info.coupon_value
+        course.coupon_applicable = course_extra_info.coupon_applicable
+
         if len(course_extra_info.modes) == 0:
             course.price = 0
         else:
@@ -777,6 +782,11 @@ def get_courses_with_extra_info_json(user, org=None, platform=None, filter_=None
         course.discounted_price = course_extra_info.discounted_price
         course.currency = course_extra_info.currency
         course.discount_type = course_extra_info.discount_type
+        course.coupon_type = course_extra_info.coupon_type
+        course.coupon_available = course_extra_info.coupon_available
+        course.coupon_value = course_extra_info.coupon_value
+        course.coupon_applicable = course_extra_info.coupon_applicable
+
         if len(course_extra_info.modes) == 0:
             course.price = 0
         else:

@@ -21,8 +21,11 @@ class Ecommerce_Offer(APIView):
             start_datetime_str = ecommerce_data['start_datetime']
             start_datetime = datetime.strptime(start_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
 
-            end_datetime_str = ecommerce_data['end_datetime']
-            end_datetime = datetime.strptime(end_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
+            if ecommerce_data['end_datetime'] != "None":
+                end_datetime_str = ecommerce_data['end_datetime']
+                end_datetime = datetime.strptime(end_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
+            else:
+                end_datetime = None
 
             ecommerce_offer.update(
                 associated_ecommerce_offer_id = ecommerce_data['associated_ecommerce_offer_id'],
@@ -36,6 +39,7 @@ class Ecommerce_Offer(APIView):
                 is_exclusive = ecommerce_data['is_exclusive'],
                 is_suspended = ecommerce_data['is_suspended'],
             )
+
 
             for course in ecommerce_offer[0].course.all():
                 # Condition 01: course is present in Offer courses
@@ -107,9 +111,6 @@ class Ecommerce_Coupon(APIView):
 
     def post(self, request):
         ecommerce_data = request.data
-
-        logging.info("========================================")
-        logging.info(ecommerce_data)
 
         # If Coupon already exists
         # Update it

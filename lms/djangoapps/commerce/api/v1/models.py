@@ -29,7 +29,7 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from lms.djangoapps.lhub_ecommerce_offer.models import Offer
+from lms.djangoapps.lhub_ecommerce_offer.models import Offer, Coupon
 from decimal import Decimal as D
 from datetime import datetime
 import pytz
@@ -177,6 +177,25 @@ class Course(object):
 
 
     @property
+    def coupon_applicable(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        current_datetime = str(utc.localize(datetime.now()))
+        current_datetime = utc.localize(datetime.strptime(current_datetime[:19], '%Y-%m-%d %H:%M:%S'))
+        if len(self.modes) > 0:
+            if Coupon.objects.filter(course__pk=course_id).exists():
+                coupon = Coupon.objects.filter(course__pk=course_id).first()
+                start_date = coupon.start_datetime
+                end_date = coupon.end_datetime
+                if current_datetime >= start_date and current_datetime < end_date:
+                    return True
+                else:
+                    return False
+        return False
+
+
+
+
+    @property
     def discount_applicable(self):
         course_id = CourseKey.from_string(six.text_type(self.id))
         current_datetime = str(utc.localize(datetime.now()))
@@ -186,10 +205,16 @@ class Course(object):
                 offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
                 start_date = offer.start_datetime
                 end_date = offer.end_datetime
-                if offer.is_suspended == False and current_datetime >= start_date and current_datetime < end_date:
-                    return True
+                if end_date:
+                    if offer.is_suspended == False and current_datetime >= start_date and current_datetime < end_date:
+                        return True
+                    else:
+                        return False
                 else:
-                    return False
+                    if offer.is_suspended == False and current_datetime >= start_date:
+                        return True
+                    else:
+                        return False
         return False
 
     @property
@@ -222,22 +247,36 @@ class Course(object):
             current_datetime = utc.localize(datetime.strptime(current_datetime[:19], '%Y-%m-%d %H:%M:%S'))
             
             if Offer.objects.filter(course__pk=course_id).exists():
-                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                offer = Offer.objects.filter(course__pk=course_id).order_by('-priority', 'id').first()
                 start_date = offer.start_datetime
                 end_date = offer.end_datetime
-                
-                if offer.is_suspended == False and current_datetime >= start_date and current_datetime < end_date:
-                    incentive_type = offer.incentive_type
-                    incentive_value = float(offer.incentive_value)
-                    
-                    if incentive_type == 'Percentage':
-                        discounted_price = price - (price * (incentive_value/100))
-                    elif incentive_type == 'Absolute':
-                        discounted_price = price - incentive_value
+                if end_date:
+                    if offer.is_suspended == False and current_datetime >= start_date and current_datetime < end_date:
+                        incentive_type = offer.incentive_type
+                        incentive_value = float(offer.incentive_value)
+                        
+                        if incentive_type == 'Percentage':
+                            discounted_price = price - (price * (incentive_value/100))
+                        elif incentive_type == 'Absolute':
+                            discounted_price = price - incentive_value
 
-                    return "%.2f" % discounted_price
+                        return "%.2f" % discounted_price
+                    else:
+                        return "%.2f" % price
                 else:
-                    return "%.2f" % price
+                    if offer.is_suspended == False and current_datetime >= start_date:
+                        incentive_type = offer.incentive_type
+                        incentive_value = float(offer.incentive_value)
+                        
+                        if incentive_type == 'Percentage':
+                            discounted_price = price - (price * (incentive_value/100))
+                        elif incentive_type == 'Absolute':
+                            discounted_price = price - incentive_value
+
+                        return "%.2f" % discounted_price
+                    else:
+                        return "%.2f" % price 
+
 
         course_mode_price = self.get_paid_mode_price()
         return course_mode_price
@@ -251,26 +290,39 @@ class Course(object):
             current_datetime = utc.localize(datetime.strptime(current_datetime[:19], '%Y-%m-%d %H:%M:%S'))
             
             if Offer.objects.filter(course__pk=course_id).exists():
-                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                offer = Offer.objects.filter(course__pk=course_id).order_by('-priority', 'id').first()
                 start_date = offer.start_datetime
                 end_date = offer.end_datetime
-                
-                if offer.is_suspended == False and current_datetime >= start_date and current_datetime < end_date:
-                    incentive_type = offer.incentive_type
-                    incentive_value = float(offer.incentive_value)
-                    
-                    if incentive_type == 'Percentage':
-                        discounted_price = price - (price * (incentive_value/100))
-                    elif incentive_type == 'Absolute':
-                        discounted_price = price - incentive_value
+                if end_date:
+                    if offer.is_suspended == False and current_datetime >= start_date and current_datetime < end_date:
+                        incentive_type = offer.incentive_type
+                        incentive_value = float(offer.incentive_value)
+                        
+                        if incentive_type == 'Percentage':
+                            discounted_price = price - (price * (incentive_value/100))
+                        elif incentive_type == 'Absolute':
+                            discounted_price = price - incentive_value
 
-                    return str("%.2f" % discounted_price)
+                        return "%.2f" % discounted_price
+                    else:
+                        return "%.2f" % price
                 else:
-                    return str("%.2f" % price)
+                    if offer.is_suspended == False and current_datetime >= start_date:
+                        incentive_type = offer.incentive_type
+                        incentive_value = float(offer.incentive_value)
+                        
+                        if incentive_type == 'Percentage':
+                            discounted_price = price - (price * (incentive_value/100))
+                        elif incentive_type == 'Absolute':
+                            discounted_price = price - incentive_value
+
+                        return "%.2f" % discounted_price
+                    else:
+                        return "%.2f" % price 
+
 
         course_mode_price = self.get_paid_mode_price()
         return course_mode_price
-
 
     @property
     def discount_percentage(self):
@@ -291,6 +343,54 @@ class Course(object):
                 self.modes[0].discount_percentage = offer.incentive_value
                 return str("%.2f" % self.modes[0].discount_percentage)
         return "%.2f" % 0.0
+
+
+    @property
+    def coupon_available(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        if len(self.modes) > 0:
+            if Coupon.objects.filter(course__pk=course_id).exists():
+                coupon = Coupon.objects.filter(course__pk=course_id).first()
+                if coupon:
+                    return True
+                else:
+                    return False
+    
+
+
+    @property
+    def coupon_type(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        if len(self.modes) > 0:
+            if Coupon.objects.filter(course__pk=course_id).exists():
+                coupon = Coupon.objects.filter(course__pk=course_id).first()
+                if coupon.incentive_type == 'Percentage':
+                    return 'Percentage'
+                else:
+                    return 'Value'
+
+
+    @property
+    def coupon_value(self):
+        course_id = CourseKey.from_string(six.text_type(self.id))
+        values = []
+        current_datetime = str(utc.localize(datetime.now()))
+        current_datetime = utc.localize(datetime.strptime(current_datetime[:19], '%Y-%m-%d %H:%M:%S'))
+        if len(self.modes) > 0:
+            if Coupon.objects.filter(course__pk=course_id).exists():
+                coupons = Coupon.objects.filter(course__pk=course_id)
+                for coupon in coupons:
+                    start_date = coupon.start_datetime
+                    end_date = coupon.end_datetime
+
+                    if current_datetime >= start_date and current_datetime < end_date:
+                        if coupon.incentive_type == 'Percentage':
+                            values.append(coupon.coupon_code + " -" + str(coupon.incentive_value) + "%")
+                        elif coupon.incentive_type == 'Absolute':
+                            values.append(coupon.coupon_code + " -S$" + str(coupon.incentive_value))
+                return values
+
+
 
 
     @property

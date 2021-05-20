@@ -73,6 +73,7 @@ from lms.djangoapps.courseware.courses import (
     get_studio_url,
     sort_by_announcement,
     sort_by_start_date,
+    sort_by_enrollments,
     sort_by_rating,
     sort_by_price,
 
@@ -268,11 +269,12 @@ def courses(request):
     if difficulty_level_id == "":
         difficulty_level_id = None
     mode = request.GET.get('mode', '')
+    logging.info("==============")
+    # if request.GET.keys()
+    logging.info(len(request.GET.keys()))
+    logging.info("==============")
     if mode == "":
         mode = None
-    logging.info("=================")
-    logging.info(mode)
-    logging.info("=================")
     category = sub_category = difficulty_level = None
     show_categorized_view = True
     courses_list = []
@@ -298,6 +300,8 @@ def courses(request):
             courses_list = sort_by_rating(courses_list)
         elif sort == 'price':
             courses_list = sort_by_price(courses_list)
+        elif sort == "enrollments":
+            courses_list = sort_by_enrollments(courses_list)
         # else:
         #     courses_list = sort_by_announcement(courses_list)
         else:
@@ -322,7 +326,7 @@ def courses(request):
             return False
 
         if sub_category and course.subcategory_id != sub_category.id:
-            return Falselogginglogging
+            return False
 
         if difficulty_level and course.difficulty_level != difficulty_level.level.capitalize():
             return False
@@ -347,10 +351,10 @@ def courses(request):
         selected_category_name = category.name
     elif sub_category:
         selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
-    if (difficulty_level_id == None) and (sort==None) and (mode==None) :
-        show_categorized_view = True
-    else:
+    if len(request.GET.keys()) > 0:
         show_categorized_view = False
+    else:
+        show_categorized_view = True
     user_category = None
     user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
     if hasattr(user_extra_info, 'industry_id'):

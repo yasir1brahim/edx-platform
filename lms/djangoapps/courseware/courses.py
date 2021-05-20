@@ -831,6 +831,14 @@ def sort_by_rating(courses):
     )
     return courses
 
+def sort_by_enrollments(courses):
+    courses = sorted(
+        courses,
+        key=lambda course: course.enrollments_count or 0,
+        reverse=True
+    )
+    return courses
+
 
 def sort_by_price(courses):
     courses = sorted(

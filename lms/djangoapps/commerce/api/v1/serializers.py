@@ -262,7 +262,7 @@ class CourseDetailSerializer(serializers.Serializer):
     allow_review = serializers.BooleanField()
     is_enrolled = serializers.BooleanField(required=False)
     own_feedback = serializers.BooleanField(required=False)
-    voucher_applicable = serializers.BooleanField(required=False, source='coupon_applicable')
+    voucher_applicable = serializers.BooleanField(required=False)
     available_vouchers = AvailableVouchersSerializer(required=False, many=True)
 
     class Meta(object):

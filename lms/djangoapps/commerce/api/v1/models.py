@@ -202,7 +202,7 @@ class Course(object):
         current_datetime = utc.localize(datetime.strptime(current_datetime[:19], '%Y-%m-%d %H:%M:%S'))
         if len(self.modes) > 0:
             if Offer.objects.filter(course__pk=course_id).exists():
-                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                offer = Offer.objects.filter(course__pk=course_id).order_by('-priority', 'id').first()
                 start_date = offer.start_datetime
                 end_date = offer.end_datetime
                 if end_date:
@@ -222,7 +222,7 @@ class Course(object):
         course_id = CourseKey.from_string(six.text_type(self.id))
         if len(self.modes) > 0:
             if Offer.objects.filter(course__pk=course_id).exists():
-                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                offer = Offer.objects.filter(course__pk=course_id).order_by('-priority', 'id').first()
                 if offer.incentive_type == 'Percentage':
                     return "Percentage"
                 else:
@@ -329,7 +329,7 @@ class Course(object):
         course_id = CourseKey.from_string(six.text_type(self.id))
         if len(self.modes) > 0:
             if Offer.objects.filter(course__pk=course_id).exists():
-                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                offer = Offer.objects.filter(course__pk=course_id).order_by('-priority', 'id').first()
                 self.modes[0].discount_percentage = offer.incentive_value
                 return self.modes[0].discount_percentage
         return 0.0
@@ -339,7 +339,7 @@ class Course(object):
         course_id = CourseKey.from_string(six.text_type(self.id))
         if len(self.modes) > 0:
             if Offer.objects.filter(course__pk=course_id).exists():
-                offer = Offer.objects.filter(course__pk=course_id).order_by('priority', 'id').first()
+                offer = Offer.objects.filter(course__pk=course_id).order_by('-priority', 'id').first()
                 self.modes[0].discount_percentage = offer.incentive_value
                 return str("%.2f" % self.modes[0].discount_percentage)
         return "%.2f" % 0.0

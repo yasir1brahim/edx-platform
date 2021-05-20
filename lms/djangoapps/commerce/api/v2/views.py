@@ -1,3 +1,4 @@
+from lms.djangoapps.lhub_ecommerce_offer.models import Coupon
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from openedx.core.lib.api.authentication import BearerAuthentication
@@ -203,6 +204,9 @@ class CourseDetailView(RetrieveAPIView):
             course.allow_review = course_overview.allow_review
             course.is_enrolled = CourseEnrollment.is_enrolled(self.request.user, course_id)
             course.own_feedback = CourseReview.is_reviewed(self.request.user, course_id)
+            course.discount_type = course_extra_info.discount_type
+            course.voucher_applicable = course_extra_info.coupon_applicable
+            course.available_vouchers = course_extra_info.available_vouchers
 
             if len(course_extra_info.modes) == 0:
                 course.price = 0

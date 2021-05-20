@@ -450,6 +450,7 @@ class CourseCheckoutDetailView(RetrieveAPIView):
             course.name = course_overview.display_name
             course.new_category = course_overview.new_category if course_overview.new_category else "None"
             course.organization = course.display_org_with_default
+            course.available_vouchers = course_extra_info.available_vouchers
             if len(course_extra_info.modes) == 0:
                 course.price = 0
             else:
@@ -489,7 +490,10 @@ def get_basket_content_mobile(request,id=None):
         response = api.basket_details.get(id=id)
     else:
         response = api.basket_details_mobile.get()
+        log.info("==============")
+        log.info(response)
     if response['status_code'] == 404:
         return HttpResponseNotFound(response['message'])
     return Response(response)
+
 

@@ -249,6 +249,7 @@ class CourseDetailSerializer(serializers.Serializer):
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
     discount_applicable = serializers.BooleanField(required=False)
+    discount_type = serializers.CharField(required=False)
     discounted_price = serializers.CharField(required=False)
     sale_type = serializers.CharField(required=False)
     subcategory_id = serializers.CharField(required=False)
@@ -261,6 +262,8 @@ class CourseDetailSerializer(serializers.Serializer):
     allow_review = serializers.BooleanField()
     is_enrolled = serializers.BooleanField(required=False)
     own_feedback = serializers.BooleanField(required=False)
+    voucher_applicable = serializers.BooleanField(required=False, source='coupon_applicable')
+    available_vouchers = AvailableVouchersSerializer(required=False, many=True)
 
     class Meta(object):
         # For disambiguating within the drf-yasg swagger schema

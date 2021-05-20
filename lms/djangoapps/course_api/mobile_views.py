@@ -327,7 +327,8 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             org=form.cleaned_data['org'],
             platform='Mobile',
             filter_=form.cleaned_data['filter_'],
-            search_term=form.cleaned_data['search_term']
+            search_term=form.cleaned_data['search_term'],
+            get_extra_info=True
         )
         return result
 

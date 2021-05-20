@@ -46,6 +46,7 @@ class OfferAdmin(admin.ModelAdmin):
 class CouponAdmin(admin.ModelAdmin):
     """ Coupon class for Offer model """
     fields = (
+        'name',
         'coupon_code',
         'incentive_type',
         'incentive_value',
@@ -57,6 +58,7 @@ class CouponAdmin(admin.ModelAdmin):
         'associated_ecommerce_coupon_id',
     )
     list_display = [
+        'name',
         'coupon_code',
         'incentive_type',
         'incentive_value',

@@ -124,6 +124,7 @@ class Ecommerce_Coupon(APIView):
 
             ecommerce_coupon.update(
                 associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id'],
+                name = ecommerce_data['name'],
                 coupon_code = ecommerce_data['coupon_code'],
                 start_datetime = start_datetime,
                 end_datetime = end_datetime,
@@ -165,6 +166,7 @@ class Ecommerce_Coupon(APIView):
 
             ecommerce_coupon = Coupon(
                 associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id'],
+                name = ecommerce_data['name'],
                 coupon_code = ecommerce_data['coupon_code'],
                 start_datetime = start_datetime,
                 end_datetime = end_datetime,

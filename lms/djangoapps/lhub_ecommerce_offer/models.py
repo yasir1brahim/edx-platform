@@ -22,6 +22,7 @@ class Offer(models.Model):
 
 
 class Coupon(models.Model):
+    name = models.CharField(max_length=250)
     coupon_code = models.CharField(max_length=250)
     incentive_type = models.CharField(max_length=250)
     incentive_value = models.DecimalField(max_digits=12, decimal_places=2)

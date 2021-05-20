@@ -174,8 +174,6 @@ class Course(object):
             return None
 
 
-
-
     @property
     def coupon_applicable(self):
         course_id = CourseKey.from_string(six.text_type(self.id))
@@ -191,8 +189,6 @@ class Course(object):
                 else:
                     return False
         return False
-
-
 
 
     @property
@@ -371,24 +367,24 @@ class Course(object):
 
 
     @property
-    def coupon_value(self):
+    def available_vouchers(self):
         course_id = CourseKey.from_string(six.text_type(self.id))
-        values = []
+        vouchers = []
         current_datetime = str(utc.localize(datetime.now()))
         current_datetime = utc.localize(datetime.strptime(current_datetime[:19], '%Y-%m-%d %H:%M:%S'))
         if len(self.modes) > 0:
             if Coupon.objects.filter(course__pk=course_id).exists():
+                vouchers_data = Coupon.objects.filter(course__pk=course_id).values('name', 'coupon_code', 'incentive_type', 'incentive_value', 'is_exclusive')
                 coupons = Coupon.objects.filter(course__pk=course_id)
-                for coupon in coupons:
+                for index, coupon in enumerate(coupons):
                     start_date = coupon.start_datetime
                     end_date = coupon.end_datetime
 
                     if current_datetime >= start_date and current_datetime < end_date:
-                        if coupon.incentive_type == 'Percentage':
-                            values.append(coupon.coupon_code + " -" + str(coupon.incentive_value) + "%")
-                        elif coupon.incentive_type == 'Absolute':
-                            values.append(coupon.coupon_code + " -S$" + str(coupon.incentive_value))
-                return values
+                            vouchers.append(vouchers_data[index])
+                return vouchers
+            else:
+                return []
 
 
 

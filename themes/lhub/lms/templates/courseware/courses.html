@@ -130,7 +130,7 @@ span.main_price_cut {
     padding: 4px 0px 0px 0px;
     margin-top: 12px;
     color: #7f7f7f;
-    font-size: 16px;
+    font-size: 13px;
 }
 
 .card-slider-container span.crd-sldr-course-info-title,
@@ -415,7 +415,22 @@ section.find-courses {
   100% { transform: rotate(360deg); }
 }
 
-
+.coupon_details {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+}
+.coupon_details p {
+    display: flex;
+    margin: 0px;
+    line-height: 1.4;
+    justify-content: flex-end;
+}
+.coupon_details span.coupen_code_value {
+    font-size: 12px;
+    color: #ed9800;
+    font-weight: 600;
+}
 
 </style>
 
@@ -904,8 +919,29 @@ function show_most_popular_courses(target) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                            </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">` 
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {  
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+                                    
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {    
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }    
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>
@@ -1039,8 +1075,29 @@ function show_free_courses(target) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                           </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">` 
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {  
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+                                    
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {    
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }    
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>
@@ -1137,7 +1194,6 @@ function show_top_rated_courses(top_rated) {
                 }
                 course_discounted_price = response['result']['results'][i]['discounted_price'];
                 course_discount_percentage = response['result']['results'][i]['discount_percentage'];
-
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
                   <a href="#">
@@ -1178,8 +1234,29 @@ function show_top_rated_courses(top_rated) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                           </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">` 
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {  
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+                                    
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {    
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }    
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>
@@ -1275,6 +1352,7 @@ function show_recommended_courses(target) {
                 }
                 course_discounted_price = response['result']['results'][i]['discounted_price'];
                 course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+                available_vouchers = response['result']['results'][i]['available_vouchers'];
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
@@ -1316,8 +1394,29 @@ function show_recommended_courses(target) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                          </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">` 
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {  
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+                                    
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {    
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }    
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>

@@ -211,7 +211,7 @@ $(document).ready(function() {
     if (response['status_code'] == 200)
     {
     $('#loader-sec').css('display', 'none')
-    window.location.href = $('#ecommerce_url').val() + "/checkout/card-selection"
+    window.location.href = $('#ecommerce_url').val() + "/basket"
     }
     
     else

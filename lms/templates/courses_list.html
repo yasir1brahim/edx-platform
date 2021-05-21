@@ -704,7 +704,7 @@ function show_most_popular_courses(target) {
                 course_org = response['result']['results'][i]['organization'];
                 course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -767,19 +767,19 @@ function show_most_popular_courses(target) {
                            available_vouchers = response['result']['results'][i]['available_vouchers'];
                            if (available_vouchers.length > 0)
                                 {
-                                   course+=`<div class="coupon_details">` 
+                                   course+=`<div class="coupon_details">`
                                   for (var j=0; j < available_vouchers.length; j++)
-                                  {  
+                                  {
                                         if (available_vouchers[j]["discount_type"] == 'Absolute')
                                         {
-                                    
+
                                            course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
                                         }
                                         else
-                                        {    
+                                        {
 
                                          course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
-                                        }    
+                                        }
                                     }
                             course+=`</div>`
                         }
@@ -864,7 +864,7 @@ function show_free_courses(target) {
                 course_org = response['result']['results'][i]['organization'];
                 course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -923,19 +923,19 @@ function show_free_courses(target) {
                            available_vouchers = response['result']['results'][i]['available_vouchers'];
                            if (available_vouchers.length > 0)
                                 {
-                                   course+=`<div class="coupon_details">` 
+                                   course+=`<div class="coupon_details">`
                                   for (var j=0; j < available_vouchers.length; j++)
-                                  {  
+                                  {
                                         if (available_vouchers[j]["discount_type"] == 'Absolute')
                                         {
-                                    
+
                                            course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
                                         }
                                         else
-                                        {    
+                                        {
 
                                          course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
-                                        }    
+                                        }
                                     }
                             course+=`</div>`
                         }
@@ -1020,7 +1020,7 @@ function show_top_rated_courses(top_rated) {
                 course_org = response['result']['results'][i]['organization'];
                 course_code = response['result']['results'][i]["id"];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -1083,19 +1083,19 @@ function show_top_rated_courses(top_rated) {
                            available_vouchers = response['result']['results'][i]['available_vouchers'];
                            if (available_vouchers.length > 0)
                                 {
-                                   course+=`<div class="coupon_details">` 
+                                   course+=`<div class="coupon_details">`
                                   for (var j=0; j < available_vouchers.length; j++)
-                                  {  
+                                  {
                                         if (available_vouchers[j]["discount_type"] == 'Absolute')
                                         {
-                                    
+
                                            course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
                                         }
                                         else
-                                        {    
+                                        {
 
                                          course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
-                                        }    
+                                        }
                                     }
                             course+=`</div>`
                         }
@@ -1179,7 +1179,7 @@ function show_recommended_courses(target) {
                 course_org = response['result']['results'][i]['organization'];
                 course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -1242,19 +1242,19 @@ function show_recommended_courses(target) {
                            available_vouchers = response['result']['results'][i]['available_vouchers'];
                            if (available_vouchers.length > 0)
                                 {
-                                   course+=`<div class="coupon_details">` 
+                                   course+=`<div class="coupon_details">`
                                   for (var j=0; j < available_vouchers.length; j++)
-                                  {  
+                                  {
                                         if (available_vouchers[j]["discount_type"] == 'Absolute')
                                         {
-                                    
+
                                            course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
                                         }
                                         else
-                                        {    
+                                        {
 
                                          course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
-                                        }    
+                                        }
                                     }
                             course+=`</div>`
                         }

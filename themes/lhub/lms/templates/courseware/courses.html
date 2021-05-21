@@ -667,9 +667,13 @@ var top_prev_url;
 var recommended_next_url;
 var recommended_prev_url;
 var viewedSlider_top = $('#top_rated_ul');
+var viewedSlider_rec = $("#recommended_courses_ul");
+var viewedSlider_free = $("#free_courses_ul");
+var viewedSlider_top = $("#top_rated_ul");
 $(document).ready(function() {
 
 $('#rec_id').click(function() {
+
     window.location.href = window.location.protocol + "//" + window.location.host + "/courses?category=" + $("#user_industry").val();
     return false;
     %if show_categorized_view == True:
@@ -847,7 +851,7 @@ function show_most_popular_courses(target) {
             $('.courses-listing').empty()
         pagination_popular_url = response['result']['pagination']["next"];
         if( pagination_popular_url != null){
-            $("#top_next_btn").css("display","");
+            $("#popular_next_btn").css("display","");
             popular_next_url = pagination_popular_url;
         }
         else {
@@ -1007,7 +1011,7 @@ function show_free_courses(target) {
             $('.courses-listing').empty();
         pagination_free_url = response['result']['pagination']["next"];
         if( pagination_free_url != null){
-            $("#top_next_btn").css("display","");
+            $("#free_next_btn").css("display","");
             free_next_url = pagination_free_url;
         }
         else {
@@ -1331,6 +1335,9 @@ function show_recommended_courses(target) {
             if (response['result']['pagination']['previous'] != null){
                 $("#recommended_prev_btn").css("display","");
                 recommended_prev_url = response['result']['pagination']['previous'];
+            }
+            else {
+            $("#recommended_prev_btn").css("display","None");
             }
 
 

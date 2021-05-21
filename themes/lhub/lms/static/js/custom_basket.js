@@ -340,7 +340,7 @@ $(document).ready(function() {
     course_discount_percentage = response['result']['result'][i]['discount_percentage']
     course_discount_type = response['result']['result'][i]['discount_type']
     
-    
+
     
     var course = `<li class="courses-listing-item">
     <article class="course" id="`+course_id+`" role="region" aria-label="`+course_name+`">
@@ -389,8 +389,32 @@ $(document).ready(function() {
     
     course +=`
     </ul>
-    </div>
-    </h2>
+    </div>`
+
+           available_vouchers = response['result']['result'][i]['available_vouchers']
+
+           console.log("voucher>>", available_vouchers)
+
+           if (available_vouchers.length > 0)
+                {
+                   course+=`<div class="coupon_details">` 
+                  for (var j=0; j < available_vouchers.length; j++)
+                  {  
+                        if (available_vouchers[j]["incentive_type"] == 'Absolute')
+                        {
+                    
+                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["coupon_code"] +` -S$` + available_vouchers[j]["incentive_value"]+`</span></p>`
+                        }
+                        else
+                        {    
+
+                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["coupon_code"]+ ` -`+available_vouchers[j]["incentive_value"]+`%</span></p>`
+                        }    
+                    }
+            course+=`</div>`
+        }
+
+        course+=`</h2>
     <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: `+course_start+`</div>
     </div>
     </a>

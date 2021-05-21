@@ -1302,9 +1302,9 @@ function show_top_rated_courses(top_rated) {
 }
 
 function show_recommended_courses(target) {
-    console.log("===Hey There===");
     $('#recommended_courses_ul').owlCarousel('destroy');
     $("#recommended_courses_ul ").html('');
+        var form = new FormData();
         var recommended_settings = {
         "url": target,
         "method": "GET",
@@ -1319,9 +1319,8 @@ function show_recommended_courses(target) {
     $("#recommended_courses_loader").css("display", "");
     $.ajax(recommended_settings).done(function(response) {
         $("#recommended_courses_loader").css("display", "None")
-        console.log(response);
         if (response['status_code'] == 200) {
-            //$('#recommended_courses_loader').css('display', '')
+            $('#heading_recommended_courses').css('display', '')
             $('.courses-listing').empty()
             pagination_next_url = response['result']['pagination']["next"];
 
@@ -1441,7 +1440,7 @@ function show_recommended_courses(target) {
             var viewedSlider_rec = $('#recommended_courses_ul');
 
             viewedSlider_rec.owlCarousel({
-                loop: true,
+                loop: false,
                 margin: 20,
                 autoplay: false,
                 autoplayTimeout: 6000,

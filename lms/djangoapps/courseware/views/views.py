@@ -274,10 +274,8 @@ def courses(request):
     if difficulty_level_id == "":
         difficulty_level_id = None
     mode = request.GET.get('mode', '')
-    logging.info("==============")
     # if request.GET.keys()
-    logging.info(len(request.GET.keys()))
-    logging.info("==============")
+
     if mode == "":
         mode = None
     category = sub_category = difficulty_level = None
@@ -357,25 +355,20 @@ def courses(request):
         selected_category_name = category.name
     elif sub_category:
         selected_category_name = '{} - {}'.format(sub_category.category.name, sub_category.name)
+
     banner_list = Banner.objects.filter(platform__in = ['WEB', 'BOTH'], enabled=True)
 
     if len(request.GET.keys()) ==  0:
+
         show_categorized_view = True
-        logging.info("TURE========================")
-        logging.info(category_id)
+
     elif len(request.GET.keys()) > 0:
         if (difficulty_level_id==None) and (sort==None) and (mode==None) and (category_id==None) and (subcategory_id == None):
             show_categorized_view = True
-            logging.info("TURE========================")
-            logging.info(category_id)
         else:
             show_categorized_view = False
-            logging.info("========================")
-            logging.info(category_id)
     else:
         show_categorized_view = False
-        logging.info("========================")
-        logging.info(category_id)
     user_category = None
     user_extra_info = UserExtraInfo.objects.filter(user_id=request.user.id).first()
     if hasattr(user_extra_info, 'industry_id'):

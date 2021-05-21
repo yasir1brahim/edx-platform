@@ -418,9 +418,10 @@ section.find-courses {
               <%include file="course.html" args="course=course" />
             <h1>This is course </h1>
           </li> -->
+
         %endfor
         </ul>
-        %if user.is_authenticated:
+                          %if user.is_authenticated:
    <section class="card-slider-container">
 <input id="user_industry" type="hidden" value="${user_industry}">
 
@@ -492,7 +493,9 @@ section.find-courses {
    </section>
    <!-- to here -->
 
+
       </section>
+
     ## in case there are courses that are not shown on the homepage, a 'View all Courses' link should appear
       % if homepage_course_max and len(courses) > homepage_course_max:
       <div class="courses-more">
@@ -648,10 +651,9 @@ $(document).ready(function() {
 
 // Till here
 
-show_most_popular_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4");
-show_free_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4");
-show_top_rated_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4");
-
+    show_most_popular_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4");
+    show_free_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4");
+    show_top_rated_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-ratings&page=1&page_size=4");
 
 });
 
@@ -700,7 +702,7 @@ function show_most_popular_courses(target) {
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
                 course_image = response['result']['results'][i]['image'];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
@@ -722,7 +724,7 @@ function show_most_popular_courses(target) {
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">
@@ -860,7 +862,7 @@ function show_free_courses(target) {
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
                 course_image = response['result']['results'][i]['image'];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
@@ -878,7 +880,7 @@ function show_free_courses(target) {
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">
@@ -1016,7 +1018,7 @@ function show_top_rated_courses(top_rated) {
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]["id"];
                 course_name = response['result']['results'][i]['name'];
                 course_image = response['result']['results'][i]['image'];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
@@ -1038,7 +1040,7 @@ function show_top_rated_courses(top_rated) {
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">
@@ -1175,7 +1177,7 @@ function show_recommended_courses(target) {
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
                 course_image = response['result']['results'][i]['image'];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
@@ -1197,7 +1199,7 @@ function show_recommended_courses(target) {
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">

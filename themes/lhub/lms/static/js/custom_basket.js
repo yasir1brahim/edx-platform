@@ -393,8 +393,6 @@ $(document).ready(function() {
 
            available_vouchers = response['result']['result'][i]['available_vouchers']
 
-           console.log("voucher>>", available_vouchers)
-
            if (available_vouchers.length > 0)
                 {
                    course+=`<div class="coupon_details">` 

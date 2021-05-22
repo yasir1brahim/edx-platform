@@ -125,10 +125,13 @@ class Ecommerce_Coupon(APIView):
             end_datetime_str = ecommerce_data['end_datetime']
             end_datetime = datetime.strptime(end_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
 
+            coupon_code = ecommerce_data['coupon_code']
+            coupon_code = coupon_code.upper()
+
             ecommerce_coupon.update(
                 associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id'],
                 name = ecommerce_data['name'],
-                coupon_code = ecommerce_data['coupon_code'],
+                coupon_code = coupon_code,
                 start_datetime = start_datetime,
                 end_datetime = end_datetime,
                 incentive_type = ecommerce_data['incentive_type'],
@@ -167,10 +170,14 @@ class Ecommerce_Coupon(APIView):
             end_datetime_str = ecommerce_data['end_datetime']
             end_datetime = datetime.strptime(end_datetime_str[:19], '%Y-%m-%d %H:%M:%S')
 
+            coupon_code = ecommerce_data['coupon_code']
+            coupon_code = coupon_code.upper()
+
+
             ecommerce_coupon = Coupon(
                 associated_ecommerce_coupon_id = ecommerce_data['associated_ecommerce_coupon_id'],
                 name = ecommerce_data['name'],
-                coupon_code = ecommerce_data['coupon_code'],
+                coupon_code = coupon_code,
                 start_datetime = start_datetime,
                 end_datetime = end_datetime,
                 incentive_type = ecommerce_data['incentive_type'],

@@ -130,7 +130,7 @@ span.main_price_cut {
     padding: 4px 0px 0px 0px;
     margin-top: 12px;
     color: #7f7f7f;
-    font-size: 16px;
+    font-size: 13px;
 }
 
 .card-slider-container span.crd-sldr-course-info-title,
@@ -415,7 +415,22 @@ section.find-courses {
   100% { transform: rotate(360deg); }
 }
 
-
+.coupon_details {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+}
+.coupon_details p {
+    display: flex;
+    margin: 0px;
+    line-height: 1.4;
+    justify-content: flex-end;
+}
+.coupon_details span.coupen_code_value {
+    font-size: 12px;
+    color: #ed9800;
+    font-weight: 600;
+}
 
 </style>
 
@@ -467,6 +482,59 @@ section.find-courses {
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="find-courses">
       <section class="courses-container">
+      	<div class="carousel">
+   <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+            <ul class="carousel-indicators">
+        % if banner_list:
+            % for y in banner_list:
+                % if loop.index==1:
+                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" class="active"></li>
+                % else:
+                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" ></li>
+                % endif
+            % endfor
+        % endif
+            </ul>
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner">
+            % if banner_list:
+                % for y in banner_list:
+                        % if loop.index==1:
+                        <div class="item active" >
+                            <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
+                            <img src="${y.banner_img_url_txt}"  class="d-block w-100 p-0">
+                                </a>
+                        <div class="carousel-caption">
+                            <h4 >${y.course_over_view.display_name_with_default}</h4>
+                        </div>
+                        </div>
+                        % else:
+                        <div class="item">
+                             <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
+                            <img src="${y.banner_img_url_txt}"  class="d-block w-100 p-0">
+                             </a>
+                        <div class="carousel-caption">
+                            <h3>${y.course_over_view.display_name_with_default}</h3>
+                        </div>
+                        </div>
+                        % endif
+                % endfor
+            % endif
+            </div>
+
+    <!-- Left and right controls -->
+    <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right"></span>
+      <span class="sr-only">Next</span>
+    </a>
+
+  </div>
+</div>
         % if course_discovery_enabled:
         <div id="discovery-form" role="search" aria-label="course" class="wrapper-search-context">
           <div id="discovery-message" class="search-status-label"></div>
@@ -523,62 +591,10 @@ section.find-courses {
       <section class="card-slider-container">
       <div class="slider-heading">
       <h2 class="card-slider-title" style="">Most Popular Courses</h2>
-      <a href="/courses?sort=-enrollments">View All</a>
+      <a href="/courses?sort=enrollments">View All</a>
       </div>
 
-	<div class="carousel">
-   <div id="myCarousel" class="carousel slide" data-ride="carousel">
-    <!-- Indicators -->
-            <ul class="carousel-indicators">
-        % if banner_list:
-            % for y in banner_list:
-                % if loop.index==1:
-                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" class="active"></li>
-                % else:
-                    <li data-target="#myCarousel" data-slide-to="${y.slide_position}" ></li>
-                % endif
-            % endfor
-        % endif
-            </ul>
-            <!-- Wrapper for slides -->
-            <div class="carousel-inner">
-            % if banner_list:
-                % for y in banner_list:
-                        % if loop.index==1:
-                        <div class="item active" >
-                            <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
-                            <img src="${y.banner_img_url_txt}"  class="d-block w-100 p-0">
-                                </a>
-                        <div class="carousel-caption">
-                            <h4 >${y.course_over_view.display_name_with_default}</h4>
-                        </div>
-                        </div>
-                        % else:
-                        <div class="item">
-                             <a href="${reverse('about_course', args=[str(y.course_over_view.id)])}">
-                            <img src="${y.banner_img_url_txt}"  class="d-block w-100 p-0">
-                             </a>
-                        <div class="carousel-caption">
-                            <h3>${y.course_over_view.display_name_with_default}</h3>
-                        </div>
-                        </div>
-                        % endif
-                % endfor
-            % endif
-            </div>
 
-    <!-- Left and right controls -->
-    <a class="left carousel-control" href="#myCarousel" data-slide="prev">
-      <span class="glyphicon glyphicon-chevron-left"></span>
-      <span class="sr-only">Previous</span>
-    </a>
-    <a class="right carousel-control" href="#myCarousel" data-slide="next">
-      <span class="glyphicon glyphicon-chevron-right"></span>
-      <span class="sr-only">Next</span>
-    </a>
-
-  </div>
-</div>
 
       <div class="card-slider-courses">
             <div class="loader-sec" id = "most_popular_loader" style="display:none;">
@@ -651,11 +667,18 @@ var top_prev_url;
 var recommended_next_url;
 var recommended_prev_url;
 var viewedSlider_top = $('#top_rated_ul');
+var viewedSlider_rec = $("#recommended_courses_ul");
+var viewedSlider_free = $("#free_courses_ul");
+var viewedSlider_top = $("#top_rated_ul");
 $(document).ready(function() {
 
 $('#rec_id').click(function() {
-    window.location.href = window.location.protocol + "//" + window.location.host + "/courses?category_id=" + $("#user_industry").val();
+
+    window.location.href = window.location.protocol + "//" + window.location.host + "/courses?category=" + $("#user_industry").val();
     return false;
+    %if show_categorized_view == True:
+    show_categorized_view = False
+    %endif
 });
 
 
@@ -790,9 +813,9 @@ $('#rec_id').click(function() {
 %if show_categorized_view:
     show_most_popular_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-enrollments_count&page=1&page_size=4");
     show_free_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&sale_type=free&page=1&page_size=4");
-    show_top_rated_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-rating&page=1&page_size=4");
+    show_top_rated_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&ordering=-ratings&page=1&page_size=4");
 %if user.is_authenticated:
-    show_recommended_courses(window.location.protocol + '//' + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&category=0&page=1&page_size=4");
+    show_recommended_courses(window.location.protocol + "//" + window.location.host + "/api/commerce/v2/web/courses/?platform_visibility=web&category=" + $("#user_industry").val() + "&page=1&page_size=4");
 %endif
 %endif
 
@@ -828,7 +851,7 @@ function show_most_popular_courses(target) {
             $('.courses-listing').empty()
         pagination_popular_url = response['result']['pagination']["next"];
         if( pagination_popular_url != null){
-            $("#top_next_btn").css("display","");
+            $("#popular_next_btn").css("display","");
             popular_next_url = pagination_popular_url;
         }
         else {
@@ -844,9 +867,9 @@ function show_most_popular_courses(target) {
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -856,17 +879,17 @@ function show_most_popular_courses(target) {
                 course_start = response['result']['results'][i]['start_date'];
                 course_discount_applicable = response['result']['results'][i]['discount_applicable'];
                 course_price = response['result']['results'][i]['modes'][0]['price'];
-                if (course_price == 0) {
-                    course_price = "Free"
+               /* if (course_price == 0) {
+                    course_price = "Free" ;
                 } else {
-                    course_price = "S$" + course_price
-                }
+                    course_price = "S$" + course_price ;
+                }*/
                 course_discounted_price = response['result']['results'][i]['discounted_price'];
                 course_discount_percentage = response['result']['results'][i]['discount_percentage'];
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">
@@ -904,8 +927,29 @@ function show_most_popular_courses(target) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                            </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">`
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>
@@ -967,7 +1011,7 @@ function show_free_courses(target) {
             $('.courses-listing').empty();
         pagination_free_url = response['result']['pagination']["next"];
         if( pagination_free_url != null){
-            $("#top_next_btn").css("display","");
+            $("#free_next_btn").css("display","");
             free_next_url = pagination_free_url;
         }
         else {
@@ -983,9 +1027,9 @@ function show_free_courses(target) {
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -1001,7 +1045,7 @@ function show_free_courses(target) {
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">
@@ -1039,8 +1083,29 @@ function show_free_courses(target) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                           </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">`
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>
@@ -1118,9 +1183,9 @@ function show_top_rated_courses(top_rated) {
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -1130,17 +1195,16 @@ function show_top_rated_courses(top_rated) {
                 course_start = response['result']['results'][i]['start_date'];
                 course_discount_applicable = response['result']['results'][i]['discount_applicable'];
                 course_price = response['result']['results'][i]['modes'][0]['price'];
-                if (course_price == 0) {
+                /*                if (course_price == 0) {
                     course_price = "Free"
                 } else {
                     course_price = "S$" + course_price
-                }
+                }*/
                 course_discounted_price = response['result']['results'][i]['discounted_price'];
                 course_discount_percentage = response['result']['results'][i]['discount_percentage'];
-
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">
@@ -1178,8 +1242,29 @@ function show_top_rated_courses(top_rated) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                           </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">`
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>
@@ -1217,9 +1302,9 @@ function show_top_rated_courses(top_rated) {
 }
 
 function show_recommended_courses(target) {
-    console.log("===Hey There===");
     $('#recommended_courses_ul').owlCarousel('destroy');
     $("#recommended_courses_ul ").html('');
+        var form = new FormData();
         var recommended_settings = {
         "url": target,
         "method": "GET",
@@ -1234,9 +1319,8 @@ function show_recommended_courses(target) {
     $("#recommended_courses_loader").css("display", "");
     $.ajax(recommended_settings).done(function(response) {
         $("#recommended_courses_loader").css("display", "None")
-        console.log(response);
         if (response['status_code'] == 200) {
-            //$('#recommended_courses_loader').css('display', '')
+            $('#heading_recommended_courses').css('display', '')
             $('.courses-listing').empty()
             pagination_next_url = response['result']['pagination']["next"];
 
@@ -1251,14 +1335,17 @@ function show_recommended_courses(target) {
                 $("#recommended_prev_btn").css("display","");
                 recommended_prev_url = response['result']['pagination']['previous'];
             }
+            else {
+            $("#recommended_prev_btn").css("display","None");
+            }
 
 
             for (var i = 0; i < response['result']['results'].length; i++) {
                 course_id = response['result']['results'][i]['course_number'];
                 course_org = response['result']['results'][i]['organization'];
-                course_code = response['result']['results'][i]['code'];
+                course_code = response['result']['results'][i]['id'];
                 course_name = response['result']['results'][i]['name'];
-                course_image = response['result']['results'][i]['image'];
+                course_image = response['result']['results'][i]["media"]['image']["raw"];
                 course_difficulty_level = response['result']['results'][i]['difficulty_level'];
                 course_enrollments_count = response['result']['results'][i]['enrollments_count'];
                 course_ratings = response['result']['results'][i]['ratings'];
@@ -1268,17 +1355,18 @@ function show_recommended_courses(target) {
                 course_start = response['result']['results'][i]['start_date'];
                 course_discount_applicable = response['result']['results'][i]['discount_applicable'];
                 course_price = response['result']['results'][i]['modes'][0]['price'];
-                if (course_price == 0) {
+                /*                if (course_price == 0) {
                     course_price = "Free"
                 } else {
                     course_price = "S$" + course_price
-                }
+                }*/
                 course_discounted_price = response['result']['results'][i]['discounted_price'];
                 course_discount_percentage = response['result']['results'][i]['discount_percentage'];
+                available_vouchers = response['result']['results'][i]['available_vouchers'];
 
                 var course = `<li class="card-slider-card-items owl-item">
                <article class="card-slider-course">
-                  <a href="#">
+                  <a href="/courses/`+course_code+`/about">
                      <header class="card-slider-card-img-cont">
                         <div class="card-slider-card-cover-img">
                            <img src="` + course_image + `" alt="` + course_name + `">
@@ -1316,8 +1404,29 @@ function show_recommended_courses(target) {
                                 course +=`
 
                               </ul>
-                           </div>
-                        </h2>
+                          </div>`
+
+                           available_vouchers = response['result']['results'][i]['available_vouchers'];
+                           if (available_vouchers.length > 0)
+                                {
+                                   course+=`<div class="coupon_details">`
+                                  for (var j=0; j < available_vouchers.length; j++)
+                                  {
+                                        if (available_vouchers[j]["discount_type"] == 'Absolute')
+                                        {
+
+                                           course+= `<p><span class="coupen_code_value"><i class="fa fa-check"></i>`+ available_vouchers[j]["code"] +` -S$` + available_vouchers[j]["discount_value"]+`</span></p>`
+                                        }
+                                        else
+                                        {
+
+                                         course+=   `<p><span class="coupen_code_value"><i class="fa fa-check"></i>` +available_vouchers[j]["code"]+ ` -`+available_vouchers[j]["discount_value"]+`%</span></p>`
+                                        }
+                                    }
+                            course+=`</div>`
+                        }
+
+                        course+=`</h2>
                         <div class="crd-sldr-course-info-date" aria-hidden="true" data-format="shortDate" data-datetime="2013-02-05T05:00:00+0000" data-language="en" data-string="Starts: {date}">Starts: ` + course_start + `</div>
                      </div>
                   </a>
@@ -1331,7 +1440,7 @@ function show_recommended_courses(target) {
             var viewedSlider_rec = $('#recommended_courses_ul');
 
             viewedSlider_rec.owlCarousel({
-                loop: true,
+                loop: false,
                 margin: 20,
                 autoplay: false,
                 autoplayTimeout: 6000,
